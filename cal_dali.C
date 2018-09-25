@@ -81,6 +81,9 @@ int main(int argc, char *argv[]){
   Double_t Dist_BDC1Target = env_geo->GetValue("Dist_BDC1Target",0.0); //mm
   Double_t Dist_BDC1FDC1 = env_geo->GetValue("Dist_BDC1FDC1",0.0); //Distance between the middle of BDC1 and the middle of FDC1 mm
   Double_t Dist_SBTTarget = env_geo->GetValue("Dist_SBTTarget",0.0); //mm
+
+  Double_t MINOSoffsetZ = env_geo->GetValue("MINOSoffsetZ",0.0); //offset of vertexZ. [mm]
+  
   //=====Load ANAROOT parameters===========================================
   TArtStoreManager *sman = TArtStoreManager::Instance();
   TArtBigRIPSParameters *BigRIPSPara = TArtBigRIPSParameters::Instance();
@@ -231,6 +234,8 @@ int main(int argc, char *argv[]){
 
   Int_t br56sc, br56ca, br55ca, br54ca, br53ca, br52ca;
   Int_t sa56ca, sa55ca, sa54ca, sa53ca, sa52ca, sa55k;
+
+  Double_t vertexZ_cor;
   
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
@@ -259,6 +264,8 @@ int main(int argc, char *argv[]){
   tr->Branch("sa53ca",&sa53ca);
   tr->Branch("sa52ca",&sa52ca);
   tr->Branch("sa55k",&sa55k);
+
+  tr->Branch("vertexZ_cor",&vertexZ_cor);
   
   
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
@@ -324,6 +331,8 @@ int main(int argc, char *argv[]){
     sa53ca = 0;
     sa52ca = 0;
     sa55k  = 0;
+
+    vertexZ_cor = 0;
     
     CalibDALI->ReconstructData();
     
@@ -372,6 +381,32 @@ int main(int argc, char *argv[]){
       //   SortDaliHit(0,DALI_Mult-1, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
     }
 
+    vertexZ_cor = vertexZ + MINOSoffsetZ;
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
     //===== PID cut =====
     if(cbr56ca->IsInside(aoqBR,zetBR)) br56ca = 1;
     if(cbr55ca->IsInside(aoqBR,zetBR)) br55ca = 1;
@@ -383,7 +418,7 @@ int main(int argc, char *argv[]){
     if(csa54ca->IsInside(aoqSA,zetSA)) sa54ca = 1;
     if(csa53ca->IsInside(aoqSA,zetSA)) sa53ca = 1;
     if(csa52ca->IsInside(aoqSA,zetSA)) sa52ca = 1;
-    if(csa55k->IsInside(aoqSA,zetSA)) sa55k = 1;
+    if(csa55k->IsInside(aoqSA,zetSA))  sa55k  = 1;
 
     
     tr ->Fill();
@@ -408,6 +443,17 @@ int main(int argc, char *argv[]){
   
   return 0;
 }//main()
+
+
+
+
+
+
+
+
+
+
+
 
 void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_EnergyDopplerCorrected, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_CosTheta)
 {
