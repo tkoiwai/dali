@@ -412,16 +412,16 @@ int main(int argc, char *argv[]){
 
   //===== LOOP
   int nEntry = anatrB->GetEntries();
-  //for(int iEntry=0;iEntry<nEntry;iEntry++){
-  for(int iEntry=0;iEntry<5;iEntry++){
-
+  for(int iEntry=0;iEntry<nEntry;iEntry++){
+    //for(int iEntry=0;iEntry<5;iEntry++){
+    
     if(iEntry%100==0&&iEntry!=0) clog << iEntry/1000 << "k events treated..." << "\r";
-
+    
     anatrB->GetEntry(iEntry);
-
+    
     runnum   = RunNumber_beam;
     eventnum = EventNumber_beam;
-
+    
     //=== init
     int dali_multi = 0;
     for(unsigned int j=0;j<DALI_ID->size();j++){
@@ -443,99 +443,33 @@ int main(int argc, char *argv[]){
     
     dali_ab->clear();
     dali_ab_ecor->clear();
-    //dali_pos->clear();
-    //dali_multi = DALI_Multi;
-    cout << "DALI_Multi " << DALI_Multi << endl;
-    cout << "dali_multi " << dali_multi << endl;
-    cout << "dali_e->size() " << dali_e->size() << endl;
-
+    
     //=== calc
-    /*
-    double tmpx = Sqrt(-1);
-    double tmpy = Sqrt(-1);
-    double tmpz = Sqrt(-1);
-    for(int i=0;i<dali_id->size();i++){
-      tmpx = dali_x->at(i);
-      tmpy = dali_y->at(i);
-      tmpz = dali_z->at(i);
-      dali_pos->at(i) = TVector3(tmpx,tmpy,tmpz);
-    }
-    */
     
     if(dali_multi>1){
 
-      //SortDaliHit(0,dali_multi-1, dali_id, dali_e, dali_t, dali_x, dali_y, dali_z, dali_cos);
-      Int_t TempID;
-      Double_t TempEnergy;
-      Double_t TempTime;
-      Double_t TempX;
-      Double_t TempY;
-      Double_t TempZ;
-      Double_t TempCosTheta;
-      
-      int i = 0;
-      int j = dali_multi-1;
-      int k = floor((i + j) / 2);
-      
-      double pivot = dali_e->at(k);
-      cout << "pivot " << pivot << endl;
-      
-      //--partition---/
-      while (i <= j) {
-	while (dali_e->at(i) > pivot)
-	  i++;
-	cout << "i = " << i << endl; 
-	while (dali_e->at(j) < pivot)	   
-	  j--;
-	cout << "j = " << j << endl; 
-	if (i <= j) {
-	  TempID = dali_id->at(j);
-	  TempEnergy = dali_e->at(j);
-	  TempTime = dali_t->at(j);
-	  TempX = dali_x->at(j);
-	  TempY = dali_y->at(j);
-	  TempZ = dali_z->at(j);
-	  TempCosTheta = dali_cos->at(j);
-	  
-	  dali_id->at(j) = dali_id->at(i);
-	  dali_e->at(j) = dali_e->at(i);
-	  dali_t->at(j) = dali_t->at(i);
-	  dali_x->at(j) = dali_x->at(i);
-	  dali_y->at(j) = dali_y->at(i);
-	  dali_z->at(j) = dali_z->at(i);
-	  dali_cos->at(j) = dali_cos->at(i);
-	  
-	  dali_id->at(i) = TempID;
-	  dali_e->at(i) = TempEnergy;
-	  dali_t->at(i) = TempTime;
-	  dali_x->at(i) = TempX;
-	  dali_y->at(i) = TempY;
-	  dali_z->at(i) = TempZ;
-	  dali_cos->at(i) = TempCosTheta;
-	  
-	  i++;
-	  j--;
-	}
-      };
-    }
+      SortDaliHit(0,dali_multi-1, dali_id, dali_e, dali_t, dali_x, dali_y, dali_z, dali_cos);
+     
+
+      double tmp_abenergy = 0;
     
-    dali_ab->at(0) = dali_e->at(0);
-    
-    for(unsigned int i=1;i<dali_id->size();i++){
-      for(int j=0;j<7;j++){
-	if(dali_id->at(i)==ab_crystal_id[dali_id->at(0)][j]){
-	  dali_ab->at(0) += dali_e->at(i);
+      for(unsigned int i=1;i<dali_id->size();i++){
+	for(int j=0;j<7;j++){
+	  if(dali_id->at(i)==ab_crystal_id[dali_id->at(0)][j]){
+	    //dali_ab->at(0) += dali_e->at(i);
+	    tmp_abenergy += dali_e->at(i);
+	  }
+	  else continue;
 	}
-	else continue;
+	dali_ab->push_back(tmp_abenergy);
       }
-    }
+      
+    }    
+    
+    
+    
 
-
-
-
-		    
-
-
+    
 
 
 
@@ -545,7 +479,7 @@ int main(int argc, char *argv[]){
   anatrD->Write();
   ofile->Close();
 }//main()
-/*
+  /*
 void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *dali_id,vector <Double_t> *dali_e,vector <Double_t> *dali_t, vector <Double_t> *dali_cos)
 {
   Int_t TempID;
@@ -588,7 +522,7 @@ void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *dali_id,vector <Double_
   if (i < right)
     SortDaliHit(i, right, dali_id, dali_e, dali_t, dali_cos);
 }
-*/
+  */
 void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_X, vector <Double_t> *DALI_Y, vector <Double_t> *DALI_Z, vector <Double_t> *DALI_CosTheta)
 {
   Int_t TempID;
