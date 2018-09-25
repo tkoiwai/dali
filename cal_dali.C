@@ -125,9 +125,14 @@ int main(int argc, char *argv[]){
   infileB->GetObject("anatrB",anatrB);
 
   Double_t zetBR, aoqBR;
+  Double_t betaF7F13, betaF3F13, bammaF7F13, gammaF3F13;
 
   anatrB->SetBranchAddress("zetBR",&zetBR);
   anatrB->SetBranchAddress("aoqBR",&aoqBR);
+  anatrB->SetBranchAddress("betaF7F13",&betaF7F13);
+  anatrB->SetBranchAddress("betaF3F13",&betaF3F13);
+  anatrB->SetBranchAddress("gammaF7F13",&gammaF7F13);
+  anatrB->SetBranchAddress("gammaF3F13",&gammaF3F13);
 
   //===== Load smri file for PID cut =====
   TString infnameS = Form("/home/koiwai/analysis/rootfiles/ana/smri/ana_smri%04d.root",FileNumber);
@@ -136,11 +141,30 @@ int main(int argc, char *argv[]){
   infileS->GetObject("anatrS",anatrS);
 
   Double_t zetSA, aoqSA;
+  Double_t beta_minoshodo, gamma_minoshodo;
 
   anatrS->SetBranchAddress("zetSA",&zetSA);
   anatrS->SetBranchAddress("aoqSA",&aoqSA);
+  anatrS->SetBranchAddress("beta_minoshodo",&beta_minoshodo);
+  anatrS->SetBranchAddress("gamma_minoshodo",&gamma_minoshodo);
 
+  //===== Load MINOS file =====
+  TString infnameM = Form("/home/koiwai/analysis/rootfiles/minos/vertex/vertex%04d.root",FileNumber);
+  TFile   *infileM = TFile::Open(infnameM);
+  TTree   *trM;
+  infileM->GetObject("tr",trM);
+  
+  Double_t vertexX, vertexY, vertexZ, vertexTheta, vertexPhi, theta2p;
+
+  trM->SetBranchAddress("vertexX",&vertexX);
+  trM->SetBranchAddress("vertexY",&vertexY);
+  trM->SetBranchAddress("vertexZ",&vertexZ);
+  trM->SetBranchAddress("vertexTheta",&vertexTheta);
+  trM->SetBranchAddress("vertexPhi",&vertexPhi);
+  trM->SetBranchAddress("theta2p",&theta2p);
+  
   anatrB->AddFriend(anatrS);
+  anatrB->AddFriend(trM);
   
   //===== Load cut files -----
   TFile *brcuts = new TFile("/home/koiwai/analysis/cutfiles/BRpid.root","");
