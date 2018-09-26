@@ -474,9 +474,15 @@ int main(int argc, char *argv[]){
   Double_t beta_vertex;
 
   Int_t    dali_multi_ab;
-  vector<Double_t> *dali_e_ab  = new vector<Double_t>();
-  vector<Int_t>    *dali_id_ab = new vector<Int_t>();
-
+  vector<Double_t> *dali_e_ab     = new vector<Double_t>();
+  vector<Int_t>    *dali_id_ab    = new vector<Int_t>();
+  vector<Double_t> *dali_cos_ab   = new vector<Double_t>();
+  vector<Double_t> *dali_t_ab     = new vector<Double_t>();
+  vector<Double_t> *dali_layer_ab = new vector<Double_t>();
+  vector<Double_t> *dali_x_ab     = new vector<Double_t>();
+  vector<Double_t> *dali_y_ab     = new vector<Double_t>();
+  vector<Double_t> *dali_z_ab     = new vector<Double_t>();
+ 
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
   tr->Branch("DALI_Energy",&DALI_Energy);
@@ -511,6 +517,11 @@ int main(int argc, char *argv[]){
   tr->Branch("dali_multi_ab",&dali_multi_ab);
   tr->Branch("dali_e_ab",&dali_e_ab);
   tr->Branch("dali_id_ab",&dali_id_ab);
+  tr->Branch("dali_t_ab",&dali_t_ab);
+  tr->Branch("dali_layer_ab",&dali_layer_ab);
+  tr->Branch("dali_x_ab",&dali_x_ab);
+  tr->Branch("dali_y_ab",&dali_y_ab);
+  tr->Branch("dali_z_ab",&dali_z_ab);
   //tr->Branch("",&);
   
   tr->Branch("vertexZ",&vertexZ);
@@ -585,6 +596,11 @@ int main(int argc, char *argv[]){
 
     dali_e_ab->clear();
     dali_id_ab->clear();
+    dali_t_ab->clear();
+    dali_x_ab->clear();
+    dali_y_ab->clear();
+    dali_z_ab->clear();
+    dali_layer_ab->clear();
     dali_multi_ab = 0;
     
     CalibDALI->ReconstructData();
@@ -669,12 +685,19 @@ int main(int argc, char *argv[]){
 	if(AddBack_flag==false){
 	  dali_e_ab->push_back(DALI_Energy->at(i));
 	  dali_id_ab->push_back(DALI_ID->at(i));
+	  dali_t_ab->push_back(DALI_Time->at(i));
+	  dali_x_ab->push_back(DALI_X->at(i));
+	  dali_y_ab->push_back(DALI_Y->at(i));
+	  dali_z_ab->push_back(DALI_Z->at(i));
+	  dali_layer_ab->push_back(DALI_Layer->at(i));
 	}
       }
       
       dali_multi_ab = dali_id_ab->size();
       
     }//DALI_Multi>1
+
+
     
 
 
@@ -727,6 +750,11 @@ int main(int argc, char *argv[]){
 
   delete dali_e_ab;
   delete dali_id_ab;
+  delete dali_t_ab;
+  delete dali_x_ab;
+  delete dali_y_ab;
+  delete dali_z_ab;
+  delete dali_layer_ab;
   
   return 0;
 }//main()
