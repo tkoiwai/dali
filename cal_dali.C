@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
   }
   
   //=====Load setting parameters=========================================
-  TEnv *env_par = new TEnv("./conversion_settings.prm");
+  TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
   TEnv *env_geo = new TEnv(env_par->GetValue("geometrydata","")); //unit of length:mm
   Double_t Dist_F5F7 = env_geo->GetValue("Dist_F5F7",0.0);
   Double_t Dist_F7F13 = env_geo->GetValue("Dist_F7F13",0.0);
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]){
       DALIPara->LoadParameter((char*)xmlfile->GetName());
   }
   
-
+  //cout << "ok" << endl;
   //Load detectors.
   TArtCalibDALI *CalibDALI = new TArtCalibDALI();
   
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]){
   infileB->GetObject("anatrB",anatrB);
 
   Double_t zetBR, aoqBR;
-  Double_t betaF7F13, betaF3F13, bammaF7F13, gammaF3F13;
+  Double_t betaF7F13, betaF3F13, gammaF7F13, gammaF3F13;
 
   anatrB->SetBranchAddress("zetBR",&zetBR);
   anatrB->SetBranchAddress("aoqBR",&aoqBR);
@@ -236,6 +236,7 @@ int main(int argc, char *argv[]){
   Int_t sa56ca, sa55ca, sa54ca, sa53ca, sa52ca, sa55k;
 
   Double_t vertexZ_cor;
+  Double_t beta_vertex;
   
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
@@ -266,6 +267,9 @@ int main(int argc, char *argv[]){
   tr->Branch("sa55k",&sa55k);
 
   tr->Branch("vertexZ_cor",&vertexZ_cor);
+  tr->Branch("beta_vertex",&beta_vertex);
+
+  tr->Branch("vertexZ",&vertexZ);
   
   
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
@@ -332,7 +336,8 @@ int main(int argc, char *argv[]){
     sa52ca = 0;
     sa55k  = 0;
 
-    vertexZ_cor = 0;
+    vertexZ_cor = Sqrt(-1);
+    beta_vertex = Sqrt(-1);
     
     CalibDALI->ReconstructData();
     
@@ -382,6 +387,8 @@ int main(int argc, char *argv[]){
     }
 
     vertexZ_cor = vertexZ + MINOSoffsetZ;
+
+    beta_vertex = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ/150.0;
 
     
 
