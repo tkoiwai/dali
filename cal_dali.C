@@ -21,6 +21,7 @@
 #include <vector>
 #include "TMath.h"
 #include "TCutG.h"
+#include "TInterpreter.h"
 
 //ANAROOT headers
 #include "TArtStoreManager.hh" //I/O of data and parameter
@@ -44,6 +45,7 @@
 #include "TArtDALIParameters.hh"
 
 
+
 using namespace TMath;
 
 #define WriteOneEnvFile(file) file->Write(TString(TString(file->GetRcName()).ReplaceAll("/","_")).ReplaceAll(".","_")); // / toka . no youna moji wo _ ni replace surudake.
@@ -57,6 +59,9 @@ inline bool exists_test(const std::string&);
 inline bool exists_test(const TString&);
 //=====main Function==========================================================
 int main(int argc, char *argv[]){
+
+  gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h");
+  
   Long64_t MaxEventNumber = LLONG_MAX; //signed 8bit int. LLOMG_MAX ~ 2^63-1(const.)
   
   Int_t FileNumber = TString(argv[1]).Atoi();
@@ -85,7 +90,8 @@ int main(int argc, char *argv[]){
   Double_t Dist_BDC1Target = env_geo->GetValue("Dist_BDC1Target",0.0); //mm
   Double_t Dist_BDC1FDC1 = env_geo->GetValue("Dist_BDC1FDC1",0.0); //Distance between the middle of BDC1 and the middle of FDC1 mm
   Double_t Dist_SBTTarget = env_geo->GetValue("Dist_SBTTarget",0.0); //mm
-
+  Double_t Dist_MINOSfrontFDC1 = env_geo->GetValue("Dist_MINOSfrontFDC1",0.0); //mm
+  
   Double_t MINOSoffsetZ = env_geo->GetValue("MINOSoffsetZ",0.0); //offset of vertexZ. [mm]
   
   //=====Load ANAROOT parameters===========================================
@@ -169,9 +175,24 @@ int main(int argc, char *argv[]){
   trM->SetBranchAddress("vertexTheta",&vertexTheta);
   trM->SetBranchAddress("vertexPhi",&vertexPhi);
   trM->SetBranchAddress("theta2p",&theta2p);
+
+  //===== Load DC file =====
+  TString infnameDC = Form("/home/koiwai/analysis/rootfiles/ana/mwdc/ana_mwdc%04d.root",FileNumber);
+  TFile   *infileDC = TFile::Open(infnameDC);
+  TTree   *trDC;
+  infileDC->GetObject("anatrDC",trDC);
+
+  Double_t FDC1_X, FDC1_Y, FDC1_A, FDC1_B;
+
+  trDC->SetBranchAddress("FDC1_X",&FDC1_X);
+  trDC->SetBranchAddress("FDC1_Y",&FDC1_Y);
+  trDC->SetBranchAddress("FDC1_A",&FDC1_A);
+  trDC->SetBranchAddress("FDC1_B",&FDC1_B);
+
   
   anatrB->AddFriend(anatrS);
   anatrB->AddFriend(trM);
+  anatrB->AddFriend(trDC);
   
   //===== Load cut files -----
   TFile *brcuts = new TFile("/home/koiwai/analysis/cutfiles/BRpid.root","");
@@ -483,23 +504,35 @@ int main(int argc, char *argv[]){
   vector<Double_t> *dali_y_ab     = new vector<Double_t>();
   vector<Double_t> *dali_z_ab     = new vector<Double_t>();
 
-  vector<Double_t> *dali_edop_ab     = new vector<Double_t>();
+  vector<Double_t> *dali_edop_ab  = new vector<Double_t>();
+
+  TVector3 vertex;
+  TVector3 fdc1;
+  vector<TVector3> dali_pos;
+
+  TVector3 beam;
+  vector<TVector3> gamma;
+
+  vector<Double_t> gamma_cos;
  
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
   tr->Branch("DALI_Energy",&DALI_Energy);
   tr->Branch("DALI_CosTheta",&DALI_CosTheta);
   tr->Branch("DALI_Time",&DALI_Time);
+
   tr->Branch("DALI_ID",&DALI_ID);
   tr->Branch("DALI_Layer",&DALI_Layer);
   tr->Branch("DALI_X",&DALI_X);
   tr->Branch("DALI_Y",&DALI_Y);
   tr->Branch("DALI_Z",&DALI_Z);
+
   //tr->Branch("DALI_Pos",&DALI_Pos);
   tr->Branch("DALI_Multi",&DALI_Multi);
   tr->Branch("source",&source);
 
   tr->Branch("br56sc",&br56sc);
+
   tr->Branch("br56ca",&br56ca);
   tr->Branch("br55ca",&br55ca);
   tr->Branch("br54ca",&br54ca);
@@ -531,6 +564,15 @@ int main(int argc, char *argv[]){
   //tr->Branch("",&);
   
   tr->Branch("vertexZ",&vertexZ);
+
+  tr->Branch("vertex",&vertex);
+  tr->Branch("fdc1",&fdc1);
+  tr->Branch("dali_pos",&dali_pos);
+
+  tr->Branch("gamma",&gamma);
+  tr->Branch("beam",&beam);
+
+  tr->Branch("gamma_cos",&gamma_cos);
   
   
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
@@ -612,6 +654,15 @@ int main(int argc, char *argv[]){
     dali_multi_ab = 0;
 
     dali_edop_ab->clear();
+
+    vertex.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    fdc1.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    dali_pos.clear();
+
+    beam.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    gamma.clear();
+
+    gamma_cos.clear();
     
     CalibDALI->ReconstructData();
     
@@ -687,6 +738,10 @@ int main(int argc, char *argv[]){
       dali_z_ab->push_back(DALI_Z->at(0));
       dali_layer_ab->push_back(DALI_Layer->at(0));
 
+
+
+      //===== ADD BACK =====
+      
       Bool_t AddBack_flag = false;
       
       for(Int_t i=1;i<DALI_Multi;i++){
@@ -726,11 +781,34 @@ int main(int argc, char *argv[]){
 
       dali_multi_ab = 1;
     }
+
+    //vector <TVector3> *DALI_Pos = new vector<TVector3>();    
     
+    vertex.SetXYZ(vertexX,vertexY,vertexZ);
+    fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1-vertexZ_cor);
+    for(Int_t i=0;i<dali_multi_ab;i++)
+      dali_pos.push_back(TVector3(dali_x_ab->at(i),dali_y_ab->at(i),dali_z_ab->at(i)));
+    
+    beam = fdc1 - vertex;
+    for(Int_t i=0;i<dali_multi_ab;i++){
+      TVector3 gamma_tmp;
+      gamma_tmp = dali_pos.at(i) - vertex;
+      gamma.push_back(gamma_tmp);
+    }
+
+    for(Int_t i=0;i<dali_multi_ab;i++){
+      gamma_cos.push_back(beam * (gamma.at(i)) / beam.Mag() / (gamma.at(i)).Mag());
+    }
+
+    
+
+
+    //===== DOPPLER CORRECTION =====
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	Double_t dali_edop_tmp = Sqrt(-1);
-	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*dali_cos_ab->at(i));
+	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*dali_cos_ab->at(i));
+	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*gamma_cos.at(i));
 	dali_edop_ab->push_back(dali_edop_tmp);
       }
     }
@@ -783,6 +861,7 @@ int main(int argc, char *argv[]){
   delete DALI_CosTheta;
   delete TArtStoreManager::Instance();
 
+  
   delete dali_e_ab;
   delete dali_id_ab;
   delete dali_cos_ab;
@@ -793,7 +872,15 @@ int main(int argc, char *argv[]){
   delete dali_layer_ab;
 
   delete dali_edop_ab;
-  
+  /*
+  delete vertex;
+  delete fdc1;
+  delete dali_pos;
+
+  delete beam;
+  delete gamma;
+  delete gamma_cos;
+  */
   return 0;
 }//main()
 
