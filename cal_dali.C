@@ -471,7 +471,7 @@ int main(int argc, char *argv[]){
   Int_t sa56ca, sa55ca, sa54ca, sa53ca, sa52ca, sa55k;
 
   Double_t vertexZ_cor;
-  Double_t beta_vertex;
+  Double_t beta_vertex, gamma_vertex;
 
   Int_t    dali_multi_ab;
   vector<Double_t> *dali_e_ab     = new vector<Double_t>();
@@ -482,6 +482,8 @@ int main(int argc, char *argv[]){
   vector<Double_t> *dali_x_ab     = new vector<Double_t>();
   vector<Double_t> *dali_y_ab     = new vector<Double_t>();
   vector<Double_t> *dali_z_ab     = new vector<Double_t>();
+
+  vector<Double_t> *dali_edop_ab     = new vector<Double_t>();
  
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
@@ -513,15 +515,19 @@ int main(int argc, char *argv[]){
 
   tr->Branch("vertexZ_cor",&vertexZ_cor);
   tr->Branch("beta_vertex",&beta_vertex);
+  tr->Branch("gamma_vertex",&gamma_vertex);
 
   tr->Branch("dali_multi_ab",&dali_multi_ab);
   tr->Branch("dali_e_ab",&dali_e_ab);
   tr->Branch("dali_id_ab",&dali_id_ab);
+  tr->Branch("dali_cos_ab",&dali_cos_ab);
   tr->Branch("dali_t_ab",&dali_t_ab);
   tr->Branch("dali_layer_ab",&dali_layer_ab);
   tr->Branch("dali_x_ab",&dali_x_ab);
   tr->Branch("dali_y_ab",&dali_y_ab);
   tr->Branch("dali_z_ab",&dali_z_ab);
+
+  tr->Branch("dali_edop_ab",&dali_edop_ab);
   //tr->Branch("",&);
   
   tr->Branch("vertexZ",&vertexZ);
@@ -591,17 +597,21 @@ int main(int argc, char *argv[]){
     sa52ca = 0;
     sa55k  = 0;
 
-    vertexZ_cor = Sqrt(-1);
-    beta_vertex = Sqrt(-1);
+    vertexZ_cor  = Sqrt(-1);
+    beta_vertex  = Sqrt(-1);
+    gamma_vertex = Sqrt(-1);
 
     dali_e_ab->clear();
     dali_id_ab->clear();
+    dali_cos_ab->clear();
     dali_t_ab->clear();
     dali_x_ab->clear();
     dali_y_ab->clear();
     dali_z_ab->clear();
     dali_layer_ab->clear();
     dali_multi_ab = 0;
+
+    dali_edop_ab->clear();
     
     CalibDALI->ReconstructData();
     
@@ -655,7 +665,8 @@ int main(int argc, char *argv[]){
 
     vertexZ_cor = vertexZ + MINOSoffsetZ;
 
-    beta_vertex = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ/150.0;
+    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ/150.0;
+    gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
 
     if(DALI_Multi>1){
       SortDaliHit(0,DALI_Multi-1,
@@ -669,6 +680,12 @@ int main(int argc, char *argv[]){
       
       dali_e_ab->push_back(DALI_Energy->at(0));
       dali_id_ab->push_back(DALI_ID->at(0));
+      dali_cos_ab->push_back(DALI_CosTheta->at(0));
+      dali_t_ab->push_back(DALI_Time->at(0));
+      dali_x_ab->push_back(DALI_X->at(0));
+      dali_y_ab->push_back(DALI_Y->at(0));
+      dali_z_ab->push_back(DALI_Z->at(0));
+      dali_layer_ab->push_back(DALI_Layer->at(0));
 
       Bool_t AddBack_flag = false;
       
@@ -685,6 +702,7 @@ int main(int argc, char *argv[]){
 	if(AddBack_flag==false){
 	  dali_e_ab->push_back(DALI_Energy->at(i));
 	  dali_id_ab->push_back(DALI_ID->at(i));
+	  dali_cos_ab->push_back(DALI_CosTheta->at(i));
 	  dali_t_ab->push_back(DALI_Time->at(i));
 	  dali_x_ab->push_back(DALI_X->at(i));
 	  dali_y_ab->push_back(DALI_Y->at(i));
@@ -696,9 +714,26 @@ int main(int argc, char *argv[]){
       dali_multi_ab = dali_id_ab->size();
       
     }//DALI_Multi>1
+    else if(DALI_Multi==1){
+      dali_e_ab->push_back(DALI_Energy->at(0));
+      dali_id_ab->push_back(DALI_ID->at(0));
+      dali_cos_ab->push_back(DALI_CosTheta->at(0));
+      dali_t_ab->push_back(DALI_Time->at(0));
+      dali_x_ab->push_back(DALI_X->at(0));
+      dali_y_ab->push_back(DALI_Y->at(0));
+      dali_z_ab->push_back(DALI_Z->at(0));
+      dali_layer_ab->push_back(DALI_Layer->at(0));
 
-
+      dali_multi_ab = 1;
+    }
     
+    if(dali_multi_ab>=1){
+      for(Int_t i=0;i<dali_multi_ab;i++){
+	Double_t dali_edop_tmp = Sqrt(-1);
+	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*dali_cos_ab->at(i));
+	dali_edop_ab->push_back(dali_edop_tmp);
+      }
+    }
 
 
 
@@ -750,11 +785,14 @@ int main(int argc, char *argv[]){
 
   delete dali_e_ab;
   delete dali_id_ab;
+  delete dali_cos_ab;
   delete dali_t_ab;
   delete dali_x_ab;
   delete dali_y_ab;
   delete dali_z_ab;
   delete dali_layer_ab;
+
+  delete dali_edop_ab;
   
   return 0;
 }//main()
