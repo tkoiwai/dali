@@ -807,8 +807,8 @@ int main(int argc, char *argv[]){
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	Double_t dali_edop_tmp = Sqrt(-1);
-	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*dali_cos_ab->at(i));
-	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1+beta_vertex*gamma_cos.at(i));
+	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i));
+	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
 	dali_edop_ab->push_back(dali_edop_tmp);
       }
     }
