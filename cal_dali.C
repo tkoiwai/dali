@@ -82,15 +82,17 @@ int main(int argc, char *argv[]){
   //=====Load setting parameters=========================================
   TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
   TEnv *env_geo = new TEnv(env_par->GetValue("geometrydata","")); //unit of length:mm
-  Double_t Dist_F5F7 = env_geo->GetValue("Dist_F5F7",0.0);
-  Double_t Dist_F7F13 = env_geo->GetValue("Dist_F7F13",0.0);
-  Double_t BDC1_Width = env_geo->GetValue("BDC1_Width",0.0); //mm
-  Double_t FDC1_Width = env_geo->GetValue("FDC1_Width",0.0); //mm
-  Double_t Dist_BDC1BDC2 = env_geo->GetValue("Dist_BDC1BDC2",0.0); //mm
-  Double_t Dist_BDC1Target = env_geo->GetValue("Dist_BDC1Target",0.0); //mm
-  Double_t Dist_BDC1FDC1 = env_geo->GetValue("Dist_BDC1FDC1",0.0); //Distance between the middle of BDC1 and the middle of FDC1 mm
-  Double_t Dist_SBTTarget = env_geo->GetValue("Dist_SBTTarget",0.0); //mm
+  Double_t Dist_F5F7           = env_geo->GetValue("Dist_F5F7",0.0);
+  Double_t Dist_F7F13          = env_geo->GetValue("Dist_F7F13",0.0);
+  Double_t BDC1_Width          = env_geo->GetValue("BDC1_Width",0.0); //mm
+  Double_t FDC1_Width          = env_geo->GetValue("FDC1_Width",0.0); //mm
+  Double_t Dist_BDC1BDC2       = env_geo->GetValue("Dist_BDC1BDC2",0.0); //mm
+  Double_t Dist_BDC1Target     = env_geo->GetValue("Dist_BDC1Target",0.0); //mm
+  Double_t Dist_BDC1FDC1       = env_geo->GetValue("Dist_BDC1FDC1",0.0); //Distance between the middle of BDC1 and the middle of FDC1 mm
+  Double_t Dist_BDCFDC1        = env_geo->GetValue("Dist_BDCFDC1",0.0); //Distance between the middle of BDC and FDC1 mm
+  Double_t Dist_SBTTarget      = env_geo->GetValue("Dist_SBTTarget",0.0); //mm
   Double_t Dist_MINOSfrontFDC1 = env_geo->GetValue("Dist_MINOSfrontFDC1",0.0); //mm
+  Double_t Dist_MINOSfrontBDC  = env_geo->GetValue("Dist_MINOSfrontBDC",0.0); //mm, negative value
   
   Double_t MINOSoffsetZ = env_geo->GetValue("MINOSoffsetZ",0.0); //offset of vertexZ. [mm]
   
@@ -182,8 +184,13 @@ int main(int argc, char *argv[]){
   TTree   *trDC;
   infileDC->GetObject("anatrDC",trDC);
 
+  Double_t BDC_X, BDC_Y, BDC_A, BDC_B;
   Double_t FDC1_X, FDC1_Y, FDC1_A, FDC1_B;
 
+  trDC->SetBranchAddress("BDC_X",&BDC_X);
+  trDC->SetBranchAddress("BDC_Y",&BDC_Y);
+  trDC->SetBranchAddress("BDC_A",&BDC_A);
+  trDC->SetBranchAddress("BDC_B",&BDC_B);
   trDC->SetBranchAddress("FDC1_X",&FDC1_X);
   trDC->SetBranchAddress("FDC1_Y",&FDC1_Y);
   trDC->SetBranchAddress("FDC1_A",&FDC1_A);
@@ -494,6 +501,8 @@ int main(int argc, char *argv[]){
   Double_t vertexZ_cor;
   Double_t beta_vertex, gamma_vertex;
 
+  Double_t beta_vertex_simple, gamma_vertex_simple;
+
   Int_t    dali_multi_ab;
   vector<Double_t> *dali_e_ab     = new vector<Double_t>();
   vector<Int_t>    *dali_id_ab    = new vector<Int_t>();
@@ -508,12 +517,18 @@ int main(int argc, char *argv[]){
 
   TVector3 vertex;
   TVector3 fdc1;
+  TVector3 bdc;
   vector<TVector3> dali_pos;
 
   TVector3 beam;
   vector<TVector3> gamma;
 
   vector<Double_t> gamma_cos;
+
+  vector<Double_t> *dali_edop_simple_ab  = new vector<Double_t>();
+  TVector3 vertex_simple;
+  TVector3 beam_simple;
+  vector<TVector3> gamma_simple;
  
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
@@ -550,6 +565,9 @@ int main(int argc, char *argv[]){
   tr->Branch("beta_vertex",&beta_vertex);
   tr->Branch("gamma_vertex",&gamma_vertex);
 
+  tr->Branch("beta_vertex_simple",&beta_vertex_simple);
+  tr->Branch("gamma_vertex_simple",&gamma_vertex_simple);
+
   tr->Branch("dali_multi_ab",&dali_multi_ab);
   tr->Branch("dali_e_ab",&dali_e_ab);
   tr->Branch("dali_id_ab",&dali_id_ab);
@@ -567,13 +585,18 @@ int main(int argc, char *argv[]){
 
   tr->Branch("vertex",&vertex);
   tr->Branch("fdc1",&fdc1);
+  tr->Branch("bdc",&bdc);
   tr->Branch("dali_pos",&dali_pos);
 
   tr->Branch("gamma",&gamma);
   tr->Branch("beam",&beam);
 
   tr->Branch("gamma_cos",&gamma_cos);
-  
+
+  tr->Branch("dali_edop_simple_ab",&dali_edop_simple_ab);
+  tr->Branch("vertex_simple",&vertex_simple);
+  tr->Branch("beam_simple",&beam_simple);
+  tr->Branch("gamma_simple",&gamma_simple);
   
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
   //while(EventStore->GetNextEvent()&&EventNumber<5000){
@@ -643,6 +666,9 @@ int main(int argc, char *argv[]){
     beta_vertex  = Sqrt(-1);
     gamma_vertex = Sqrt(-1);
 
+    beta_vertex_simple  = Sqrt(-1);
+    gamma_vertex_simple = Sqrt(-1);
+
     dali_e_ab->clear();
     dali_id_ab->clear();
     dali_cos_ab->clear();
@@ -657,12 +683,19 @@ int main(int argc, char *argv[]){
 
     vertex.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     fdc1.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    bdc.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     dali_pos.clear();
 
     beam.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     gamma.clear();
 
     gamma_cos.clear();
+
+    dali_edop_simple_ab->clear();
+    vertex_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    beam_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    gamma_simple.clear();
+    
     
     CalibDALI->ReconstructData();
     
@@ -782,12 +815,16 @@ int main(int argc, char *argv[]){
       dali_multi_ab = 1;
     }
 
-    //vector <TVector3> *DALI_Pos = new vector<TVector3>();    
+    //===== ADD BACK END =====
+    
     
     vertex.SetXYZ(vertexX,vertexY,vertexZ_cor);
-    fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1-vertexZ_cor);
+
+    vertex.SetZ(vertex.Z() + 75.); //To match the centre of MINOS cell and DALI Z = 0.
+    
+    fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1);
     for(Int_t i=0;i<dali_multi_ab;i++)
-      dali_pos.push_back(TVector3(dali_x_ab->at(i),dali_y_ab->at(i),dali_z_ab->at(i)));
+      dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
     
     beam = fdc1 - vertex;
     for(Int_t i=0;i<dali_multi_ab;i++){
@@ -804,6 +841,7 @@ int main(int argc, char *argv[]){
 
 
     //===== DOPPLER CORRECTION =====
+    
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	Double_t dali_edop_tmp = Sqrt(-1);
@@ -813,8 +851,31 @@ int main(int argc, char *argv[]){
       }
     }
 
+    //===== DOPPLER CORRECTION END =====
 
+    //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
+    beta_vertex_simple  = 0.5*(beta_F7F13 - beta_minoshodo);
+    gamma_vertex_simple = Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
+    
+    bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
+    beam_simple = fdc1 - bdc;
+    vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
+     for(Int_t i=0;i<dali_multi_ab;i++){
+       TVector3 gamma_simple_tmp;
+       gamma_simple_tmp = dali_pos.at(i) - vertex_simple;
+       gamma_simple.push_back(gamma_simple_tmp);
+     }
+
+    if(dali_multi_ab>=1){
+      for(Int_t i=0;i<dali_multi_ab;i++){
+	Double_t dali_edop_simple_tmp = Sqrt(-1);
+	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab.at(i));
+	dali_edop_simple_ab->push_back(dali_edop_simple_tmp);
+      }
+    }
+
+    
 
 
 
@@ -841,7 +902,7 @@ int main(int argc, char *argv[]){
     if(csa55k->IsInside(aoqSA,zetSA))  sa55k  = 1;
 
     
-    tr ->Fill();
+    tr->Fill();
     
   }//while loop
   std::clog << std::endl;
