@@ -784,7 +784,7 @@ int main(int argc, char *argv[]){
 
     //vector <TVector3> *DALI_Pos = new vector<TVector3>();    
     
-    vertex.SetXYZ(vertexX,vertexY,vertexZ);
+    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor);
     fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1-vertexZ_cor);
     for(Int_t i=0;i<dali_multi_ab;i++)
       dali_pos.push_back(TVector3(dali_x_ab->at(i),dali_y_ab->at(i),dali_z_ab->at(i)));
