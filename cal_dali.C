@@ -855,8 +855,8 @@ int main(int argc, char *argv[]){
 
     //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
-    beta_vertex_simple  = 0.5*(beta_F7F13 - beta_minoshodo);
-    gamma_vertex_simple = Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
+    beta_vertex_simple  = 0.5*(betaF7F13 - beta_minoshodo);
+    gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
     
     bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
     beam_simple = fdc1 - bdc;
@@ -870,12 +870,12 @@ int main(int argc, char *argv[]){
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	Double_t dali_edop_simple_tmp = Sqrt(-1);
-	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab.at(i));
+	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
 	dali_edop_simple_ab->push_back(dali_edop_simple_tmp);
       }
     }
 
-    
+    //===== SIMPLE DOPPLER CORRECTION END =====    
 
 
 
