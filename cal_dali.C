@@ -855,7 +855,7 @@ int main(int argc, char *argv[]){
 
     //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
-    beta_vertex_simple  = 0.5*(betaF7F13 - beta_minoshodo);
+    beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
     gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
     
     bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
