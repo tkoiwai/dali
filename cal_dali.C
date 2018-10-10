@@ -529,6 +529,9 @@ int main(int argc, char *argv[]){
   TVector3 vertex_simple;
   TVector3 beam_simple;
   vector<TVector3> gamma_simple;
+
+  vector<Double_t> *dali_edop_ab_func  = new vector<Double_t>();
+  vector<Double_t> *dali_edop_simple_ab_func  = new vector<Double_t>();
  
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
@@ -597,6 +600,9 @@ int main(int argc, char *argv[]){
   tr->Branch("vertex_simple",&vertex_simple);
   tr->Branch("beam_simple",&beam_simple);
   tr->Branch("gamma_simple",&gamma_simple);
+
+  tr->Branch("dali_edop_ab_func",&dali_edop_ab_func);
+  tr->Branch("dali_edop_simple_ab_func",&dali_edop_simple_ab_func);
   
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
   //while(EventStore->GetNextEvent()&&EventNumber<5000){
@@ -695,6 +701,9 @@ int main(int argc, char *argv[]){
     vertex_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     beam_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     gamma_simple.clear();
+
+    dali_edop_ab_func->clear();
+    dali_edop_simple_ab_func->clear();
     
     
     CalibDALI->ReconstructData();
@@ -742,9 +751,8 @@ int main(int argc, char *argv[]){
 	
 	
       }
-      DALI_Multi = DALI_Mult;
-      // if (DALI_Mult > 1)
-      //   SortDaliHit(0,DALI_Mult-1, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
+      // DALI_Multi = DALI_Mult;
+      DALI_Multi = DALI_ID->size();
     }
 
     vertexZ_cor = vertexZ + MINOSoffsetZ;
@@ -851,6 +859,7 @@ int main(int argc, char *argv[]){
 	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i));
 	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
 	dali_edop_ab->push_back(dali_edop_tmp);
+	dali_edop_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex,gamma_cos.at(i)));
       }
     }
 
@@ -875,6 +884,7 @@ int main(int argc, char *argv[]){
 	Double_t dali_edop_simple_tmp = Sqrt(-1);
 	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
 	dali_edop_simple_ab->push_back(dali_edop_simple_tmp);
+	dali_edop_simple_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex_simple,dali_cos_ab->at(i)));
       }
     }
 
@@ -936,6 +946,11 @@ int main(int argc, char *argv[]){
   delete dali_layer_ab;
 
   delete dali_edop_ab;
+  delete dali_edop_simple_ab;
+
+  delete dali_edop_ab_func;
+  delete dali_edop_simple_ab_func;
+
   /*
   delete vertex;
   delete fdc1;
