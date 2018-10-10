@@ -813,6 +813,9 @@ int main(int argc, char *argv[]){
       dali_layer_ab->push_back(DALI_Layer->at(0));
 
       dali_multi_ab = 1;
+    }else if(DALI_Multi==0){
+      tr->Fill();
+      continue;
     }
 
     //===== ADD BACK END =====
