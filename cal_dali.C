@@ -735,10 +735,7 @@ int main(int argc, char *argv[]){
 	  DALI_Z->push_back(DALINaI->GetZPos());
 	  //DALI_Pos->push_back(TVector3(DALINaI->GetXPos(),DALINaI->GetYPos(),DALINaI->GetZPos()));
 	  DALI_Mult++;	  	  
-	} else{
-	  tr->Fill();
-	  continue;
-	}
+	} 
 	
 	
       }
@@ -879,13 +876,14 @@ int main(int argc, char *argv[]){
 
     //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
-    beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
-    gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
-    
+    //beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
+    //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
+    const Double_t beta_mid = 0.57;
+    const Double_t gamma_mid = 1/Sqrt(1 - beta_mid*beta_mid);
     //bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
     //beam_simple = fdc1 - bdc;
     //vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
-    vertex_simple.SetXYZ(0,0,0);
+    //vertex_simple.SetXYZ(0,0,0);
     /*
     for(Int_t i=0;i<dali_multi_ab;i++){
        TVector3 gamma_simple_tmp;
@@ -897,7 +895,8 @@ int main(int argc, char *argv[]){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	//Double_t dali_edop_simple_tmp = Sqrt(-1);
 	//dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
-	dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i)));
+	//dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i)));
+	dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_mid*(1-beta_mid*dali_cos_ab->at(i)));
       }
     }
 
