@@ -452,7 +452,7 @@ int main(int argc, char *argv[]){
     {212, 213, 221, 223,  -1,  -1,  -1},
     {213, 214, 222, 224,  -1,  -1,  -1},
     {215, 216, 223, 225,  -1,  -1,  -1},
-    {216, 217, 218, 224,  -1,  -1,  -1}
+    {216, 217, 218, 224,  -1,  -1,  -1}//225
   };
  
   
@@ -784,7 +784,7 @@ int main(int argc, char *argv[]){
       //===== ADD BACK =====
       
       Bool_t AddBack_flag = false;
-      
+      /*
       for(Int_t i=1;i<DALI_Multi;i++){
 	dali_multi_ab = dali_id_ab->size();
 	for(Int_t k=0;k<dali_multi_ab;k++){
@@ -805,7 +805,31 @@ int main(int argc, char *argv[]){
 	  dali_z_ab->push_back(DALI_Z->at(i));
 	  dali_layer_ab->push_back(DALI_Layer->at(i));
 	}
+      }//for DALI_Multi
+      */
+
+      for(Int_t i=1;i<DALI_Multi;i++){
+	for(Int_t k=0;k<dali_id_ab->size();k++){
+	  for(Int_t j=0;j<7;j++){
+	    if(DALI_ID->at(i)==AddBackTable[dali_id_ab->at(k)][j]){
+	      dali_e_ab->at(k) += DALI_Energy->at(i);
+	      AddBack_flag = true;
+	      break;
+	    }	    
+	  }
+	  if(AddBack_flag==false){
+	    dali_e_ab->push_back(DALI_Energy->at(i));
+	    dali_id_ab->push_back(DALI_ID->at(i));
+	    dali_cos_ab->push_back(DALI_CosTheta->at(i));
+	    dali_t_ab->push_back(DALI_Time->at(i));
+	    dali_x_ab->push_back(DALI_X->at(i));
+	    dali_y_ab->push_back(DALI_Y->at(i));
+	    dali_z_ab->push_back(DALI_Z->at(i));
+	    dali_layer_ab->push_back(DALI_Layer->at(i));
+	  }
+	}
       }
+      
       
       dali_multi_ab = dali_id_ab->size();
       
