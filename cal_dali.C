@@ -757,7 +757,7 @@ int main(int argc, char *argv[]){
 
     vertexZ_cor = vertexZ + MINOSoffsetZ;
 
-    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ/150.0;
+    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
     gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
 
     if(DALI_Multi>1){
@@ -834,18 +834,13 @@ int main(int argc, char *argv[]){
     vertex.SetZ(vertex.Z() + 75.); //To match the centre of MINOS cell and DALI Z = 0.
     
     fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1);
-    for(Int_t i=0;i<dali_multi_ab;i++)
-      dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
+    //beam = fdc1 - vertex;
     
-    beam = fdc1 - vertex;
     for(Int_t i=0;i<dali_multi_ab;i++){
-      TVector3 gamma_tmp;
-      gamma_tmp = dali_pos.at(i) - vertex;
-      gamma.push_back(gamma_tmp);
-    }
-
-    for(Int_t i=0;i<dali_multi_ab;i++){
-      gamma_cos.push_back(beam * (gamma.at(i)) / beam.Mag() / (gamma.at(i)).Mag());
+      dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));        
+      gamma.push_back(dali_pos.at(i)-vertex);
+      //gamma_cos.push_back(beam * (gamma.at(i)) / beam.Mag() / (gamma.at(i)).Mag());
+      gamma_cos.push_back((gamma.at(i)).CosTheta());
     }
 
     
@@ -859,7 +854,7 @@ int main(int argc, char *argv[]){
 	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i));
 	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
 	dali_edop_ab->push_back(dali_edop_tmp);
-	dali_edop_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex,gamma_cos.at(i)));
+	//dali_edop_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex,gamma_cos.at(i)));
       }
     }
 
@@ -871,8 +866,9 @@ int main(int argc, char *argv[]){
     gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
     
     bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
-    beam_simple = fdc1 - bdc;
-    vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
+    //beam_simple = fdc1 - bdc;
+    //vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
+    vertex_simple.SetXYZ(0,0,0);
      for(Int_t i=0;i<dali_multi_ab;i++){
        TVector3 gamma_simple_tmp;
        gamma_simple_tmp = dali_pos.at(i) - vertex_simple;
@@ -884,7 +880,7 @@ int main(int argc, char *argv[]){
 	Double_t dali_edop_simple_tmp = Sqrt(-1);
 	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
 	dali_edop_simple_ab->push_back(dali_edop_simple_tmp);
-	dali_edop_simple_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex_simple,dali_cos_ab->at(i)));
+	//dali_edop_simple_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex_simple,dali_cos_ab->at(i)));
       }
     }
 
