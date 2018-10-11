@@ -530,9 +530,6 @@ int main(int argc, char *argv[]){
   TVector3 beam_simple;
   vector<TVector3> gamma_simple;
 
-  vector<Double_t> *dali_edop_ab_func  = new vector<Double_t>();
-  vector<Double_t> *dali_edop_simple_ab_func  = new vector<Double_t>();
- 
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
   tr->Branch("DALI_Energy",&DALI_Energy);
@@ -601,9 +598,6 @@ int main(int argc, char *argv[]){
   tr->Branch("beam_simple",&beam_simple);
   tr->Branch("gamma_simple",&gamma_simple);
 
-  tr->Branch("dali_edop_ab_func",&dali_edop_ab_func);
-  tr->Branch("dali_edop_simple_ab_func",&dali_edop_simple_ab_func);
-  
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
   //while(EventStore->GetNextEvent()&&EventNumber<5000){
     EventNumber++;
@@ -702,9 +696,6 @@ int main(int argc, char *argv[]){
     beam_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     gamma_simple.clear();
 
-    dali_edop_ab_func->clear();
-    dali_edop_simple_ab_func->clear();
-    
     
     CalibDALI->ReconstructData();
     
@@ -756,22 +747,6 @@ int main(int argc, char *argv[]){
       DALI_Multi = DALI_ID->size();
     }
 
-    vertexZ_cor = vertexZ + MINOSoffsetZ;
-
-    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
-    gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
-
-
-
-    /*
-    if(DALI_Multi>2){
-      tr->Fill();
-      continue;
-    }
-    */
-     
-
-    
     if(DALI_Multi>1){
       SortDaliHit(0,DALI_Multi-1,
 		  DALI_ID,
@@ -868,10 +843,14 @@ int main(int argc, char *argv[]){
 
     //===== ADD BACK END =====
     
-    
-    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor);
+    vertexZ_cor = vertexZ + MINOSoffsetZ;
 
-    vertex.SetZ(vertex.Z() + 75.); //To match the centre of MINOS cell and DALI Z = 0.
+    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
+    gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
+    
+    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor + 75.); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
+
+    //vertex.SetZ(vertex.Z() + 75.); 
     
     fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1);
     //beam = fdc1 - vertex;
@@ -885,7 +864,6 @@ int main(int argc, char *argv[]){
 
     
 
-
     //===== DOPPLER CORRECTION =====
     
     if(dali_multi_ab>=1){
@@ -893,8 +871,7 @@ int main(int argc, char *argv[]){
 	Double_t dali_edop_tmp = Sqrt(-1);
 	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i));
 	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
-	dali_edop_ab->push_back(dali_edop_tmp);
-	//dali_edop_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex,gamma_cos.at(i)));
+	dali_edop_ab->push_back(dali_edop_tmp);	
       }
     }
 
@@ -905,22 +882,22 @@ int main(int argc, char *argv[]){
     beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
     gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
     
-    bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
+    //bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
     //beam_simple = fdc1 - bdc;
     //vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
     vertex_simple.SetXYZ(0,0,0);
-     for(Int_t i=0;i<dali_multi_ab;i++){
+    /*
+    for(Int_t i=0;i<dali_multi_ab;i++){
        TVector3 gamma_simple_tmp;
        gamma_simple_tmp = dali_pos.at(i) - vertex_simple;
        gamma_simple.push_back(gamma_simple_tmp);
      }
-
+    */
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
-	Double_t dali_edop_simple_tmp = Sqrt(-1);
-	dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
-	dali_edop_simple_ab->push_back(dali_edop_simple_tmp);
-	//dali_edop_simple_ab_func->push_back(DopplerCorrection(dali_e_ab->at(i),beta_vertex_simple,dali_cos_ab->at(i)));
+	//Double_t dali_edop_simple_tmp = Sqrt(-1);
+	//dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
+	dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i)));
       }
     }
 
@@ -984,18 +961,6 @@ int main(int argc, char *argv[]){
   delete dali_edop_ab;
   delete dali_edop_simple_ab;
 
-  delete dali_edop_ab_func;
-  delete dali_edop_simple_ab_func;
-
-  /*
-  delete vertex;
-  delete fdc1;
-  delete dali_pos;
-
-  delete beam;
-  delete gamma;
-  delete gamma_cos;
-  */
   cout << "Conversion done." << endl;
   return 0;
 }//main()
