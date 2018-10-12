@@ -492,6 +492,15 @@ int main(int argc, char *argv[]){
   vector <Double_t> *DALI_Z = new vector<Double_t>();
   //vector <TVector3> *DALI_Pos = new vector<TVector3>();
 
+  vector <Double_t> *DALI_Energy_orig = new vector <Double_t>();
+  vector <Double_t> *DALI_CosTheta_orig = new vector<Double_t>();
+  vector <Double_t> *DALI_Time_orig = new vector<Double_t>();
+  vector <Int_t> *DALI_ID_orig = new vector <Int_t>();
+  vector <Double_t> *DALI_Layer_orig = new vector<Double_t>();
+  vector <Double_t> *DALI_X_orig = new vector<Double_t>();
+  vector <Double_t> *DALI_Y_orig = new vector<Double_t>();
+  vector <Double_t> *DALI_Z_orig = new vector<Double_t>();
+  
   Int_t DALI_Multi;
   Int_t source;
 
@@ -532,15 +541,24 @@ int main(int argc, char *argv[]){
 
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
+  
   tr->Branch("DALI_Energy",&DALI_Energy);
   tr->Branch("DALI_CosTheta",&DALI_CosTheta);
   tr->Branch("DALI_Time",&DALI_Time);
-
   tr->Branch("DALI_ID",&DALI_ID);
   tr->Branch("DALI_Layer",&DALI_Layer);
   tr->Branch("DALI_X",&DALI_X);
   tr->Branch("DALI_Y",&DALI_Y);
   tr->Branch("DALI_Z",&DALI_Z);
+
+  tr->Branch("DALI_Energy_orig",&DALI_Energy_orig);
+  tr->Branch("DALI_CosTheta_orig",&DALI_CosTheta_orig);
+  tr->Branch("DALI_Time_orig",&DALI_Time_orig);
+  tr->Branch("DALI_ID_orig",&DALI_ID_orig);
+  tr->Branch("DALI_Layer_orig",&DALI_Layer_orig);
+  tr->Branch("DALI_X_orig",&DALI_X_orig);
+  tr->Branch("DALI_Y_orig",&DALI_Y_orig);
+  tr->Branch("DALI_Z_orig",&DALI_Z_orig);
 
   //tr->Branch("DALI_Pos",&DALI_Pos);
   tr->Branch("DALI_Multi",&DALI_Multi);
@@ -644,6 +662,15 @@ int main(int argc, char *argv[]){
     DALI_Y->clear();
     DALI_Z->clear();
     //DALI_Pos->clear();
+
+    DALI_ID_orig->clear();
+    DALI_Time_orig->clear();
+    DALI_Energy_orig->clear();
+    DALI_CosTheta_orig->clear();
+    DALI_Layer_orig->clear();
+    DALI_X_orig->clear();
+    DALI_Y_orig->clear();
+    DALI_Z_orig->clear();
     
     DALI_Multi = 0;
     source = 0;
@@ -733,6 +760,15 @@ int main(int argc, char *argv[]){
 	  DALI_X->push_back(DALINaI->GetXPos());
 	  DALI_Y->push_back(DALINaI->GetYPos());
 	  DALI_Z->push_back(DALINaI->GetZPos());
+
+	  DALI_ID_orig->push_back(DALINaI->GetID());
+	  DALI_Energy_orig->push_back(DALINaI->GetEnergy());
+	  DALI_CosTheta_orig->push_back(DALINaI->GetCosTheta());
+	  DALI_Time_orig->push_back(Time);
+	  DALI_Layer_orig->push_back(DALINaI->GetLayer());
+	  DALI_X_orig->push_back(DALINaI->GetXPos());
+	  DALI_Y_orig->push_back(DALINaI->GetYPos());
+	  DALI_Z_orig->push_back(DALINaI->GetZPos());
 	  //DALI_Pos->push_back(TVector3(DALINaI->GetXPos(),DALINaI->GetYPos(),DALINaI->GetZPos()));
 	  DALI_Mult++;	  	  
 	} 
@@ -945,6 +981,22 @@ int main(int argc, char *argv[]){
   delete DALI_Time;
   delete DALI_Energy;
   delete DALI_CosTheta;
+  delete DALI_Time;
+  delete DALI_Layer;
+  delete DALI_X;
+  delete DALI_Y;
+  delete DALI_Z;
+
+  delete DALI_ID_orig;
+  delete DALI_Time_orig;
+  delete DALI_Energy_orig;
+  delete DALI_CosTheta_orig;
+  delete DALI_Time_orig;
+  delete DALI_Layer_orig;
+  delete DALI_X_orig;
+  delete DALI_Y_orig;
+  delete DALI_Z_orig;
+  
   delete TArtStoreManager::Instance();
 
   
