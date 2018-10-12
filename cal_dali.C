@@ -778,8 +778,8 @@ int main(int argc, char *argv[]){
     else if(csa53ca->IsInside(aoqSA,zetSA)) SAcut_bool = true;
     */
 
-    if(br54ca==1) BRcut_bool = true;
-    if(sa53ca==1) SAcut_bool = true;
+    if((br54ca==1)||(br56sc==1)||(br56ca==1)) BRcut_bool = true;
+    if((sa53ca==1)||(sa55ca==1|||(sa55k ==1))) SAcut_bool = true;
     
    if((SAcut_bool==false)||(BRcut_bool==false)){
       tr->Fill();
