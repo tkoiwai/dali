@@ -227,31 +227,9 @@ int main(int argc, char *argv[]){
   anatrB->AddFriend(trDC);
   anatrB->AddFriend(trPID);
   
-  /*
+  
   //===== Load cut files -----
-  TFile *brcuts = new TFile("/home/koiwai/analysis/cutfiles/BRpid.root","");
-
-  TCutG *cbr56sc = (TCutG*)brcuts->Get("br56sc");
-  TCutG *cbr56ca = (TCutG*)brcuts->Get("br56ca");
-  TCutG *cbr55ca = (TCutG*)brcuts->Get("br55ca");
-  TCutG *cbr54ca = (TCutG*)brcuts->Get("br54ca");
-  TCutG *cbr53ca = (TCutG*)brcuts->Get("br53ca");
-  TCutG *cbr52ca = (TCutG*)brcuts->Get("br52ca");
-
-  //brcuts->Close();
-
-  TFile *sacuts = new TFile("/home/koiwai/analysis/cutfiles/SApid.root","");
-
-  TCutG *csa56ca = (TCutG*)sacuts->Get("sa56ca");
-  TCutG *csa55ca = (TCutG*)sacuts->Get("sa55ca");
-  TCutG *csa54ca = (TCutG*)sacuts->Get("sa54ca");
-  TCutG *csa53ca = (TCutG*)sacuts->Get("sa53ca");
-  TCutG *csa52ca = (TCutG*)sacuts->Get("sa52ca");
-
-  TCutG *csa55k  = (TCutG*)sacuts->Get("sa55k");
-
-  //sacuts->Close();
-  */
+ 
 
    int AddBackTable[226][7] = {
     { 10,  19,  -1,  -1,  -1,  -1,  -1},//0
@@ -530,10 +508,7 @@ int main(int argc, char *argv[]){
   
   Int_t DALI_Multi;
   Int_t source;
-  /*
-  Int_t br56sc, br56ca, br55ca, br54ca, br53ca, br52ca;
-  Int_t sa56ca, sa55ca, sa54ca, sa53ca, sa52ca, sa55k;
-  */
+
   Double_t vertexZ_cor;
   Double_t beta_vertex, gamma_vertex;
 
@@ -587,7 +562,6 @@ int main(int argc, char *argv[]){
   tr->Branch("DALI_Y_orig",&DALI_Y_orig);
   tr->Branch("DALI_Z_orig",&DALI_Z_orig);
   
-  //tr->Branch("DALI_Pos",&DALI_Pos);
   tr->Branch("DALI_Multi",&DALI_Multi);
   tr->Branch("source",&source);
 
@@ -620,8 +594,7 @@ int main(int argc, char *argv[]){
   tr->Branch("dali_z_ab",&dali_z_ab);
 
   tr->Branch("dali_edop_ab",&dali_edop_ab);
-  //tr->Branch("",&);
-  
+   
   tr->Branch("vertexZ",&vertexZ);
 
   tr->Branch("vertex",&vertex);
@@ -640,21 +613,14 @@ int main(int argc, char *argv[]){
   tr->Branch("gamma_simple",&gamma_simple);
 
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
-  //while(EventStore->GetNextEvent()&&EventNumber<5000){
+    //while(EventStore->GetNextEvent()&&EventNumber<5000){
     anatrB->GetEntry(EventNumber);
     EventNumber++;
-  
-    /*
-  int nEntry = anatrB->GetEntries();
-  for(int iEntry=0;iEntry<nEntry;iEntry++){
-    */
-    //cout << EventNumber << endl;
+    
     if(EventNumber%100 == 0){
       std::clog << EventNumber/100 << " * 100 events treated..." << "\r";
     }
-    
-    
-    
+   
     CalibDALI->ClearData();
     
     TArtRawEventObject *fEvent = (TArtRawEventObject *)sman->FindDataContainer("RawEvent");
@@ -680,17 +646,6 @@ int main(int argc, char *argv[]){
     }
 
     RunNumber = FileNumber;
-
-    
-
-    /*
-    if(RunNumber!=RunNumber_beam||EventNumber!=EventNumber_beam){
-      cout << "NOT OK" << endl;
-      cout << RunNumber << " " << RunNumber_beam << endl;
-      cout << EventNumber << " " << EventNumber_beam << endl;
-      break;
-    }else cout << "ok" << endl;
-    */
     
     
     DALI_ID->clear();
@@ -701,7 +656,6 @@ int main(int argc, char *argv[]){
     DALI_X->clear();
     DALI_Y->clear();
     DALI_Z->clear();
-    //DALI_Pos->clear();
     
     DALI_ID_orig->clear();
     DALI_Time_orig->clear();
@@ -714,21 +668,7 @@ int main(int argc, char *argv[]){
     
     DALI_Multi = 0;
     source = 0;
-    /*
-    br56sc = 0;
-    br56ca = 0;
-    br55ca = 0;
-    br54ca = 0;
-    br53ca = 0;
-    br52ca = 0;
-
-    sa56ca = 0;
-    sa55ca = 0;
-    sa54ca = 0;
-    sa53ca = 0;
-    sa52ca = 0;
-    sa55k  = 0;
-    */
+    
     vertexZ_cor  = Sqrt(-1);
     beta_vertex  = Sqrt(-1);
     gamma_vertex = Sqrt(-1);
@@ -769,19 +709,11 @@ int main(int argc, char *argv[]){
     //===== cut events not interested =====
     bool BRcut_bool = false;
     bool SAcut_bool = false;
-    /*
-    if(cbr56ca->IsInside(aoqBR,zetBR)) BRcut_bool = true;
-    else if(cbr56sc->IsInside(aoqBR,zetBR)) BRcut_bool = true;
-    else if(cbr54ca->IsInside(aoqBR,zetBR)) BRcut_bool = true;
-    if(csa55ca->IsInside(aoqSA,zetSA)) SAcut_bool = true;
-    else if(csa55k->IsInside(aoqSA,zetSA)) SAcut_bool = true;
-    else if(csa53ca->IsInside(aoqSA,zetSA)) SAcut_bool = true;
-    */
-
+ 
     if((br54ca==1)||(br56sc==1)||(br56ca==1)) BRcut_bool = true;
     if((sa53ca==1)||(sa55ca==1|||(sa55k ==1))) SAcut_bool = true;
     
-   if((SAcut_bool==false)||(BRcut_bool==false)){
+    if((SAcut_bool==false)||(BRcut_bool==false)){
       tr->Fill();
       continue;
     }
@@ -817,14 +749,12 @@ int main(int argc, char *argv[]){
 	  DALI_Y_orig->push_back(DALINaI->GetYPos());
 	  DALI_Z_orig->push_back(DALINaI->GetZPos());
 	  
-	  //DALI_Pos->push_back(TVector3(DALINaI->GetXPos(),DALINaI->GetYPos(),DALINaI->GetZPos()));
 	  DALI_Mult++;	  	  
 	} 
 	
 	
       }
-      
-      // DALI_Multi = DALI_Mult;
+            
       DALI_Multi = DALI_ID->size();
     }
 
@@ -878,30 +808,6 @@ int main(int argc, char *argv[]){
 	}
       }//for DALI_Multi
       
-      /*
-      for(Int_t i=1;i<DALI_Multi;i++){
-	AddBack_flag = false;
-	for(Int_t k=0;k<dali_id_ab->size();k++){
-	  for(Int_t j=0;j<7;j++){
-	    if(DALI_ID->at(i)==AddBackTable[dali_id_ab->at(k)][j]&&AddBack_flag==false){
-	      dali_e_ab->at(k) += DALI_Energy->at(i);
-	      AddBack_flag = true;
-	      //continue;
-	    }	    
-	  }
-	  //if(AddBack_flag==false){
-	    dali_e_ab->push_back(DALI_Energy->at(i));
-	    dali_id_ab->push_back(DALI_ID->at(i));
-	    dali_cos_ab->push_back(DALI_CosTheta->at(i));
-	    dali_t_ab->push_back(DALI_Time->at(i));
-	    dali_x_ab->push_back(DALI_X->at(i));
-	    dali_y_ab->push_back(DALI_Y->at(i));
-	    dali_z_ab->push_back(DALI_Z->at(i));
-	    dali_layer_ab->push_back(DALI_Layer->at(i));
-	    //}
-	}
-      }
-      */
       
       dali_multi_ab = dali_id_ab->size();
       
@@ -938,8 +844,7 @@ int main(int argc, char *argv[]){
     
     for(Int_t i=0;i<dali_multi_ab;i++){
       dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));        
-      gamma.push_back(dali_pos.at(i)-vertex);
-      //gamma_cos.push_back(beam * (gamma.at(i)) / beam.Mag() / (gamma.at(i)).Mag());
+      gamma.push_back(dali_pos.at(i)-vertex);      
       gamma_cos.push_back((gamma.at(i)).CosTheta());
     }
 
@@ -950,7 +855,6 @@ int main(int argc, char *argv[]){
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
 	Double_t dali_edop_tmp = Sqrt(-1);
-	//dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i));
 	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
 	dali_edop_ab->push_back(dali_edop_tmp);	
       }
@@ -986,32 +890,7 @@ int main(int argc, char *argv[]){
 
     //===== SIMPLE DOPPLER CORRECTION END =====    
 
-
-
-
-
-
-
-
-
-
-    
-    /*
-    //===== PID cut =====
-    if(cbr56ca->IsInside(aoqBR,zetBR)) br56ca = 1;
-    if(cbr55ca->IsInside(aoqBR,zetBR)) br55ca = 1;
-    if(cbr54ca->IsInside(aoqBR,zetBR)) br54ca = 1;
-    if(cbr53ca->IsInside(aoqBR,zetBR)) br53ca = 1;
-    if(cbr52ca->IsInside(aoqBR,zetBR)) br52ca = 1;
-    if(csa56ca->IsInside(aoqSA,zetSA)) sa56ca = 1;
-    if(csa55ca->IsInside(aoqSA,zetSA)) sa55ca = 1;
-    if(csa54ca->IsInside(aoqSA,zetSA)) sa54ca = 1;
-    if(csa53ca->IsInside(aoqSA,zetSA)) sa53ca = 1;
-    if(csa52ca->IsInside(aoqSA,zetSA)) sa52ca = 1;
-    if(csa55k->IsInside(aoqSA,zetSA))  sa55k  = 1;
-    */
-    
-    tr->Fill();
+   tr->Fill();
     
   }//while loop
   std::clog << std::endl;
