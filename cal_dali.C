@@ -617,7 +617,7 @@ int main(int argc, char *argv[]){
   tr->Branch("gamma_simple",&gamma_simple);
 
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
-  //while(EventStore->GetNextEvent()&&EventNumber<5000){
+    //while(EventStore->GetNextEvent()&&EventNumber<5000){
     EventNumber++;
     if(EventNumber%100 == 0){
       std::clog << EventNumber/100 << " * 100 events treated..." << "\r";
@@ -981,7 +981,6 @@ int main(int argc, char *argv[]){
   delete DALI_Time;
   delete DALI_Energy;
   delete DALI_CosTheta;
-  delete DALI_Time;
   delete DALI_Layer;
   delete DALI_X;
   delete DALI_Y;
@@ -991,7 +990,6 @@ int main(int argc, char *argv[]){
   delete DALI_Time_orig;
   delete DALI_Energy_orig;
   delete DALI_CosTheta_orig;
-  delete DALI_Time_orig;
   delete DALI_Layer_orig;
   delete DALI_X_orig;
   delete DALI_Y_orig;
