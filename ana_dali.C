@@ -558,7 +558,13 @@ int main(int argc, char *argv[]){
     
     vertexZ_cor = vertexZ + MINOSoffsetZ;
 
-    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
+    if(vertexZ_cor<0.)
+      beta_vertex = betaF7F13;
+    else if(vertexZ_cor>150.)
+      beta_vertex = beta_minoshodo;
+    else
+      beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
+    
     gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
     
     vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - DALIoffset); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
