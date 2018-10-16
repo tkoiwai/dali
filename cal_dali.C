@@ -95,6 +95,7 @@ int main(int argc, char *argv[]){
   Double_t Dist_MINOSfrontBDC  = env_geo->GetValue("Dist_MINOSfrontBDC",0.0); //mm, negative value
   
   Double_t MINOSoffsetZ = env_geo->GetValue("MINOSoffsetZ",0.0); //offset of vertexZ. [mm]
+  Double_t DALIoffset   = env_geo->GetValue("DALIoffset",0.0);
   
   //=====Load ANAROOT parameters===========================================
   TArtStoreManager *sman = TArtStoreManager::Instance();
@@ -835,7 +836,7 @@ int main(int argc, char *argv[]){
     beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
     gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
     
-    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - 75.); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
+    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - DALIoffset); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
 
     //vertex.SetZ(vertex.Z() + 75.); 
     
