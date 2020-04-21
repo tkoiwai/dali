@@ -1,84 +1,54 @@
-#include <TSystem.h>
-#include <string>
-#include <iostream>
-#include <sstream> //string stream
-#include <fstream>
-#include <sys/stat.h> //get the status of files. "st_"
-#include <sys/types.h>
-#include <unistd.h> //UNIx STanDard Header file
-#include <climits> //char limits
+#define cal_dali_cxx
+#include "/home/koiwai/analysis/include/dalidef.h"
 
-#include "TTree.h"
-#include "TFile.h"
-#include "THashList.h"
-#include "TEnv.h" //related to read file like geometry
-#include "TH1.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TString.h" //moji toka mojiretsu
-#include "TVector3.h" //3 vector
-#include "TVectorD.h" //?
-#include <vector>
-#include "TMath.h"
-#include "TCutG.h"
-#include "TInterpreter.h"
+bool signal_recieved = false;
+void signalhandler(int sig){
+  if(sig==SIGINT){
+    signal_recieved = true;
+  }
+}
 
-//ANAROOT headers
-#include "TArtStoreManager.hh" //I/O of data and parameter
-#include "TArtEventStore.hh" //convert ridf to raw data
-#include "TArtEventInfo.hh"
-#include "TArtRawEventObject.hh"
-#include "TArtCore.hh" //debug, info, error, warning etc.
+double get_time(){
+  struct timeval t;
+  gettimeofday(&t,NULL);
+  double d = t.tv_sec + (double)t.tv_usec/1000000;
+  return d;
+}
 
-#include "TArtBigRIPSParameters.hh"
-#include "TArtSAMURAIParameters.hh"
-#include "TArtCalibCoin.hh"
-#include "TArtRecoRIPS.hh" //added for delta. NOV14
-#include "TArtRIPS.hh"
-#include "TArtRIPSPara.hh"
-
-
-//DALI
-#include "TArtCalibDALI.hh"
-#include "TArtDALINaIPara.hh"
-#include "TArtDALINaI.hh"
-#include "TArtDALIParameters.hh"
-
-
-
-using namespace TMath;
-
-#define WriteOneEnvFile(file) file->Write(TString(TString(file->GetRcName()).ReplaceAll("/","_")).ReplaceAll(".","_")); // / toka . no youna moji wo _ ni replace surudake.
-#define WriteAllEnvFiles WriteOneEnvFile(env_par); WriteOneEnvFile(env_geo); //WriteOneEnvFile(env_nebt0); WriteOneEnvFile(env_neut0);
-
-//=====External Function defined at last=======================================
-//void SortDaliHit(Int_t, Int_t,vector <Int_t> *,vector <Double_t> *, vector <Double_t> *, vector <Double_t> *, vector <Double_t> *);
-void SortDaliHit(Int_t, Int_t,vector <Int_t> *,vector <Double_t> *, vector <Double_t> *, vector <Double_t> *,vector <Double_t> *, vector <Double_t> *, vector <Double_t> *);
-Double_t DopplerCorrection(Double_t, Double_t, Double_t);
-inline bool exists_test(const std::string&);
-inline bool exists_test(const TString&);
 //=====main Function==========================================================
 int main(int argc, char *argv[]){
+
+  double time_start = get_time();
+  signal(SIGINT,signalhandler);
+
+  time_t start, stop;
+  time(&start);
 
   gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h");
   
   Long64_t MaxEventNumber = LLONG_MAX; //signed 8bit int. LLOMG_MAX ~ 2^63-1(const.)
+
+  if (argc < 2 || argc > 4){
+    printf("Usage: ./cal_dali RUNNUMBER\nOR     ./cal_dali RUNNUMBER MAXEVENTS\nOR     ./cal_dali RUNNUMBER MAXEVENTS TEST\n");
+    exit(EXIT_FAILURE); 
+  }
+  printf("=======================================\n");
+  if (argc > 2) {
+    MaxEventNumber = TString(argv[2]).Atoi();
+    printf(" You will process %lld events\n",MaxEventNumber);
+  }
   
   Int_t FileNumber = TString(argv[1]).Atoi();
-  TString RidfFileName;
+  TString RidfFileName = Form("/home/koiwai/analysis/ridf/sdaq02/run%04d.ridf.gz",FileNumber);
 
-  if(FileNumber==0){
-    std::cerr <<  " You should provide either a runnumber" << endl;
+  if(!exists_test(RidfFileName)){
+    cerr << " ERROR - '" << RidfFileName << "' does not exist '" << endl;
+    exit(EXIT_FAILURE); 
   }
 
-  if(FileNumber>1&&FileNumber<36)
-    RidfFileName = Form("/home/koiwai/analysis/ridf/smggdaq04/DALI2CalibRun%04d.ridf.gz",FileNumber);  
-  else if(FileNumber>=36&&FileNumber<231)
-    RidfFileName = Form("/home/koiwai/analysis/ridf/sdaq02/run%04d.ridf.gz",FileNumber);
-  else{
-    std::cerr << "run number is not correct." << endl;
-  }
-  
+  printf("\n%s %d %s \n\n","=== Execute cal_dali for RUN",FileNumber,"===");
+
+   
   //=====Load setting parameters=========================================
   TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
   TEnv *env_geo = new TEnv(env_par->GetValue("geometrydata","")); //unit of length:mm
@@ -96,143 +66,10 @@ int main(int argc, char *argv[]){
   
   Double_t MINOSoffsetZ = env_geo->GetValue("MINOSoffsetZ",0.0); //offset of vertexZ. [mm]
   Double_t DALIoffset   = env_geo->GetValue("DALIoffset",0.0);
-  
-  //=====Load ANAROOT parameters===========================================
-  TArtStoreManager *sman = TArtStoreManager::Instance();
-  TArtBigRIPSParameters *BigRIPSPara = TArtBigRIPSParameters::Instance();
-  TArtSAMURAIParameters *SAMURAIPara = TArtSAMURAIParameters::Instance();
-  TArtDALIParameters *DALIPara = TArtDALIParameters::Instance();
-  
-  TObjString *xmlfile;
 
-  TIter next(TString(env_par->GetValue("BigRIPSPara","")).Tokenize(" ")); //Make array of BigRIPSPara xmlfiles in conversion_settings.prm
-  while((xmlfile = (TObjString *)next())){
-    BigRIPSPara->LoadParameter((char*)xmlfile->GetName()); //load the xmlfile(?)
-  }
+  //===== ADDBACK TABLE ==================================================
 
-  next = TString(env_par->GetValue("SamuraiPara","")).Tokenize(" ");
-  while((xmlfile = (TObjString*)next())){
-    SAMURAIPara->LoadParameter((char*)xmlfile->GetName());
-  }
-
-  next = TString(env_par->GetValue("DALIPara","")).Tokenize(" ");
-  while(( xmlfile = (TObjString *)next())) {
-      DALIPara->LoadParameter((char*)xmlfile->GetName());
-  }
-  
-
-  //Load detectors.
-  TArtCalibDALI *CalibDALI = new TArtCalibDALI();
-  
-  TArtRecoRIPS *RecoRIPS = new TArtRecoRIPS(); //added NOV14
-  
-  //=====Conversion ridf -> raw data======================================
-  TArtEventStore *EventStore = new TArtEventStore;
-
-  if(!EventStore->Open(RidfFileName)){
-    std::cerr << "cannot open " << RidfFileName << std::endl << "aborting..." << std::endl;
-    return 1;
-  }
-
-  //===== Load Beam file for PID cut =====
-  TString infnameB = Form("/home/koiwai/analysis/rootfiles/ana/beam/ana_beam%04d.root",FileNumber);
-  TFile   *infileB = TFile::Open(infnameB);
-  TTree   *anatrB;
-  infileB->GetObject("anatrB",anatrB);
-
-  Int_t EventNumber_beam, RunNumber_beam;
-  Double_t zetBR, aoqBR;
-  Double_t betaF7F13, betaF3F13, gammaF7F13, gammaF3F13;
-
-  anatrB->SetBranchAddress("EventNumber",&EventNumber_beam);
-  anatrB->SetBranchAddress("RunNumber",&RunNumber_beam);
-  anatrB->SetBranchAddress("zetBR",&zetBR);
-  anatrB->SetBranchAddress("aoqBR",&aoqBR);
-  anatrB->SetBranchAddress("betaF7F13",&betaF7F13);
-  anatrB->SetBranchAddress("betaF3F13",&betaF3F13);
-  anatrB->SetBranchAddress("gammaF7F13",&gammaF7F13);
-  anatrB->SetBranchAddress("gammaF3F13",&gammaF3F13);
-
-  //===== Load smri file for PID cut =====
-  TString infnameS = Form("/home/koiwai/analysis/rootfiles/ana/smri/ana_smri%04d.root",FileNumber);
-  TFile   *infileS = TFile::Open(infnameS);
-  TTree   *anatrS;
-  infileS->GetObject("anatrS",anatrS);
-
-  Double_t zetSA, aoqSA;
-  Double_t beta_minoshodo, gamma_minoshodo;
-
-  anatrS->SetBranchAddress("zetSA",&zetSA);
-  anatrS->SetBranchAddress("aoqSA",&aoqSA);
-  anatrS->SetBranchAddress("beta_minoshodo",&beta_minoshodo);
-  anatrS->SetBranchAddress("gamma_minoshodo",&gamma_minoshodo);
-
-  //===== Load MINOS file =====
-  TString infnameM = Form("/home/koiwai/analysis/rootfiles/minos/vertex/vertex%04d.root",FileNumber);
-  TFile   *infileM = TFile::Open(infnameM);
-  TTree   *trM;
-  infileM->GetObject("tr",trM);
-  
-  Double_t vertexX, vertexY, vertexZ, vertexTheta, vertexPhi, theta2p;
-
-  trM->SetBranchAddress("vertexX",&vertexX);
-  trM->SetBranchAddress("vertexY",&vertexY);
-  trM->SetBranchAddress("vertexZ",&vertexZ);
-  trM->SetBranchAddress("vertexTheta",&vertexTheta);
-  trM->SetBranchAddress("vertexPhi",&vertexPhi);
-  trM->SetBranchAddress("theta2p",&theta2p);
-
-  //===== Load DC file =====
-  TString infnameDC = Form("/home/koiwai/analysis/rootfiles/ana/mwdc/ana_mwdc%04d.root",FileNumber);
-  TFile   *infileDC = TFile::Open(infnameDC);
-  TTree   *trDC;
-  infileDC->GetObject("anatrDC",trDC);
-
-  Double_t BDC_X, BDC_Y, BDC_A, BDC_B;
-  Double_t FDC1_X, FDC1_Y, FDC1_A, FDC1_B;
-
-  trDC->SetBranchAddress("BDC_X",&BDC_X);
-  trDC->SetBranchAddress("BDC_Y",&BDC_Y);
-  trDC->SetBranchAddress("BDC_A",&BDC_A);
-  trDC->SetBranchAddress("BDC_B",&BDC_B);
-  trDC->SetBranchAddress("FDC1_X",&FDC1_X);
-  trDC->SetBranchAddress("FDC1_Y",&FDC1_Y);
-  trDC->SetBranchAddress("FDC1_A",&FDC1_A);
-  trDC->SetBranchAddress("FDC1_B",&FDC1_B);
-
-  //===== Load PID =====
-  TString infnamePID = Form("/home/koiwai/analysis/rootfiles/ana/pid/pid%04d.root",FileNumber);
-  TFile   *infilePID = TFile::Open(infnamePID);
-  TTree   *trPID;
-  infilePID->GetObject("pidtr",trPID);
-
-  Int_t br56sc, br56ca, br55ca, br54ca, br53ca;
-  Int_t sa56sc, sa56ca, sa55ca, sa54ca, sa53ca, sa55k;
-
-  trPID->SetBranchAddress("br56sc",&br56sc);
-  trPID->SetBranchAddress("br56ca",&br56ca);
-  trPID->SetBranchAddress("br55ca",&br55ca);
-  trPID->SetBranchAddress("br54ca",&br54ca);
-  trPID->SetBranchAddress("br53ca",&br53ca);
-  trPID->SetBranchAddress("sa56sc",&sa56sc);
-  trPID->SetBranchAddress("sa56ca",&sa56ca);
-  trPID->SetBranchAddress("sa55ca",&sa55ca);
-  trPID->SetBranchAddress("sa54ca",&sa54ca);
-  trPID->SetBranchAddress("sa53ca",&sa53ca);
-  trPID->SetBranchAddress("sa55k",&sa55k);
-
-  //===== AddFriend =====
-  
-  anatrB->AddFriend(anatrS);
-  anatrB->AddFriend(trM);
-  anatrB->AddFriend(trDC);
-  anatrB->AddFriend(trPID);
-  
-  
-  //===== Load cut files -----
- 
-
-   int AddBackTable[226][7] = {
+  int AddBackTable[226][7] = {
     { 10,  19,  -1,  -1,  -1,  -1,  -1},//0
     { 10,  11,  -1,  -1,  -1,  -1,  -1},
     { 11,  12,  -1,  -1,  -1,  -1,  -1},
@@ -460,168 +297,157 @@ int main(int argc, char *argv[]){
     {215, 216, 223, 225,  -1,  -1,  -1},
     {216, 217, 218, 224,  -1,  -1,  -1}//225
   };
- 
+
   
-  //=====ROOT file setting==========================================================
+  //=====Load ANAROOT parameters===========================================
+  TArtStoreManager *sman = TArtStoreManager::Instance();
+  //TArtBigRIPSParameters *BigRIPSPara = TArtBigRIPSParameters::Instance();
+  //TArtSAMURAIParameters *SAMURAIPara = TArtSAMURAIParameters::Instance();
+  TArtDALIParameters *DALIPara = TArtDALIParameters::Instance();
+  
+  //TObjString *xmlfile;
+
+  //TIter next(TString(env_par->GetValue("BigRIPSPara","")).Tokenize(" ")); //Make array of BigRIPSPara xmlfiles in conversion_settings.prm
+  //while((xmlfile = (TObjString *)next())){
+  //  BigRIPSPara->LoadParameter((char*)xmlfile->GetName()); //load the xmlfile(?)
+  //}
+  //
+  //next = TString(env_par->GetValue("SamuraiPara","")).Tokenize(" ");
+  //while((xmlfile = (TObjString*)next())){
+  //  SAMURAIPara->LoadParameter((char*)xmlfile->GetName());
+  //}
+  //
+  //next = TString(env_par->GetValue("DALIPara","")).Tokenize(" ");
+  //while(( xmlfile = (TObjString *)next())) {
+  //    DALIPara->LoadParameter((char*)xmlfile->GetName());
+  //}
+
+  if(FileNumber>=36&&FileNumber<=61)
+    DALIPara->LoadParameter((char*)"/home/koiwai/analysis/db/DALI/DALI_20170505.xml");
+  else if(FileNumber>=62&&FileNumber<=124)
+    DALIPara->LoadParameter((char*)"/home/koiwai/analysis/db/DALI/DALI_20170508.xml");
+  if(FileNumber>=125&&FileNumber<=196)
+    DALIPara->LoadParameter((char*)"/home/koiwai/analysis/db/DALI/DALI_20170511.xml");
+  if(FileNumber>=197&&FileNumber<=230)
+    DALIPara->LoadParameter((char*)"/home/koiwai/analysis/db/DALI/DALI_20170514.xml");
+  
+  
+
+  //Load detectors.
+  TArtCalibDALI *CalibDALI = new TArtCalibDALI();
+  
+  //TArtRecoRIPS *RecoRIPS = new TArtRecoRIPS(); //added NOV14
+
+  
+  
+  //=====Conversion ridf -> raw data======================================
+  TArtEventStore *EventStore = new TArtEventStore;
+
+  if(!EventStore->Open(RidfFileName)){
+    std::cerr << "cannot open " << RidfFileName << std::endl << "aborting..." << std::endl;
+    return 1;
+  }else{
+    cout << "input file: " << RidfFileName << endl;
+  }
+
+  //===== Load Beam file for PID cut =====
+  TString infnameB = Form("/home/koiwai/analysis/rootfiles/ana/beam/ana_beam%04d.root",FileNumber);
+  TFile   *infileB = TFile::Open(infnameB);
+  TTree   *anatrB;
+  infileB->GetObject("anatrB",anatrB);
+
+  printf("%-20s %s \n","Input beam file:",infnameB.Data());
+  
+  anaD_Get_Branch_beam(anatrB);
+  
+  //===== Load smri file for PID cut =====
+  TString infnameS = Form("/home/koiwai/analysis/rootfiles/ana/smri/ana_smri%04d.root",FileNumber);
+  TFile   *infileS = TFile::Open(infnameS);
+  TTree   *anatrS;
+  infileS->GetObject("anatrS",anatrS);
+
+  printf("%-20s %s \n","Input smri file:",infnameS.Data());
+
+  anaD_Get_Branch_smri(anatrS);
+
+  //===== Load MINOS file =====
+  TString infnameM = Form("/home/koiwai/analysis/rootfiles/minos/vertex/vertex%04d.root",FileNumber);
+  TFile   *infileM = TFile::Open(infnameM);
+  TTree   *trM;
+  infileM->GetObject("tr",trM);
+
+  printf("%-20s %s \n\n","Input minos file:",infnameM.Data());
+  
+  anaD_Get_Branch_minos(trM);
+
+  //===== AddFriend =====
+  
+  anatrB->AddFriend(anatrS);
+  anatrB->AddFriend(trM);
+
+  //===== Load cuts =======================================================================
+  TFile *fcutSA_Ca = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca.root");
+
+
+  TCutG *csa57ca = (TCutG*)fcutSA_Ca->Get("sa57ca");
+  TCutG *csa55ca = (TCutG*)fcutSA_Ca->Get("sa55ca");
+  TCutG *csa54ca = (TCutG*)fcutSA_Ca->Get("sa54ca");
+  TCutG *csa53ca = (TCutG*)fcutSA_Ca->Get("sa53ca");
+
+  
+ 
+  //=====ROOT file setting ==========================================================
   TString ofname;
-  if(FileNumber>1&&FileNumber<36){
-  //ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/dali_calibrun%04d.root",FileNumber);
-    if(FileNumber==10||FileNumber==19||FileNumber==20||FileNumber==32)
-      ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/137cs%04d.root",FileNumber);
-    else if(FileNumber==12||FileNumber==18||FileNumber==31)
-      ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/88y%04d.root",FileNumber);
-    else if(FileNumber==13||FileNumber==33)
-      ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/133ba%04d.root",FileNumber);
-    else if(FileNumber==14||FileNumber==27)
-      ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/BG%04d.root",FileNumber);
-    else
-      ofname = Form("/home/koiwai/analysis/rootfiles/dali_calibrun/60co%04d.root",FileNumber);
-      }
-  else if(FileNumber>=36&&FileNumber<231)
-    ofname = Form("/home/koiwai/analysis/rootfiles/dali/cal_dali%04d.root",FileNumber);
+  if(argc < 4)
+    ofname = Form("/home/koiwai/analysis/rootfiles/ana/dali/cal_dali%04d.root",FileNumber);
+  else if(argc == 4)
+    ofname = Form("/home/koiwai/analysis/dali/testcal_dali%04d.root",FileNumber);
 
   TFile *outfile = new TFile(ofname,"RECREATE");
   TTree *tr = new TTree("tr","tr");
-  tr->SetAutoSave(1e5); //Autosave every 10,000 events filled.
+  //  tr->SetAutoSave(1e5); //Autosave every 10,000 events filled.
 
-  //=====Define variables===================================================
-  Long64_t EventNumber = 0;
-  Int_t RunNumber = -1;
+  printf("%-20s %s \n\n","Output dali file:",ofname.Data());
 
-  vector <Double_t> *DALI_Energy = new vector <Double_t>();
-  vector <Double_t> *DALI_CosTheta = new vector<Double_t>();
-  vector <Double_t> *DALI_Time = new vector<Double_t>();
-  vector <Int_t> *DALI_ID = new vector <Int_t>();
-  vector <Double_t> *DALI_Layer = new vector<Double_t>();
-  vector <Double_t> *DALI_X = new vector<Double_t>();
-  vector <Double_t> *DALI_Y = new vector<Double_t>();
-  vector <Double_t> *DALI_Z = new vector<Double_t>();
-  //vector <TVector3> *DALI_Pos = new vector<TVector3>();
+  Set_Branch_dali(tr);
+
+  //===== LOOP start ================================================================
+  int iEntry = 0;
+  int AllEntry;
+  if(argc > 2)
+    AllEntry = MaxEventNumber;
+  else
+    AllEntry= anatrB->GetEntries();
+
+  printf("\n Number of events to treat: %d\n\n",AllEntry);
+
+  double time_prev = 0;
+  double time_startloop = get_time();
   
-  vector <Double_t> *DALI_Energy_orig = new vector <Double_t>();
-  vector <Double_t> *DALI_CosTheta_orig = new vector<Double_t>();
-  vector <Double_t> *DALI_Time_orig = new vector<Double_t>();
-  vector <Int_t> *DALI_ID_orig = new vector <Int_t>();
-  vector <Double_t> *DALI_Layer_orig = new vector<Double_t>();
-  vector <Double_t> *DALI_X_orig = new vector<Double_t>();
-  vector <Double_t> *DALI_Y_orig = new vector<Double_t>();
-  vector <Double_t> *DALI_Z_orig = new vector<Double_t>();
-  
-  Int_t DALI_Multi;
-  Int_t source;
-
-  Double_t vertexZ_cor;
-  Double_t beta_vertex, gamma_vertex;
-
-  Double_t beta_vertex_simple, gamma_vertex_simple;
-
-  Int_t    dali_multi_ab;
-  vector<Double_t> *dali_e_ab     = new vector<Double_t>();
-  vector<Int_t>    *dali_id_ab    = new vector<Int_t>();
-  vector<Double_t> *dali_cos_ab   = new vector<Double_t>();
-  vector<Double_t> *dali_t_ab     = new vector<Double_t>();
-  vector<Double_t> *dali_layer_ab = new vector<Double_t>();
-  vector<Double_t> *dali_x_ab     = new vector<Double_t>();
-  vector<Double_t> *dali_y_ab     = new vector<Double_t>();
-  vector<Double_t> *dali_z_ab     = new vector<Double_t>();
-
-  vector<Double_t> *dali_edop_ab  = new vector<Double_t>();
-
-  TVector3 vertex;
-  TVector3 fdc1;
-  TVector3 bdc;
-  vector<TVector3> dali_pos;
-
-  TVector3 beam;
-  vector<TVector3> gamma;
-
-  vector<Double_t> gamma_cos;
-
-  vector<Double_t> *dali_edop_simple_ab  = new vector<Double_t>();
-  TVector3 vertex_simple;
-  TVector3 beam_simple;
-  vector<TVector3> gamma_simple;
-
-  tr->Branch("EventNumber",&EventNumber);
-  tr->Branch("RunNumber",&RunNumber);
-  
-  tr->Branch("DALI_Energy",&DALI_Energy);
-  tr->Branch("DALI_CosTheta",&DALI_CosTheta);
-  tr->Branch("DALI_Time",&DALI_Time);
-  tr->Branch("DALI_ID",&DALI_ID);
-  tr->Branch("DALI_Layer",&DALI_Layer);
-  tr->Branch("DALI_X",&DALI_X);
-  tr->Branch("DALI_Y",&DALI_Y);
-  tr->Branch("DALI_Z",&DALI_Z);
-  
-  tr->Branch("DALI_Energy_orig",&DALI_Energy_orig);
-  tr->Branch("DALI_CosTheta_orig",&DALI_CosTheta_orig);
-  tr->Branch("DALI_Time_orig",&DALI_Time_orig);
-  tr->Branch("DALI_ID_orig",&DALI_ID_orig);
-  tr->Branch("DALI_Layer_orig",&DALI_Layer_orig);
-  tr->Branch("DALI_X_orig",&DALI_X_orig);
-  tr->Branch("DALI_Y_orig",&DALI_Y_orig);
-  tr->Branch("DALI_Z_orig",&DALI_Z_orig);
-  
-  tr->Branch("DALI_Multi",&DALI_Multi);
-  tr->Branch("source",&source);
-
-  tr->Branch("br56sc",&br56sc);
-  tr->Branch("br56ca",&br56ca);
-  tr->Branch("br55ca",&br55ca);
-  tr->Branch("br54ca",&br54ca);
-  tr->Branch("br53ca",&br53ca);
-  tr->Branch("sa56ca",&sa56ca);
-  tr->Branch("sa55ca",&sa55ca);
-  tr->Branch("sa54ca",&sa54ca);
-  tr->Branch("sa53ca",&sa53ca);
-  tr->Branch("sa55k",&sa55k);
-
-  tr->Branch("vertexZ_cor",&vertexZ_cor);
-  tr->Branch("beta_vertex",&beta_vertex);
-  tr->Branch("gamma_vertex",&gamma_vertex);
-
-  tr->Branch("beta_vertex_simple",&beta_vertex_simple);
-  tr->Branch("gamma_vertex_simple",&gamma_vertex_simple);
-
-  tr->Branch("dali_multi_ab",&dali_multi_ab);
-  tr->Branch("dali_e_ab",&dali_e_ab);
-  tr->Branch("dali_id_ab",&dali_id_ab);
-  tr->Branch("dali_cos_ab",&dali_cos_ab);
-  tr->Branch("dali_t_ab",&dali_t_ab);
-  tr->Branch("dali_layer_ab",&dali_layer_ab);
-  tr->Branch("dali_x_ab",&dali_x_ab);
-  tr->Branch("dali_y_ab",&dali_y_ab);
-  tr->Branch("dali_z_ab",&dali_z_ab);
-
-  tr->Branch("dali_edop_ab",&dali_edop_ab);
-   
-  tr->Branch("vertexZ",&vertexZ);
-
-  tr->Branch("vertex",&vertex);
-  tr->Branch("fdc1",&fdc1);
-  tr->Branch("bdc",&bdc);
-  tr->Branch("dali_pos",&dali_pos);
-
-  tr->Branch("gamma",&gamma);
-  tr->Branch("beam",&beam);
-
-  tr->Branch("gamma_cos",&gamma_cos);
-
-  tr->Branch("dali_edop_simple_ab",&dali_edop_simple_ab);
-  tr->Branch("vertex_simple",&vertex_simple);
-  tr->Branch("beam_simple",&beam_simple);
-  tr->Branch("gamma_simple",&gamma_simple);
-
   while(EventStore->GetNextEvent()&&EventNumber<MaxEventNumber){
-    //while(EventStore->GetNextEvent()&&EventNumber<5000){
+
+    iEntry = EventNumber;
     anatrB->GetEntry(EventNumber);
     EventNumber++;
-    
-    if(EventNumber%100 == 0){
-      std::clog << EventNumber/100 << " * 100 events treated..." << "\r";
+
+    if(iEntry%1000 == 0){	
+      double time_end = get_time();	
+      double t_diff_a = time_end - time_start;
+      int t_hour_a    = t_diff_a/3600;
+      int t_min_a     = (t_diff_a - 3600*t_hour_a)/60;
+      double t_sec_a  = t_diff_a -3600*t_hour_a - 60*t_min_a;
+      
+      printf("%dh %dm %.2fs elapsed: %dk events done: %.2f events/s: about %.2fs to go: current speed: %.2f events/s \n",
+	     t_hour_a,
+	     t_min_a,
+	     t_sec_a,
+	     (int)(iEntry/1000),
+	     iEntry/(time_end - time_startloop),
+	     (AllEntry - iEntry)*(time_end - time_startloop)/(double)iEntry,
+	     1000./(time_end - time_prev));	
+      time_prev = get_time();
     }
-   
+    
     CalibDALI->ClearData();
     
     TArtRawEventObject *fEvent = (TArtRawEventObject *)sman->FindDataContainer("RawEvent");
@@ -632,20 +458,23 @@ int main(int argc, char *argv[]){
       Int_t detector = seg->GetDetector();
 
       if(device== BIGRIPS){
-	switch(detector) {
-	  //case   PPACT: if(kBEAM) CalibPPAC->LoadData(seg); break;
-	  //case   PPACQ: if(kBEAM) CalibPPAC->LoadData(seg); break;
-	default:  break;
-	}
+      	switch(detector) {
+      	  //case   PPACT: if(kBEAM) CalibPPAC->LoadData(seg); break;
+      	  //case   PPACQ: if(kBEAM) CalibPPAC->LoadData(seg); break;
+      	default:  break;
+      	}
       } else {
-	switch(detector) {
-	case    DALIA: CalibDALI->LoadData(seg); break;
-	case    DALIT: CalibDALI->LoadData(seg); break;
-	default:  break;
-	}
-      } 
+      	switch(detector) {
+      	case    DALIA: CalibDALI->LoadData(seg); break;
+      	case    DALIT: CalibDALI->LoadData(seg); break;
+      	default:  break;
+      	}
+      }
     }
 
+    TClonesArray *info_array = (TClonesArray *)sman->FindDataContainer("EventInfo");
+    //cout << "RunNumber: " << ((TArtEventInfo *)info_array->At(0))->GetRunNumber() << endl;
+    
     RunNumber = FileNumber;
     
     
@@ -653,7 +482,6 @@ int main(int argc, char *argv[]){
     DALI_Time->clear();
     DALI_Energy->clear();
     DALI_CosTheta->clear();
-    DALI_Layer->clear();
     DALI_X->clear();
     DALI_Y->clear();
     DALI_Z->clear();
@@ -662,20 +490,25 @@ int main(int argc, char *argv[]){
     DALI_Time_orig->clear();
     DALI_Energy_orig->clear();
     DALI_CosTheta_orig->clear();
-    DALI_Layer_orig->clear();
     DALI_X_orig->clear();
     DALI_Y_orig->clear();
     DALI_Z_orig->clear();
     
     DALI_Multi = 0;
-    source = 0;
     
     vertexZ_cor  = Sqrt(-1);
     beta_vertex  = Sqrt(-1);
     gamma_vertex = Sqrt(-1);
 
-    beta_vertex_simple  = Sqrt(-1);
-    gamma_vertex_simple = Sqrt(-1);
+    dali_edop->clear();
+
+    vertex.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
+    dali_pos.clear();
+
+    gamma_pos.clear();
+    gamma_cos.clear();
+
+    dali_edop_simple->clear();
 
     dali_e_ab->clear();
     dali_id_ab->clear();
@@ -684,37 +517,28 @@ int main(int argc, char *argv[]){
     dali_x_ab->clear();
     dali_y_ab->clear();
     dali_z_ab->clear();
-    dali_layer_ab->clear();
     dali_multi_ab = 0;
 
     dali_edop_ab->clear();
-
-    vertex.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    fdc1.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    bdc.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    dali_pos.clear();
-
-    beam.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    gamma.clear();
-
-    gamma_cos.clear();
-
-    dali_edop_simple_ab->clear();
-    vertex_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    beam_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    gamma_simple.clear();
+    
+    sa57ca = kFALSE;
+    sa55ca = kFALSE;
+    sa54ca = kFALSE;
+    sa53ca = kFALSE;
 
     
+
     CalibDALI->ReconstructData();
-    
+
     //===== cut events not interested =====
     bool BRcut_bool = false;
-    bool SAcut_bool = false;
- 
-    if((br54ca==1)||(br56sc==1)||(br56ca==1)) BRcut_bool = true;
-    if((sa53ca==1)||(sa55ca==1)||(sa55k ==1)) SAcut_bool = true;
     
-    if((SAcut_bool==false)||(BRcut_bool==false)){
+    if((br59sc==1)||(br58sc==1)||(br57sc==1)||(br56sc==1)||(br55sc==1)||(br54sc==1)||
+       (br56ca==1)||(br55ca==1)||(br54ca==1)||(br53ca==1)||(br52ca==1)||
+       (br54k ==1)||(br53k ==1)||(br52k ==1)||(br51k ==1)||(br50k ==1)||(br49k ==1))
+      BRcut_bool = true;
+    
+    if(BRcut_bool==false){
       tr->Fill();
       continue;
     }
@@ -726,17 +550,27 @@ int main(int argc, char *argv[]){
       Int_t NumberOfNaIHit = DALINaIHits->GetEntries();
       Double_t ADC;
       Double_t Time;
+
+      //=====DEBUG==========================
+
+      //TArtDALINaI *DALINaI = (TArtDALINaI *)DALINaIHits->At(0);
+      //DALI_ID->push_back(DALINaI->GetID());
+      //cout << DALINaI->GetID();
+
+      //=====DEBUG end========================
+      
       for(Int_t i=0; i<NumberOfNaIHit; i++) {
+
 	TArtDALINaI *DALINaI = (TArtDALINaI *)DALINaIHits->At(i);
 	ADC = DALINaI->GetRawADC();
 	Time = DALINaI->GetTimeOffseted();
+
 	if(ADC > 0 &&  ADC < 4095 && DALINaI->GetEnergy() > 0 /*&& Time > 0*/) {
 	  DALI_ID->push_back(DALINaI->GetID());
 
 	  DALI_Energy->push_back(DALINaI->GetEnergy());
 	  DALI_CosTheta->push_back(DALINaI->GetCosTheta());
 	  DALI_Time->push_back(Time);
-	  DALI_Layer->push_back(DALINaI->GetLayer());
 	  DALI_X->push_back(DALINaI->GetXPos());
 	  DALI_Y->push_back(DALINaI->GetYPos());
 	  DALI_Z->push_back(DALINaI->GetZPos());
@@ -745,17 +579,14 @@ int main(int argc, char *argv[]){
 	  DALI_Energy_orig->push_back(DALINaI->GetEnergy());
 	  DALI_CosTheta_orig->push_back(DALINaI->GetCosTheta());
 	  DALI_Time_orig->push_back(Time);
-	  DALI_Layer_orig->push_back(DALINaI->GetLayer());
 	  DALI_X_orig->push_back(DALINaI->GetXPos());
 	  DALI_Y_orig->push_back(DALINaI->GetYPos());
 	  DALI_Z_orig->push_back(DALINaI->GetZPos());
 	  
-	  DALI_Mult++;	  	  
+	  DALI_Mult++;
+       
 	} 
-	
-	
       }
-            
       DALI_Multi = DALI_ID->size();
     }
 
@@ -768,16 +599,58 @@ int main(int argc, char *argv[]){
 		  DALI_Y,
 		  DALI_Z,
 		  DALI_CosTheta);
-      
+    }else if(DALI_Multi==0){
+      tr->Fill();
+      continue;
+    }
+
+    vertexZ_cor = vertexZ + MINOSoffsetZ;
+
+    beta_vertex  = betaF7F13 - (betaF7F13 - betaTH)*vertexZ_cor/150.0;
+    gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
+    
+    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - DALIoffset);
+    //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
+
+    for(Int_t i=0;i<DALI_Multi;i++){
+      dali_pos.push_back(TVector3(10*DALI_X->at(i),10*DALI_Y->at(i),10*DALI_Z->at(i)));
+      gamma_pos.push_back(dali_pos.at(i)-vertex);      
+      gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
+    }
+    
+    //===== DOPPLER CORRECTION =====
+    
+    if(DALI_Multi>=1){
+      for(Int_t i=0;i<DALI_Multi;i++){
+	Double_t dali_edop_tmp = Sqrt(-1);
+	dali_edop_tmp = DALI_Energy->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
+	dali_edop->push_back(dali_edop_tmp);	
+      }
+    }
+
+    //===== DOPPLER CORRECTION END =====
+
+    //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
+
+    const Double_t beta_mid = 0.57;
+    const Double_t gamma_mid = 1/Sqrt(1 - beta_mid*beta_mid);
+    if(DALI_Multi>=1){
+      for(Int_t i=0;i<DALI_Multi;i++){
+	dali_edop_simple->push_back(DALI_Energy->at(i)*gamma_mid*(1-beta_mid*DALI_CosTheta->at(i)));
+      }
+    }
+
+    //===== SIMPLE DOPPLER CORRECTION END =====
+
+    //===== ADDBACK ===========================
+    if(DALI_Multi>1){
       dali_e_ab->push_back(DALI_Energy->at(0));
       dali_id_ab->push_back(DALI_ID->at(0));
       dali_cos_ab->push_back(DALI_CosTheta->at(0));
-      dali_t_ab->push_back(DALI_Time->at(0));
+      dali_t_ab->push_back(DALI_Time->at(0));      
       dali_x_ab->push_back(DALI_X->at(0));
       dali_y_ab->push_back(DALI_Y->at(0));
       dali_z_ab->push_back(DALI_Z->at(0));
-      dali_layer_ab->push_back(DALI_Layer->at(0));
-
 
 
       //===== ADD BACK =====
@@ -805,7 +678,7 @@ int main(int argc, char *argv[]){
 	  dali_x_ab->push_back(DALI_X->at(i));
 	  dali_y_ab->push_back(DALI_Y->at(i));
 	  dali_z_ab->push_back(DALI_Z->at(i));
-	  dali_layer_ab->push_back(DALI_Layer->at(i));
+
 	}
       }//for DALI_Multi
       
@@ -821,75 +694,31 @@ int main(int argc, char *argv[]){
       dali_x_ab->push_back(DALI_X->at(0));
       dali_y_ab->push_back(DALI_Y->at(0));
       dali_z_ab->push_back(DALI_Z->at(0));
-      dali_layer_ab->push_back(DALI_Layer->at(0));
-
+      
       dali_multi_ab = 1;
     }else if(DALI_Multi==0){
       tr->Fill();
       continue;
     }
 
-    //===== ADD BACK END =====
-    
-    vertexZ_cor = vertexZ + MINOSoffsetZ;
-
-    beta_vertex  = betaF7F13 - (betaF7F13 - beta_minoshodo)*vertexZ_cor/150.0;
-    gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
-    
-    vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - DALIoffset); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
-
-    //vertex.SetZ(vertex.Z() + 75.); 
-    
-    fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1);
-    //beam = fdc1 - vertex;
-    
-    for(Int_t i=0;i<dali_multi_ab;i++){
-      dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));        
-      gamma.push_back(dali_pos.at(i)-vertex);      
-      gamma_cos.push_back((gamma.at(i)).CosTheta());
-    }
-
-    
-
-    //===== DOPPLER CORRECTION =====
-    
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
-	Double_t dali_edop_tmp = Sqrt(-1);
-	dali_edop_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
-	dali_edop_ab->push_back(dali_edop_tmp);	
+	Double_t dali_edop_ab_tmp = Sqrt(-1);
+	dali_edop_ab_tmp = dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*gamma_cos.at(i));
+	dali_edop_ab->push_back(dali_edop_ab_tmp);	
       }
-    }
+    } 
 
-    //===== DOPPLER CORRECTION END =====
+    //===== ADDBACK END =======================
 
-    //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
+    //===== TIMING GATE =======================
+    //===== TIMING GATE END ===================
 
-    //beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
-    //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
-    const Double_t beta_mid = 0.57;
-    const Double_t gamma_mid = 1/Sqrt(1 - beta_mid*beta_mid);
-    //bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
-    //beam_simple = fdc1 - bdc;
-    //vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
-    //vertex_simple.SetXYZ(0,0,0);
-    /*
-    for(Int_t i=0;i<dali_multi_ab;i++){
-       TVector3 gamma_simple_tmp;
-       gamma_simple_tmp = dali_pos.at(i) - vertex_simple;
-       gamma_simple.push_back(gamma_simple_tmp);
-     }
-    */
-    if(dali_multi_ab>=1){
-      for(Int_t i=0;i<dali_multi_ab;i++){
-	//Double_t dali_edop_simple_tmp = Sqrt(-1);
-	//dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
-	//dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i)));
-	dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_mid*(1-beta_mid*dali_cos_ab->at(i)));
-      }
-    }
-
-    //===== SIMPLE DOPPLER CORRECTION END =====    
+    //===== isotope gate =====
+    if(csa57ca->IsInside(aoqSA,zetSA))  sa57ca = kTRUE;
+    if(csa55ca->IsInside(aoqSA,zetSA))  sa55ca = kTRUE;
+    if(csa54ca->IsInside(aoqSA,zetSA))  sa54ca = kTRUE;
+    if(csa53ca->IsInside(aoqSA,zetSA))  sa53ca = kTRUE;
 
    tr->Fill();
     
@@ -898,7 +727,6 @@ int main(int argc, char *argv[]){
 
   tr->BuildIndex("RunNumber","EventNumber");
   outfile->cd();
-  WriteAllEnvFiles;
   outfile->Write();
   outfile->Close("R");
 
@@ -909,7 +737,6 @@ int main(int argc, char *argv[]){
   delete DALI_Time;
   delete DALI_Energy;
   delete DALI_CosTheta;
-  delete DALI_Layer;
   delete DALI_X;
   delete DALI_Y;
   delete DALI_Z;
@@ -918,14 +745,15 @@ int main(int argc, char *argv[]){
   delete DALI_Time_orig;
   delete DALI_Energy_orig;
   delete DALI_CosTheta_orig;
-  delete DALI_Layer_orig;
   delete DALI_X_orig;
   delete DALI_Y_orig;
   delete DALI_Z_orig;
   
   delete TArtStoreManager::Instance();
 
-  
+  delete dali_edop;
+  delete dali_edop_simple;
+
   delete dali_e_ab;
   delete dali_id_ab;
   delete dali_cos_ab;
@@ -933,12 +761,19 @@ int main(int argc, char *argv[]){
   delete dali_x_ab;
   delete dali_y_ab;
   delete dali_z_ab;
-  delete dali_layer_ab;
 
   delete dali_edop_ab;
-  delete dali_edop_simple_ab;
 
-  cout << "Conversion done." << endl;
+  time(&stop);
+
+  int t_hour = (int)difftime(stop,start)/3600;
+  int t_min  = (int)(difftime(stop,start) - t_hour*3600)/60;
+  double t_sec  = difftime(stop,start) - t_hour*3600 - t_min*60;
+  printf("Elapsed time: %dh %dm %.1f seconds\n",t_hour,t_min,t_sec);
+
+  double time_end = get_time();
+  printf("Average process speed: %f events/s\n",AllEntry/(time_end - time_start));
+  printf("RUN%d: Conversion finished!: caldaliok%d\n",FileNumber,FileNumber);
   return 0;
 }//main()
 
@@ -1010,7 +845,7 @@ void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_
 
 
 /*
-void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_EnergyDopplerCorrected, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_CosTheta)
+void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_EnergyDopplerCorrected, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_CosThetav)
 {
   Int_t TempID;
   Double_t TempEnergy;

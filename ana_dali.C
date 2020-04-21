@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
     std::cerr <<  " You should provide either a runnumber" << endl;
   }
   
-  //=====Load setting parameters=========================================
+    //=====Load setting parameters=========================================
   TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
   TEnv *env_geo = new TEnv(env_par->GetValue("geometrydata","")); //unit of length:mm
   Double_t Dist_F5F7           = env_geo->GetValue("Dist_F5F7",0.0);
@@ -348,19 +348,29 @@ int main(int argc, char *argv[]){
   Int_t RunNumber = -1;
   Int_t IncrementNumber = 0;
 
+  Int_t br59sc_C;
+  Int_t br58sc_C;
+  Int_t br57sc_C;
   Int_t br56sc_C;
   Int_t br56ca_C;
+  Int_t br55ca_C;
   Int_t br54ca_C;
+  Int_t br55k_C;
   Int_t br51k_C;
+  Int_t sa59sc_C;
+  Int_t sa58sc_C;
+  Int_t sa57sc_C;
+  Int_t sa56sc_C;
+  Int_t sa56ca_C;
   Int_t sa55ca_C;
-  Int_t sa55k_C;
+  Int_t sa54ca_C;
   Int_t sa53ca_C;
+  Int_t sa55k_C;
+  Int_t sa51k_C;
   Int_t sa50ar_C;
   
   Double_t vertexZ_cor;
   Double_t beta_vertex, gamma_vertex;
-
-  Double_t beta_vertex_simple, gamma_vertex_simple;
 
   Int_t    dali_multi_ab;
   vector<Double_t> *dali_e_ab     = new vector<Double_t>();
@@ -374,39 +384,46 @@ int main(int argc, char *argv[]){
   vector<Double_t> *dali_edop_ab  = new vector<Double_t>();
 
   TVector3 vertex;
-  TVector3 fdc1;
-  TVector3 bdc;
   vector<TVector3> dali_pos;
 
-  TVector3 beam;
   vector<TVector3> gamma;
 
   vector<Double_t> gamma_cos;
 
   vector<Double_t> *dali_edop_simple_ab  = new vector<Double_t>();
-  TVector3 vertex_simple;
-  TVector3 beam_simple;
-  vector<TVector3> gamma_simple;
+  vector<Double_t> *dali_edop_beta_ab  = new vector<Double_t>();
+  vector<Double_t> *dali_edop_theta_ab  = new vector<Double_t>();
+
+  Int_t BG_flag_C = 0;
 
   tr->Branch("EventNumber",&EventNumber);
   tr->Branch("RunNumber",&RunNumber);
   tr->Branch("IncrementNumber",&IncrementNumber);
 
+  tr->Branch("br59sc",&br59sc_C);
+  tr->Branch("br58sc",&br58sc_C);
+  tr->Branch("br57sc",&br57sc_C);
   tr->Branch("br56sc",&br56sc_C);
   tr->Branch("br56ca",&br56ca_C);
+  tr->Branch("br55ca",&br55ca_C);
   tr->Branch("br54ca",&br54ca_C);
+  tr->Branch("br55k",&br55k_C);
   tr->Branch("br51k",&br51k_C);
+  tr->Branch("sa59sc",&sa59sc_C);
+  tr->Branch("sa58sc",&sa58sc_C);
+  tr->Branch("sa57sc",&sa57sc_C);
+  tr->Branch("sa56sc",&sa56sc_C);
+  tr->Branch("sa56ca",&sa56ca_C);
   tr->Branch("sa55ca",&sa55ca_C);
-  tr->Branch("sa55k",&sa55k_C);
+  tr->Branch("sa54ca",&sa54ca_C);
   tr->Branch("sa53ca",&sa53ca_C);
+  tr->Branch("sa55k",&sa55k_C);
+  tr->Branch("sa51k",&sa51k_C);
   tr->Branch("sa50ar",&sa50ar_C);
   
   tr->Branch("vertexZ_cor",&vertexZ_cor);
   tr->Branch("beta_vertex",&beta_vertex);
   tr->Branch("gamma_vertex",&gamma_vertex);
-
-  tr->Branch("beta_vertex_simple",&beta_vertex_simple);
-  tr->Branch("gamma_vertex_simple",&gamma_vertex_simple);
 
   tr->Branch("dali_multi_ab",&dali_multi_ab);
   tr->Branch("dali_e_ab",&dali_e_ab);
@@ -422,24 +439,22 @@ int main(int argc, char *argv[]){
   tr->Branch("vertexZ",&vertexZ);
 
   tr->Branch("vertex",&vertex);
-  tr->Branch("fdc1",&fdc1);
-  tr->Branch("bdc",&bdc);
   tr->Branch("dali_pos",&dali_pos);
 
   tr->Branch("gamma",&gamma);
-  tr->Branch("beam",&beam);
 
   tr->Branch("gamma_cos",&gamma_cos);
 
   tr->Branch("dali_edop_simple_ab",&dali_edop_simple_ab);
-  tr->Branch("vertex_simple",&vertex_simple);
-  tr->Branch("beam_simple",&beam_simple);
-  tr->Branch("gamma_simple",&gamma_simple);
+  tr->Branch("dali_edop_beta_ab",&dali_edop_beta_ab);
+  tr->Branch("dali_edop_theta_ab",&dali_edop_theta_ab);
+
+  tr->Branch("BG_flag",&BG_flag_C);
 
   Int_t nEntry = intr->GetEntries();
-
-  for(Int_t iEntry=0;iEntry<nEntry;iEntry++){
-    //for(Int_t iEntry=0;iEntry<5;iEntry++){
+  
+  //for(Int_t iEntry=0;iEntry<nEntry;iEntry++){
+    for(Int_t iEntry=0;iEntry<10;iEntry++){
 
     intr->GetEntry(iEntry);
     IncrementNumber++;
@@ -452,21 +467,32 @@ int main(int argc, char *argv[]){
     EventNumber = EventNumber_mych;
     //cout << "e num mych " << EventNumber_mych << endl;; 
 
+    br59sc_C = br59sc;
+    br58sc_C = br58sc;
+    br57sc_C = br57sc;
     br56sc_C = br56sc;
     br56ca_C = br56ca;
+    br55ca_C = br55ca;
     br54ca_C = br54ca;
+    br55k_C  = br55k;
     br51k_C  = br51k;
+    sa59sc_C = sa59sc;
+    sa58sc_C = sa58sc;
+    sa57sc_C = sa57sc;
+    sa56sc_C = sa56sc;
+    sa56ca_C = sa56ca;
     sa55ca_C = sa55ca;
-    sa55k_C  = sa55k;
+    sa54ca_C = sa54ca;
     sa53ca_C = sa53ca;
+    sa55k_C  = sa55k;
+    sa51k_C  = sa51k;
     sa50ar_C = sa50ar;
+
+    BG_flag_C = BG_flag;
     
     vertexZ_cor  = Sqrt(-1);
     beta_vertex  = Sqrt(-1);
     gamma_vertex = Sqrt(-1);
-
-    beta_vertex_simple  = Sqrt(-1);
-    gamma_vertex_simple = Sqrt(-1);
 
     dali_e_ab->clear();
     dali_id_ab->clear();
@@ -480,26 +506,21 @@ int main(int argc, char *argv[]){
     dali_edop_ab->clear();
 
     vertex.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    fdc1.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    bdc.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     dali_pos.clear();
 
-    beam.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
     gamma.clear();
 
     gamma_cos.clear();
 
     dali_edop_simple_ab->clear();
-    vertex_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    beam_simple.SetXYZ(Sqrt(-1),Sqrt(-1),Sqrt(-1));
-    gamma_simple.clear();
+    dali_edop_beta_ab->clear();
+    dali_edop_theta_ab->clear();
 
-    
     if(DALI_Multi>1){
       dali_e_ab->push_back(DALI_Energy->at(0));
       dali_id_ab->push_back(DALI_ID->at(0));
       dali_cos_ab->push_back(DALI_CosTheta->at(0));
-      dali_t_ab->push_back(DALI_Time->at(0));
+      dali_t_ab->push_back(DALI_Time->at(0));      
       dali_x_ab->push_back(DALI_X->at(0));
       dali_y_ab->push_back(DALI_Y->at(0));
       dali_z_ab->push_back(DALI_Z->at(0));
@@ -546,15 +567,19 @@ int main(int argc, char *argv[]){
       dali_x_ab->push_back(DALI_X->at(0));
       dali_y_ab->push_back(DALI_Y->at(0));
       dali_z_ab->push_back(DALI_Z->at(0));
-
-
+      
       dali_multi_ab = 1;
     }else if(DALI_Multi==0){
       tr->Fill();
       continue;
     }
-
+    
     //===== ADD BACK END =====
+
+    //===== Timing gate =====
+    for(int i=0;i<dali_multi_ab;i++){
+      if(-13.851>dali_t_ab->at(i)||dali_t_ab->at(i)>13.621) continue; //5 sigma
+    }
     
     vertexZ_cor = vertexZ + MINOSoffsetZ;
 
@@ -568,11 +593,6 @@ int main(int argc, char *argv[]){
     gamma_vertex = 1/Sqrt(1-beta_vertex*beta_vertex);
     
     vertex.SetXYZ(vertexX,vertexY,vertexZ_cor - DALIoffset); //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
-
-    //vertex.SetZ(vertex.Z() + 75.); 
-    
-    fdc1.SetXYZ(FDC1_X,FDC1_Y,Dist_MINOSfrontFDC1);
-    //beam = fdc1 - vertex;
     
     for(Int_t i=0;i<dali_multi_ab;i++){
       dali_pos.push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));        
@@ -600,23 +620,11 @@ int main(int argc, char *argv[]){
     //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
     const Double_t beta_mid = 0.57;
     const Double_t gamma_mid = 1/Sqrt(1 - beta_mid*beta_mid);
-    //bdc.SetXYZ(BDC_X,BDC_Y,Dist_MINOSfrontBDC);
-    //beam_simple = fdc1 - bdc;
-    //vertex_simple.SetXYZ((FDC1_X-BDC_X)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,(FDC1_Y-BDC_Y)*-1.*Dist_MINOSfrontBDC/Dist_BDCFDC1,0.);
-    //vertex_simple.SetXYZ(0,0,0);
-    /*
-    for(Int_t i=0;i<dali_multi_ab;i++){
-       TVector3 gamma_simple_tmp;
-       gamma_simple_tmp = dali_pos.at(i) - vertex_simple;
-       gamma_simple.push_back(gamma_simple_tmp);
-     }
-    */
     if(dali_multi_ab>=1){
       for(Int_t i=0;i<dali_multi_ab;i++){
-	//Double_t dali_edop_simple_tmp = Sqrt(-1);
-	//dali_edop_simple_tmp = dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i));
-	//dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_vertex_simple*(1-beta_vertex_simple*dali_cos_ab->at(i)));
 	dali_edop_simple_ab->push_back(dali_e_ab->at(i)*gamma_mid*(1-beta_mid*dali_cos_ab->at(i)));
+	dali_edop_beta_ab->push_back(dali_e_ab->at(i)*gamma_vertex*(1-beta_vertex*dali_cos_ab->at(i)));
+	dali_edop_theta_ab->push_back(dali_e_ab->at(i)*gamma_mid*(1-beta_mid*gamma_cos.at(i)));
       }
     }
 
@@ -651,6 +659,8 @@ int main(int argc, char *argv[]){
 
   delete dali_edop_ab;
   delete dali_edop_simple_ab;
+  delete dali_edop_beta_ab;
+  delete dali_edop_theta_ab;
 
   cout << "Conversion done." << endl;
   return 0;
