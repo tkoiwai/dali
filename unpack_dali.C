@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
   Long64_t MaxEventNumber = LLONG_MAX;  //signed 8bit int. LLOMG_MAX ~ 2^63-1(const.)
 
   bool TestMode = false;
+  bool ENum_flag = false;
   int FileNumber = -1;
 
   int opt;
@@ -28,6 +29,7 @@ int main(int argc, char *argv[]) {
         FileNumber = atoi(optarg);
         break;
       case 'e':
+        ENum_flag = true;
         MaxEventNumber = atoi(optarg);
         break;
       case 't':
@@ -39,18 +41,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  //if(argc < 2 || argc > 4) {
-  //  printf("Usage: ./unpack_dali RUNNUMBER\nOR     ./unpack_dali RUNNUMBER MAXEVENTS\nOR     ./unpack_dali RUNNUMBER MAXEVENTS TEST\n");
-  //  exit(EXIT_FAILURE);
-  //}
-
   printf("=======================================\n");
-  //if(argc > 2) {
-  //MaxEventNumber = TString(argv[2]).Atoi();
-  printf(" You will process %lld events\n", MaxEventNumber);
-  //}
 
-  //Int_t FileNumber = TString(argv[1]).Atoi();
   TString RidfFileName = Form("/home/koiwai/analysis/ridf/sdaq02/run%04d.ridf.gz", FileNumber);
 
   if(!exists_test(RidfFileName)) {
@@ -59,6 +51,8 @@ int main(int argc, char *argv[]) {
   }
 
   printf("\n%s %d %s \n\n", "=== Execute unpack_dali for RUN", FileNumber, "===");
+  if(ENum_flag)
+    printf("=== You will process %lld events\n \n", MaxEventNumber);
 
   //*=====Load setting parameters=========================================
   TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
@@ -122,14 +116,14 @@ int main(int argc, char *argv[]) {
 
   //===== LOOP start ================================================================
   int iEntry = 0;
-  //int AllEnrty;
+  int AllEntry;
   //printf("\n Number of events to treat: %d\n\n", AllEntry);
 
   prepare_timer_tk();
 
   while(EventStore->GetNextEvent() && EventNumber < MaxEventNumber) {
     iEntry = EventNumber;
-    anatrB->GetEntry(EventNumber);
+    // anatrB->GetEntry(EventNumber);
     EventNumber++;
 
     start_timer_tk(iEntry, 1000);
@@ -186,27 +180,6 @@ int main(int argc, char *argv[]) {
     DALI_Z_orig->clear();
 
     DALI_Multi = 0;
-
-    dali_edop->clear();
-
-    vertex.SetXYZ(Sqrt(-1), Sqrt(-1), Sqrt(-1));
-    dali_pos.clear();
-
-    gamma_pos.clear();
-    gamma_cos.clear();
-
-    dali_edop_simple->clear();
-
-    dali_e_ab->clear();
-    dali_id_ab->clear();
-    dali_cos_ab->clear();
-    dali_t_ab->clear();
-    dali_x_ab->clear();
-    dali_y_ab->clear();
-    dali_z_ab->clear();
-    dali_multi_ab = 0;
-
-    dali_edop_ab->clear();
 
     CalibDALI->ReconstructData();
 
@@ -268,58 +241,46 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    //===== ADDBACK END =======================
+
+    //===== TIMING GATE =======================
+    //===== TIMING GATE END ===================
+
     tr->Fill();
-    continue;
-  }
 
-  if(dali_multi_ab >= 1) {
-    for(Int_t i = 0; i < dali_multi_ab; i++) {
-      Double_t dali_edop_ab_tmp = Sqrt(-1);
-      dali_edop_ab_tmp = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos.at(i));
-      dali_edop_ab->push_back(dali_edop_ab_tmp);
-    }
-  }
+  }  //while loop
+  AllEntry = iEntry;
+  std::clog << std::endl;
 
-  //===== ADDBACK END =======================
+  tr->BuildIndex("RunNumber", "EventNumber");
+  outfile->cd();
+  outfile->Write();
+  outfile->Close("R");
 
-  //===== TIMING GATE =======================
-  //===== TIMING GATE END ===================
+  EventStore->ClearData();
+  delete CalibDALI;
 
-  tr->Fill();
+  delete DALI_ID;
+  delete DALI_Time;
+  delete DALI_Energy;
+  delete DALI_CosTheta;
+  delete DALI_X;
+  delete DALI_Y;
+  delete DALI_Z;
 
-}  //while loop
-iEntry = AllEntry;
-std::clog << std::endl;
+  delete DALI_ID_orig;
+  delete DALI_Time_orig;
+  delete DALI_Energy_orig;
+  delete DALI_CosTheta_orig;
+  delete DALI_X_orig;
+  delete DALI_Y_orig;
+  delete DALI_Z_orig;
 
-tr->BuildIndex("RunNumber", "EventNumber");
-outfile->cd();
-outfile->Write();
-outfile->Close("R");
+  delete TArtStoreManager::Instance();
 
-EventStore->ClearData();
-delete CalibDALI;
+  stop_timer_tk(FileNumber, AllEntry);
 
-delete DALI_ID;
-delete DALI_Time;
-delete DALI_Energy;
-delete DALI_CosTheta;
-delete DALI_X;
-delete DALI_Y;
-delete DALI_Z;
-
-delete DALI_ID_orig;
-delete DALI_Time_orig;
-delete DALI_Energy_orig;
-delete DALI_CosTheta_orig;
-delete DALI_X_orig;
-delete DALI_Y_orig;
-delete DALI_Z_orig;
-
-delete TArtStoreManager::Instance();
-
-stop_timer_tk(FileNumber, AllEntry);
-
-return 0;
+  return 0;
 }  //main()
 
 void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_t> *DALI_Energy, vector<Double_t> *DALI_Time, vector<Double_t> *DALI_X, vector<Double_t> *DALI_Y, vector<Double_t> *DALI_Z, vector<Double_t> *DALI_CosTheta) {
