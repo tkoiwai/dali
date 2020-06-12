@@ -13,6 +13,7 @@
 int main(int argc, char *argv[]) {
   initiate_timer_tk();
 
+  
   gInterpreter->GenerateDictionary("vector<TVector3>", "TVector3.h");
 
   Long64_t MaxEventNumber = LLONG_MAX;  //signed 8bit int. LLOMG_MAX ~ 2^63-1(const.)
@@ -250,157 +251,57 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    vertex.SetXYZ(vertexX, vertexY, vertexZ_cor - DALIoffset);
-    //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
-
-    for(Int_t i = 0; i < DALI_Multi; i++) {
-      dali_pos.push_back(TVector3(10 * DALI_X->at(i), 10 * DALI_Y->at(i), 10 * DALI_Z->at(i)));
-      gamma_pos.push_back(dali_pos.at(i) - vertex);
-      gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
-    }
-
-    //===== DOPPLER CORRECTION =====
-
-    if(DALI_Multi >= 1) {
-      for(Int_t i = 0; i < DALI_Multi; i++) {
-        Double_t dali_edop_tmp = Sqrt(-1);
-        dali_edop_tmp = DALI_Energy->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos.at(i));
-        dali_edop->push_back(dali_edop_tmp);
-      }
-    }
-
-    //===== DOPPLER CORRECTION END =====
-
-    //===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
-
-    const Double_t beta_mid = 0.57;
-    const Double_t gamma_mid = 1 / Sqrt(1 - beta_mid * beta_mid);
-    if(DALI_Multi >= 1) {
-      for(Int_t i = 0; i < DALI_Multi; i++) {
-        dali_edop_simple->push_back(DALI_Energy->at(i) * gamma_mid * (1 - beta_mid * DALI_CosTheta->at(i)));
-      }
-    }
-
-    //===== SIMPLE DOPPLER CORRECTION END =====
-
-    //===== ADDBACK ===========================
-    if(DALI_Multi > 1) {
-      dali_e_ab->push_back(DALI_Energy->at(0));
-      dali_id_ab->push_back(DALI_ID->at(0));
-      dali_cos_ab->push_back(DALI_CosTheta->at(0));
-      dali_t_ab->push_back(DALI_Time->at(0));
-      dali_x_ab->push_back(DALI_X->at(0));
-      dali_y_ab->push_back(DALI_Y->at(0));
-      dali_z_ab->push_back(DALI_Z->at(0));
-
-      //===== ADD BACK =====
-
-      Bool_t AddBack_flag = false;
-
-      for(Int_t i = 1; i < DALI_Multi; i++) {
-        AddBack_flag = false;
-        dali_multi_ab = dali_id_ab->size();
-        for(Int_t k = 0; k < dali_multi_ab; k++) {
-          for(Int_t j = 0; j < 7; j++) {
-            if(DALI_ID->at(i) == AddBackTable[dali_id_ab->at(k)][j] && DALI_Energy->at(i) > 300) {
-              dali_e_ab->at(k) = dali_e_ab->at(k) + DALI_Energy->at(i);
-              AddBack_flag = true;
-              break;
-            }
-          }
-          if(AddBack_flag == true) break;
-        }
-        if(AddBack_flag == false) {
-          dali_e_ab->push_back(DALI_Energy->at(i));
-          dali_id_ab->push_back(DALI_ID->at(i));
-          dali_cos_ab->push_back(DALI_CosTheta->at(i));
-          dali_t_ab->push_back(DALI_Time->at(i));
-          dali_x_ab->push_back(DALI_X->at(i));
-          dali_y_ab->push_back(DALI_Y->at(i));
-          dali_z_ab->push_back(DALI_Z->at(i));
-        }
-      }  //for DALI_Multi
-
-      dali_multi_ab = dali_id_ab->size();
-
-    }  //DALI_Multi>1
-    else if(DALI_Multi == 1) {
-      dali_e_ab->push_back(DALI_Energy->at(0));
-      dali_id_ab->push_back(DALI_ID->at(0));
-      dali_cos_ab->push_back(DALI_CosTheta->at(0));
-      dali_t_ab->push_back(DALI_Time->at(0));
-      dali_x_ab->push_back(DALI_X->at(0));
-      dali_y_ab->push_back(DALI_Y->at(0));
-      dali_z_ab->push_back(DALI_Z->at(0));
-
-      dali_multi_ab = 1;
-    } else if(DALI_Multi == 0) {
-      tr->Fill();
-      continue;
-    }
-
-    if(dali_multi_ab >= 1) {
-      for(Int_t i = 0; i < dali_multi_ab; i++) {
-        Double_t dali_edop_ab_tmp = Sqrt(-1);
-        dali_edop_ab_tmp = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos.at(i));
-        dali_edop_ab->push_back(dali_edop_ab_tmp);
-      }
-    }
-
-    //===== ADDBACK END =======================
-
-    //===== TIMING GATE =======================
-    //===== TIMING GATE END ===================
-
-
-
     tr->Fill();
+    continue;
+  }
 
-  }  //while loop
-  std::clog << std::endl;
+  if(dali_multi_ab >= 1) {
+    for(Int_t i = 0; i < dali_multi_ab; i++) {
+      Double_t dali_edop_ab_tmp = Sqrt(-1);
+      dali_edop_ab_tmp = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos.at(i));
+      dali_edop_ab->push_back(dali_edop_ab_tmp);
+    }
+  }
 
-  tr->BuildIndex("RunNumber", "EventNumber");
-  outfile->cd();
-  outfile->Write();
-  outfile->Close("R");
+  //===== ADDBACK END =======================
 
-  EventStore->ClearData();
-  delete CalibDALI;
+  //===== TIMING GATE =======================
+  //===== TIMING GATE END ===================
 
-  delete DALI_ID;
-  delete DALI_Time;
-  delete DALI_Energy;
-  delete DALI_CosTheta;
-  delete DALI_X;
-  delete DALI_Y;
-  delete DALI_Z;
+  tr->Fill();
 
-  delete DALI_ID_orig;
-  delete DALI_Time_orig;
-  delete DALI_Energy_orig;
-  delete DALI_CosTheta_orig;
-  delete DALI_X_orig;
-  delete DALI_Y_orig;
-  delete DALI_Z_orig;
+}  //while loop
+std::clog << std::endl;
 
-  delete TArtStoreManager::Instance();
+tr->BuildIndex("RunNumber", "EventNumber");
+outfile->cd();
+outfile->Write();
+outfile->Close("R");
 
-  delete dali_edop;
-  delete dali_edop_simple;
+EventStore->ClearData();
+delete CalibDALI;
 
-  delete dali_e_ab;
-  delete dali_id_ab;
-  delete dali_cos_ab;
-  delete dali_t_ab;
-  delete dali_x_ab;
-  delete dali_y_ab;
-  delete dali_z_ab;
+delete DALI_ID;
+delete DALI_Time;
+delete DALI_Energy;
+delete DALI_CosTheta;
+delete DALI_X;
+delete DALI_Y;
+delete DALI_Z;
 
-  delete dali_edop_ab;
+delete DALI_ID_orig;
+delete DALI_Time_orig;
+delete DALI_Energy_orig;
+delete DALI_CosTheta_orig;
+delete DALI_X_orig;
+delete DALI_Y_orig;
+delete DALI_Z_orig;
 
-  stop_timer_tk(FileNumber, AllEntry);
+delete TArtStoreManager::Instance();
 
-  return 0;
+stop_timer_tk(FileNumber, AllEntry);
+
+return 0;
 }  //main()
 
 void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_t> *DALI_Energy, vector<Double_t> *DALI_Time, vector<Double_t> *DALI_X, vector<Double_t> *DALI_Y, vector<Double_t> *DALI_Z, vector<Double_t> *DALI_CosTheta) {
