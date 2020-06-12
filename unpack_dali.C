@@ -13,22 +13,44 @@
 int main(int argc, char *argv[]) {
   initiate_timer_tk();
 
-  
   gInterpreter->GenerateDictionary("vector<TVector3>", "TVector3.h");
 
   Long64_t MaxEventNumber = LLONG_MAX;  //signed 8bit int. LLOMG_MAX ~ 2^63-1(const.)
 
-  if(argc < 2 || argc > 4) {
-    printf("Usage: ./unpack_dali RUNNUMBER\nOR     ./unpack_dali RUNNUMBER MAXEVENTS\nOR     ./unpack_dali RUNNUMBER MAXEVENTS TEST\n");
-    exit(EXIT_FAILURE);
-  }
-  printf("=======================================\n");
-  if(argc > 2) {
-    MaxEventNumber = TString(argv[2]).Atoi();
-    printf(" You will process %lld events\n", MaxEventNumber);
+  bool TestMode = false;
+  int FileNumber = -1;
+
+  int opt;
+
+  while((opt = getopt(argc, argv, "tr:e:")) != -1) {
+    switch(opt) {
+      case 'r':
+        FileNumber = atoi(optarg);
+        break;
+      case 'e':
+        MaxEventNumber = atoi(optarg);
+        break;
+      case 't':
+        TestMode = true;
+        break;
+
+      default:
+        break;
+    }
   }
 
-  Int_t FileNumber = TString(argv[1]).Atoi();
+  //if(argc < 2 || argc > 4) {
+  //  printf("Usage: ./unpack_dali RUNNUMBER\nOR     ./unpack_dali RUNNUMBER MAXEVENTS\nOR     ./unpack_dali RUNNUMBER MAXEVENTS TEST\n");
+  //  exit(EXIT_FAILURE);
+  //}
+
+  printf("=======================================\n");
+  //if(argc > 2) {
+  //MaxEventNumber = TString(argv[2]).Atoi();
+  printf(" You will process %lld events\n", MaxEventNumber);
+  //}
+
+  //Int_t FileNumber = TString(argv[1]).Atoi();
   TString RidfFileName = Form("/home/koiwai/analysis/ridf/sdaq02/run%04d.ridf.gz", FileNumber);
 
   if(!exists_test(RidfFileName)) {
@@ -36,7 +58,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  printf("\n%s %d %s \n\n", "=== Execute cal_dali for RUN", FileNumber, "===");
+  printf("\n%s %d %s \n\n", "=== Execute unpack_dali for RUN", FileNumber, "===");
 
   //*=====Load setting parameters=========================================
   TEnv *env_par = new TEnv("/home/koiwai/analysis/conversion_settings.prm");
@@ -85,10 +107,10 @@ int main(int argc, char *argv[]) {
 
   //=====ROOT file setting ==========================================================
   TString ofname;
-  if(argc < 4)
+  if(!TestMode)
     ofname = Form("/home/koiwai/analysis/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
-  else if(argc == 4)
-    ofname = Form("/home/koiwai/analysis/dali/testcal_dali%04d.root", FileNumber);
+  else
+    ofname = Form("/home/koiwai/analysis/dali/test_unpack_dali%04d.root", FileNumber);
 
   TFile *outfile = new TFile(ofname, "RECREATE");
   TTree *tr = new TTree("tr", "tr");
@@ -100,13 +122,8 @@ int main(int argc, char *argv[]) {
 
   //===== LOOP start ================================================================
   int iEntry = 0;
-  int AllEntry;
-  if(argc > 2)
-    AllEntry = MaxEventNumber;
-  else
-    AllEntry = anatrB->GetEntries();
-
-  printf("\n Number of events to treat: %d\n\n", AllEntry);
+  //int AllEnrty;
+  //printf("\n Number of events to treat: %d\n\n", AllEntry);
 
   prepare_timer_tk();
 
@@ -115,7 +132,7 @@ int main(int argc, char *argv[]) {
     anatrB->GetEntry(EventNumber);
     EventNumber++;
 
-    start_timer_tk(iEntry, AllEntry, 1000);
+    start_timer_tk(iEntry, 1000);
 
     CalibDALI->ClearData();
 
@@ -271,6 +288,7 @@ int main(int argc, char *argv[]) {
   tr->Fill();
 
 }  //while loop
+iEntry = AllEntry;
 std::clog << std::endl;
 
 tr->BuildIndex("RunNumber", "EventNumber");
