@@ -1,3 +1,11 @@
+//!===============================================================================
+//!  2020 June 12 TK wrote.
+//!  unpacking+calibration for DALI2+ date of SEASTAR3-2017
+//!  Doppler cor will be done in next step
+//!
+//!
+//!===============================================================================
+
 #define unpack_dali_cxx
 #include "/home/koiwai/analysis/include/unpackdalidef.h"
 
