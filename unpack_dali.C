@@ -82,53 +82,10 @@ int main(int argc, char *argv[]) {
     cout << "input file: " << RidfFileName << endl;
   }
 
-  //===== Load Beam file for PID cut =====
-  TString infnameB = Form("/home/koiwai/analysis/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
-  TFile *infileB = TFile::Open(infnameB);
-  TTree *anatrB;
-  infileB->GetObject("anatrB", anatrB);
-
-  printf("%-20s %s \n", "Input beam file:", infnameB.Data());
-
-  anaD_Get_Branch_beam(anatrB);
-
-  //===== Load smri file for PID cut =====
-  TString infnameS = Form("/home/koiwai/analysis/rootfiles/ana/smri/ana_smri%04d.root", FileNumber);
-  TFile *infileS = TFile::Open(infnameS);
-  TTree *anatrS;
-  infileS->GetObject("anatrS", anatrS);
-
-  printf("%-20s %s \n", "Input smri file:", infnameS.Data());
-
-  anaD_Get_Branch_smri(anatrS);
-
-  //===== Load MINOS file =====
-  TString infnameM = Form("/home/koiwai/analysis/rootfiles/minos/vertex/vertex%04d.root", FileNumber);
-  TFile *infileM = TFile::Open(infnameM);
-  TTree *trM;
-  infileM->GetObject("tr", trM);
-
-  printf("%-20s %s \n\n", "Input minos file:", infnameM.Data());
-
-  anaD_Get_Branch_minos(trM);
-
-  //===== AddFriend =====
-
-  anatrB->AddFriend(anatrS);
-  anatrB->AddFriend(trM);
-
-  //===== Load cuts =======================================================================
-  TFile *fcutSA_Ca = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca.root");
-
-  TCutG *csa57ca = (TCutG *)fcutSA_Ca->Get("sa57ca");
-  TCutG *csa55ca = (TCutG *)fcutSA_Ca->Get("sa55ca");
-  TCutG *csa54ca = (TCutG *)fcutSA_Ca->Get("sa54ca");
-  TCutG *csa53ca = (TCutG *)fcutSA_Ca->Get("sa53ca");
-
   //=====ROOT file setting ==========================================================
   TString ofname;
   if(argc < 4)
-    ofname = Form("/home/koiwai/analysis/rootfiles/ana/dali/cal_dali%04d.root", FileNumber);
+    ofname = Form("/home/koiwai/analysis/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
   else if(argc == 4)
     ofname = Form("/home/koiwai/analysis/dali/testcal_dali%04d.root", FileNumber);
 
@@ -212,10 +169,6 @@ int main(int argc, char *argv[]) {
 
     DALI_Multi = 0;
 
-    vertexZ_cor = Sqrt(-1);
-    beta_vertex = Sqrt(-1);
-    gamma_vertex = Sqrt(-1);
-
     dali_edop->clear();
 
     vertex.SetXYZ(Sqrt(-1), Sqrt(-1), Sqrt(-1));
@@ -237,25 +190,7 @@ int main(int argc, char *argv[]) {
 
     dali_edop_ab->clear();
 
-    sa57ca = kFALSE;
-    sa55ca = kFALSE;
-    sa54ca = kFALSE;
-    sa53ca = kFALSE;
-
     CalibDALI->ReconstructData();
-
-    //===== cut events not interested =====
-    bool BRcut_bool = false;
-
-    if((br59sc == 1) || (br58sc == 1) || (br57sc == 1) || (br56sc == 1) || (br55sc == 1) || (br54sc == 1) ||
-       (br56ca == 1) || (br55ca == 1) || (br54ca == 1) || (br53ca == 1) || (br52ca == 1) ||
-       (br54k == 1) || (br53k == 1) || (br52k == 1) || (br51k == 1) || (br50k == 1) || (br49k == 1))
-      BRcut_bool = true;
-
-    if(BRcut_bool == false) {
-      tr->Fill();
-      continue;
-    }
 
     TClonesArray *DALINaIHits = (TClonesArray *)sman->FindDataContainer("DALINaI");
     if(DALINaIHits) {
@@ -314,11 +249,6 @@ int main(int argc, char *argv[]) {
       tr->Fill();
       continue;
     }
-
-    vertexZ_cor = vertexZ + MINOSoffsetZ;
-
-    beta_vertex = betaF7F13 - (betaF7F13 - betaTH) * vertexZ_cor / 150.0;
-    gamma_vertex = 1 / Sqrt(1 - beta_vertex * beta_vertex);
 
     vertex.SetXYZ(vertexX, vertexY, vertexZ_cor - DALIoffset);
     //To match the centre of MINOS cell and DALI Z = 0.(DALIOffset)
@@ -422,11 +352,7 @@ int main(int argc, char *argv[]) {
     //===== TIMING GATE =======================
     //===== TIMING GATE END ===================
 
-    //===== isotope gate =====
-    if(csa57ca->IsInside(aoqSA, zetSA)) sa57ca = kTRUE;
-    if(csa55ca->IsInside(aoqSA, zetSA)) sa55ca = kTRUE;
-    if(csa54ca->IsInside(aoqSA, zetSA)) sa54ca = kTRUE;
-    if(csa53ca->IsInside(aoqSA, zetSA)) sa53ca = kTRUE;
+
 
     tr->Fill();
 
@@ -531,58 +457,6 @@ void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_
   if(i < right)
     SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
 }
-
-/*
-void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_EnergyDopplerCorrected, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_CosThetav)
-{
-  Int_t TempID;
-  Double_t TempEnergy;
-  Double_t TempEnergyDopplerCorrected;
-  Double_t TempTime;
-  Double_t TempCosTheta;
-
-  int i = left, j = right;
-  double pivot = DALI_EnergyDopplerCorrected->at((left + right) / 2);
-*/
-/* partition */
-/*
-while (i <= j) {
-    while (DALI_EnergyDopplerCorrected->at(i) > pivot)
-      i++;
-    while (DALI_EnergyDopplerCorrected->at(j) < pivot)
-      j--;
-    if (i <= j) {
-      TempID = DALI_ID->at(j);
-      TempEnergy = DALI_Energy->at(j);
-      TempEnergyDopplerCorrected = DALI_EnergyDopplerCorrected->at(j);
-      TempTime = DALI_Time->at(j);
-      TempCosTheta = DALI_CosTheta->at(j);
-
-      DALI_ID->at(j) = DALI_ID->at(i);
-      DALI_Energy->at(j) = DALI_Energy->at(i);
-      DALI_EnergyDopplerCorrected->at(j) = DALI_EnergyDopplerCorrected->at(i);
-      DALI_Time->at(j) = DALI_Time->at(i);
-      DALI_CosTheta->at(j) = DALI_CosTheta->at(i);
-
-      DALI_ID->at(i) = TempID;
-      DALI_Energy->at(i) = TempEnergy;
-      DALI_EnergyDopplerCorrected->at(i) = TempEnergyDopplerCorrected;
-      DALI_Time->at(i) = TempTime;
-      DALI_CosTheta->at(i) = TempCosTheta;
-
-      i++;
-      j--;
-    }
-  };
-*/
-/* recursion */
-/*
-  if (left < j)
-    SortDaliHit(left, j, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
-  if (i < right)
-    SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
-}
-*/
 
 Double_t DopplerCorrection(Double_t GammaDopplerEnergy, Double_t Beta, Double_t CosTheta) {
   Double_t Gamma = 1 / TMath::Sqrt(1 - Beta * Beta);
