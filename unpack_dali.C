@@ -40,7 +40,6 @@ int main(int argc, char *argv[]) {
         break;
     }
   }
-
   printf("=======================================\n");
 
   TString RidfFileName = Form("/home/koiwai/analysis/ridf/sdaq02/run%04d.ridf.gz", FileNumber);
