@@ -6,22 +6,45 @@ int main(int argc, char *argv[]) {
 
   gInterpreter->GenerateDictionary("vector<TVector3>", "TVector3.h");
 
-  Int_t FileNumber = TString(argv[1]).Atoi();
+  //Int_t FileNumber = TString(argv[1]).Atoi();
 
-  if(FileNumber == 0) {
-    std::cerr << " You should provide either a runnumber" << endl;
-  }
-  if(argc < 2 || argc > 5) {
-    printf("Usage: ./cal_dali RUNNUMBER\nOR     ./cal_dali RUNNUMBER MAXEVENTS\nOR     ./cal_dali RUNNUMBER MAXEVENTS TEST\n");
-    exit(EXIT_FAILURE);
-  }
-
+  bool TestMode = false;
+  bool ENum_flag = false;
+  int FileNumber = -1;
   int MaxEventNumber = 0;
 
-  if(argc > 2) {
-    MaxEventNumber = TString(argv[2]).Atoi();
-    printf(" You will process %d events\n", MaxEventNumber);
+  int opt;
+
+  while((opt = getopt(argc, argv, "tr:e:")) != -1) {
+    switch(opt) {
+      case 'r':
+        FileNumber = atoi(optarg);
+        break;
+      case 'e':
+        ENum_flag = true;
+        MaxEventNumber = atoi(optarg);
+        break;
+      case 't':
+        TestMode = true;
+        break;
+
+      default:
+        break;
+    }
   }
+
+  if(FileNumber == -1) {
+    std::cerr << " You should provide either a runnumber" << endl;
+  }
+  //if(argc < 2 || argc > 5) {
+  //  printf("Usage: ./cal_dali RUNNUMBER\nOR     ./cal_dali RUNNUMBER MAXEVENTS\nOR     ./cal_dali RUNNUMBER MAXEVENTS TEST\n");
+  //  exit(EXIT_FAILURE);
+  //}
+
+  //if(argc > 2) {
+  //  MaxEventNumber = TString(argv[2]).Atoi();
+  //  printf(" You will process %d events\n", MaxEventNumber);
+  //}
 
   const double MINOSoffsetZ = 12.37;
   const double DALIoffset = 96.5;
@@ -266,9 +289,9 @@ int main(int argc, char *argv[]) {
   //TString ofname =  Form("rootfiles/hist_dali%04d.root",FileNumber);
   TString ofname;
 
-  if(argc < 4)
+  if(!TestMode)
     ofname = Form("/home/koiwai/analysis/rootfiles/dali_hist/hist_dali%04d.root", FileNumber);
-  else if(argc == 4)
+  else
     ofname = Form("/home/koiwai/analysis/dali/testhist_dali%04d.root", FileNumber);
 
   TFile *outfile = new TFile(ofname, "RECREATE");
