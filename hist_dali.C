@@ -50,11 +50,33 @@ int main(int argc, char *argv[]) {
   const double DALIoffset = 96.5;
 
   //===== Load input files =====
+  TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
+  TFile *infileB = TFile::Open(infnameB);
+  TTree *intrB = (TTree *)infile->Get("anatrB");
+
+  Get_Branch_beam(intrB);
+
+  TString infnameS = Form("/home/koiwai/rootfiles/ana/smri/ana_smri%04d.root", FileNumber);
+  TFile *infileS = TFile::Open(infnameS);
+  TTree *intrS = (TTree *)infileS->Get("anatrS");
+
+  Get_Branch_smri(intrS);
+
+  TString infnameV = Form("/home/koiwai/rootfiles/minos/vertex/vertex_frank%04d.root", FileNumber);
+  TFile *infileV = TFile::Open(infnameV);
+  TTree *intrV = (TTree *)infileV->Get("tr");
+
+  Get_Branch_vertex(intrV);
+
   TString infname = Form("/home/koiwai/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
   TFile *infile = TFile::Open(infname);
   TTree *intr = (TTree *)infile->Get("tr");
 
   Get_Branch_calD(intr);
+
+  intr->AddFriend(intrB);
+  intr->AddFriend(intrS);
+  intr->AddFriend(intrV);
 
   int AddBackTable[226][7] = {
       {10, 19, -1, -1, -1, -1, -1},  //0
@@ -297,23 +319,7 @@ int main(int argc, char *argv[]) {
   TFile *outfile = new TFile(ofname, "RECREATE");
 
   //=====Define variables===================================================
-  Int_t EventNumber = 0;
-  Int_t RunNumber = -1;
-
-  Int_t dali_multi_ab;
-  vector<Double_t> *dali_e_ab = new vector<Double_t>();
-  vector<Int_t> *dali_id_ab = new vector<Int_t>();
-  vector<Double_t> *dali_cos_ab = new vector<Double_t>();
-  vector<Double_t> *dali_t_ab = new vector<Double_t>();
-  vector<Double_t> *dali_x_ab = new vector<Double_t>();
-  vector<Double_t> *dali_y_ab = new vector<Double_t>();
-  vector<Double_t> *dali_z_ab = new vector<Double_t>();
-
-  vector<Double_t> *dali_edop_ab = new vector<Double_t>();
-
-  vector<Double_t> *dali_edop_simple_ab = new vector<Double_t>();
-  vector<Double_t> *dali_edop_beta_ab = new vector<Double_t>();
-  vector<Double_t> *dali_edop_theta_ab = new vector<Double_t>();
+  //done in header
 
   //===== LOAD CUTS =====================================================================
   TFile *fcutSA_K = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
