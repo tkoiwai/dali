@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   const double DALIoffset = 96.5;
 
   //===== Load input files =====
-  TString infname = Form("rootfiles/ana/dali/cal_dali%04d.root", FileNumber);
+  TString infname = Form("/home/koiwai/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
   TFile *infile = TFile::Open(infname);
   TTree *intr = (TTree *)infile->Get("tr");
 
