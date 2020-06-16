@@ -272,8 +272,6 @@ int main(int argc, char *argv[]) {
     ofname = Form("/home/koiwai/analysis/dali/testhist_dali%04d.root", FileNumber);
 
   TFile *outfile = new TFile(ofname, "RECREATE");
-  //TTree *tr = new TTree("anatrD","anatrD");
-  //tr->SetAutoSave(1e5); //Autosave every 10,000 events filled.
 
   //=====Define variables===================================================
   Int_t EventNumber = 0;
