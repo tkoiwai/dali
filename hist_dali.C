@@ -173,13 +173,27 @@ int main(int argc, char *argv[]) {
     // done in cal_dali
 
     //*===== INIT ==================================================================
+    dali_e->clear();
+    dali_t->clear();
+    dali_cos->clear();
+    dali_x->clear();
+    dali_y->clear();
+    dali_z->clear();
+    dali_id->clear();
+    dali_multi = 0;
+
+    dali_edop->clear();
+    dali_edop_simple->clear();
+    dali_edop_beta->clear();
+    dali_edop_theta->clear();
+
     dali_e_ab->clear();
-    dali_id_ab->clear();
-    dali_cos_ab->clear();
     dali_t_ab->clear();
+    dali_cos_ab->clear();
     dali_x_ab->clear();
     dali_y_ab->clear();
     dali_z_ab->clear();
+    dali_id_ab->clear();
     dali_multi_ab = 0;
 
     dali_edop_ab->clear();
@@ -537,21 +551,34 @@ int main(int argc, char *argv[]) {
   outfile->Write();
   outfile->Close("R");
 
-  delete DALI_ID;
-  delete DALI_Time;
   delete DALI_Energy;
+  delete DALI_Time;
   delete DALI_CosTheta;
   delete DALI_X;
   delete DALI_Y;
   delete DALI_Z;
+  delete DALI_ID;
+
+  delete dali_e;
+  delete dali_t;
+  delete dali_cos;
+  delete dali_x;
+  delete dali_y;
+  delete dali_z;
+  delete dali_id;
+
+  delete dali_edop;
+  delete dali_edop_simple;
+  delete dali_edop_beta;
+  delete dali_edop_theta;
 
   delete dali_e_ab;
-  delete dali_id_ab;
-  delete dali_cos_ab;
   delete dali_t_ab;
+  delete dali_cos_ab;
   delete dali_x_ab;
   delete dali_y_ab;
   delete dali_z_ab;
+  delete dali_id_ab;
 
   delete dali_edop_ab;
   delete dali_edop_simple_ab;
