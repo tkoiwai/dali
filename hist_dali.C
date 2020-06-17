@@ -641,58 +641,6 @@ int main(int argc, char *argv[]) {
       SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
   }
 
-  /*
-void SortDaliHit(Int_t left, Int_t right,vector <Int_t> *DALI_ID,vector <Double_t> *DALI_Energy, vector <Double_t> *DALI_EnergyDopplerCorrected, vector <Double_t> *DALI_Time, vector <Double_t> *DALI_CosTheta)
-{
-  Int_t TempID;
-  Double_t TempEnergy;
-  Double_t TempEnergyDopplerCorrected;
-  Double_t TempTime;
-  Double_t TempCosTheta;
-
-  int i = left, j = right;
-  double pivot = DALI_EnergyDopplerCorrected->at((left + right) / 2);
-*/
-  /* partition */
-  /*
-while (i <= j) {
-    while (DALI_EnergyDopplerCorrected->at(i) > pivot)
-      i++;
-    while (DALI_EnergyDopplerCorrected->at(j) < pivot)
-      j--;
-    if (i <= j) {
-      TempID = DALI_ID->at(j);
-      TempEnergy = DALI_Energy->at(j);
-      TempEnergyDopplerCorrected = DALI_EnergyDopplerCorrected->at(j);
-      TempTime = DALI_Time->at(j);
-      TempCosTheta = DALI_CosTheta->at(j);
-
-      DALI_ID->at(j) = DALI_ID->at(i);
-      DALI_Energy->at(j) = DALI_Energy->at(i);
-      DALI_EnergyDopplerCorrected->at(j) = DALI_EnergyDopplerCorrected->at(i);
-      DALI_Time->at(j) = DALI_Time->at(i);
-      DALI_CosTheta->at(j) = DALI_CosTheta->at(i);
-
-      DALI_ID->at(i) = TempID;
-      DALI_Energy->at(i) = TempEnergy;
-      DALI_EnergyDopplerCorrected->at(i) = TempEnergyDopplerCorrected;
-      DALI_Time->at(i) = TempTime;
-      DALI_CosTheta->at(i) = TempCosTheta;
-
-      i++;
-      j--;
-    }
-  };
-*/
-  /* recursion */
-  /*
-  if (left < j)
-    SortDaliHit(left, j, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
-  if (i < right)
-    SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_EnergyDopplerCorrected, DALI_Time, DALI_CosTheta);
-}
-*/
-
   Double_t DopplerCorrection(Double_t GammaDopplerEnergy, Double_t Beta, Double_t CosTheta) {
     Double_t Gamma            = 1 / TMath::Sqrt(1 - Beta * Beta);
     Double_t DopplerCorrected = GammaDopplerEnergy * Gamma * (1 - Beta * CosTheta);
