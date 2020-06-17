@@ -54,8 +54,11 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  //+===== Define constants =====
+
   const double MINOSoffsetZ = 12.37;
   const double DALIoffset   = 96.5;
+  const double DALITimeGate = 15.;
 
   //===== Load input files =====
   TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
@@ -87,7 +90,6 @@ int main(int argc, char *argv[]) {
   intr->AddFriend(intrV);
 
   //+=====ROOT file setting==========================================================
-  //TString ofname =  Form("rootfiles/hist_dali%04d.root",FileNumber);
   TString ofname;
 
   if(!TestMode)
@@ -97,8 +99,8 @@ int main(int argc, char *argv[]) {
 
   TFile *outfile = new TFile(ofname, "RECREATE");
 
-  //=====Define variables===================================================
-  //done in header
+  //+=====Define variables===================================================
+  //- done in header
 
   //+===== LOAD CUTS =====================================================================
   TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
@@ -121,7 +123,7 @@ int main(int argc, char *argv[]) {
   TCutG *cbr51k  = (TCutG *)fcutBR_51K->Get("br51k");
   TCutG *csa50ar = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
-  //===== DEFINE HIST ====================================================================
+  //+===== DEFINE HIST ====================================================================
   char *cnamebr[10] = {(char *)"br54ca", (char *)"br56ca", (char *)"br56ca", (char *)"br56sc", (char *)"br58sc",
                        (char *)"br59sc", (char *)"br51k", (char *)"", (char *)"", (char *)""};
   char *cnamesa[10] = {(char *)"sa53ca", (char *)"sa55ca", (char *)"sa55k", (char *)"sa55ca", (char *)"sa57ca",
@@ -140,12 +142,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  //===== LOOP =========================================================================
+  //&===== LOOP =========================================================================
 
   Int_t nEntry = intr->GetEntries();
   int   iEntry = 0;
   int   AllEntry;
-  //if(argc > 2 && MaxEventNumber < nEntry)
+
   if(ENum_flag && MaxEventNumber < nEntry)
     AllEntry = MaxEventNumber;
   else
@@ -153,7 +155,6 @@ int main(int argc, char *argv[]) {
 
   prepare_timer_tk();
 
-  //&===== LOOP =================================================================================
   for(Int_t iEntry = 0; iEntry < AllEntry; iEntry++) {
     intr->GetEntry(iEntry);
 
@@ -166,7 +167,7 @@ int main(int argc, char *argv[]) {
 
     //+===== DALI timing gate ======================================================
     for(int i = 0; i < dali_multi; i++)
-      if(abs(dali_t->at(i)) > 15.) continue;
+      if(abs(dali_t->at(i)) > DALITimeGate) continue;
 
     //+===== PID gate ==============================================================
     //- done in cal_dali
