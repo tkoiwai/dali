@@ -6,8 +6,6 @@ int main(int argc, char *argv[]) {
 
   gInterpreter->GenerateDictionary("vector<TVector3>", "TVector3.h");
 
-  //Int_t FileNumber = TString(argv[1]).Atoi();
-
   bool   TestMode       = false;
   bool   ENum_flag      = false;
   int    FileNumber     = -1;
@@ -19,13 +17,13 @@ int main(int argc, char *argv[]) {
       {"eventnumber", required_argument, NULL, "e"},
       {"runnumber", required_argument, NULL, "r"},
       {"testmode", no_argument, NULL, "t"},
-      {0, 0, 0, 0},
+      //    {0, 0, 0, 0},
   };
 
   int opt;
   int longindex;
 
-  while((opt = getopt_long(argc, argv, "a:tr:e:" n longopts, &longindex)) != -1) {
+  while((opt = getopt_long(argc, argv, "a:tr:e:", longopts, &longindex)) != -1) {
     switch(opt) {
       case 'a':
         addbackRadius = atoi(optarg);
@@ -169,13 +167,21 @@ int main(int argc, char *argv[]) {
     //+===== GATES =================================================================
 
     //+===== DALI timing gate ======================================================
-    for(int i = 0; i < DALI_Multi; i++)
-      if(abs(DALI_Time->at(i)) > 15.) continue;
+    for(int i = 0; i < dali_multi; i++)
+      if(abs(dali_t->at(i)) > 15.) continue;
 
     //+===== PID gate ==============================================================
     //- done in cal_dali
 
     //+===== INIT ==================================================================
+    dali_e->clear();
+    dali_t->clear();
+    dali_cos->clear();
+    dali_x->clear();
+    dali_y->clear();
+    dali_z->clear();
+    dali_id->clear();
+    dali_multi = 0;
 
     dali_edop->clear();
     dali_edop_simple->clear();
@@ -196,7 +202,7 @@ int main(int argc, char *argv[]) {
     dali_edop_beta_ab->clear();
     dali_edop_theta_ab->clear();
 
-    if(DALI_Multi > 1) {
+    if(dali_multi > 1) {
       dali_e_ab->push_back(dali_e->at(0));
       dali_t_ab->push_back(dali_t->at(0));
       dali_cos_ab->push_back(dali_cos->at(0));
@@ -224,432 +230,424 @@ int main(int argc, char *argv[]) {
           }
 
           if(AddBack_flag == false) {
-            dali_e_ab->push_back(dali_Energy->at(i));
-            dali_id_ab->push_back(dali_ID->at(i));
-            dali_cos_ab->push_back(dali_CosTheta->at(i));
-            dali_t_ab->push_back(dali_Time->at(i));
-            dali_x_ab->push_back(dali_X->at(i));
-            dali_y_ab->push_back(dali_Y->at(i));
-            dali_z_ab->push_back(dali_Z->at(i));
+            dali_e_ab->push_back(dali_e->at(i));
+            dali_t_ab->push_back(dali_t->at(i));
+            dali_cos_ab->push_back(dali_cos->at(i));
+            dali_x_ab->push_back(dali_x->at(i));
+            dali_y_ab->push_back(dali_y->at(i));
+            dali_z_ab->push_back(dali_z->at(i));
+            dali_id_ab->push_back(dali_id->at(i));
           }
         }  //for dali_Multi
 
         dali_multi_ab = dali_id_ab->size();
 
       }  //dali_Multi>1
-      else if(dali_Multi == 1) {
-        dali_e_ab->push_back(dali_Energy->at(0));
-        dali_id_ab->push_back(dali_ID->at(0));
-        dali_cos_ab->push_back(dali_CosTheta->at(0));
-        dali_t_ab->push_back(dali_Time->at(0));
-        dali_x_ab->push_back(dali_X->at(0));
-        dali_y_ab->push_back(dali_Y->at(0));
-        dali_z_ab->push_back(dali_Z->at(0));
 
-        dali_multi_ab = 1;
-      }
-      else if(dali_Multi == 0) {
-        //tr->Fill();
-        continue;
-      }
+    } else if(dali_multi == 1) {
+      dali_e_ab->push_back(dali_e->at(0));
+      dali_t_ab->push_back(dali_t->at(0));
+      dali_cos_ab->push_back(dali_cos->at(0));
+      dali_x_ab->push_back(dali_x->at(0));
+      dali_y_ab->push_back(dali_y->at(0));
+      dali_z_ab->push_back(dali_z->at(0));
+      dali_id_ab->push_back(dali_id->at(0));
 
-      //-===== ADD BACK END =====
+      dali_multi_ab = 1;
+    } else if(dali_multi == 0) {
+      //tr->Fill();
+      continue;
+    }
 
-      //+===== Timing gate =====
-      for(int i = 0; i < dali_multi_ab; i++) {
-        if(-13.851 > dali_t_ab->at(i) || dali_t_ab->at(i) > 13.621) continue;  //5 sigma
-      }
-      if(!goodEvt) continue;
+    //-===== ADD BACK END =====
 
-      //for(Int_t i=0;i<dali_multi_ab;i++){
-      //  dali_pos->push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
-      //  gamma_pos.push_back(dali_pos.at(i)-vertex);
-      //  gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
-      //}
+    //+===== Timing gate =====
+    for(int i = 0; i < dali_multi_ab; i++) {
+      if(-13.851 > dali_t_ab->at(i) || dali_t_ab->at(i) > 13.621) continue;  //5 sigma
+    }
+    //? if(!goodEvt) continue;
 
-      //+===== DOPPLER CORRECTION =====
+    //for(Int_t i=0;i<dali_multi_ab;i++){
+    //  dali_pos->push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
+    //  gamma_pos.push_back(dali_pos.at(i)-vertex);
+    //  gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
+    //}
 
-      if(dali_multi_ab >= 1) {
-        for(Int_t i = 0; i < dali_multi_ab; i++) {
-          Double_t dali_edop_tmp = Sqrt(-1);
-          dali_edop_tmp          = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos->at(i));
-          dali_edop_ab->push_back(dali_edop_tmp);
-        }
-      }
+    //+===== DOPPLER CORRECTION =====
 
-      //-===== DOPPLER CORRECTION END =====
+    //if(dali_multi_ab >= 1) {
+    //  for(Int_t i = 0; i < dali_multi_ab; i++) {
+    //    Double_t dali_edop_tmp = Sqrt(-1);
+    //    dali_edop_tmp          = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos->at(i));
+    //    dali_edop_ab->push_back(dali_edop_tmp);
+    //  }
+    //}
 
-      //+===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
+    //-===== DOPPLER CORRECTION END =====
 
-      //beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
-      //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
-      const Double_t beta_mid  = 0.57;
-      const Double_t gamma_mid = 1 / Sqrt(1 - beta_mid * beta_mid);
-      if(dali_multi_ab >= 1) {
-        for(Int_t i = 0; i < dali_multi_ab; i++) {
-          dali_edop_simple_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * dali_cos_ab->at(i)));
-          dali_edop_beta_ab->push_back(dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * dali_cos_ab->at(i)));
-          dali_edop_theta_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * gamma_cos->at(i)));
-        }
-      }
+    //+===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
-      //-===== SIMPLE DOPPLER CORRECTION END =====
+    //beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
+    //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
+    //const Double_t beta_mid  = 0.57;
+    //const Double_t gamma_mid = 1 / Sqrt(1 - beta_mid * beta_mid);
+    //if(dali_multi_ab >= 1) {
+    //  for(Int_t i = 0; i < dali_multi_ab; i++) {
+    //    dali_edop_simple_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * dali_cos_ab->at(i)));
+    //    dali_edop_beta_ab->push_back(dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * dali_cos_ab->at(i)));
+    //    dali_edop_theta_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * gamma_cos->at(i)));
+    //  }
+    //}
 
-      //+===== FILL HIST ==============================================================================
-      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-        hdop[0]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[1]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[2]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[3]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[4]->Fill(dali_edop->at(0));
+    //-===== SIMPLE DOPPLER CORRECTION END =====
 
-        hdop[5]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[6]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[7]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[8]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[9]->Fill(dali_edop_ab->at(0));
-      }
+    //+===== FILL HIST ==============================================================================
+    if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+      hdop[0]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[1]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[2]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[3]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[4]->Fill(dali_edop->at(0));
 
-      if(br56ca && sa55ca) {
-        hdop[10]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[11]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[12]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[13]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[14]->Fill(dali_edop->at(0));
+      hdop[5]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[6]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[7]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[8]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[9]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[15]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[16]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[17]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[18]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[19]->Fill(dali_edop_ab->at(0));
-      }
+    if(br56ca && sa55ca) {
+      hdop[10]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[11]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[12]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[13]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[14]->Fill(dali_edop->at(0));
 
-      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-        hdop[20]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[21]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[22]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[23]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[24]->Fill(dali_edop->at(0));
+      hdop[15]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[16]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[17]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[18]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[19]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[25]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[26]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[27]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[28]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[29]->Fill(dali_edop_ab->at(0));
-      }
+    if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
+      hdop[20]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[21]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[22]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[23]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[24]->Fill(dali_edop->at(0));
 
-      if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
-        hdop[30]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[31]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[32]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[33]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[34]->Fill(dali_edop->at(0));
+      hdop[25]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[26]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[27]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[28]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[29]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[35]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[36]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[37]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[38]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[39]->Fill(dali_edop_ab->at(0));
-      }
+    if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
+      hdop[30]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[31]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[32]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[33]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[34]->Fill(dali_edop->at(0));
 
-      if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
-        hdop[40]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[41]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[42]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[43]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[44]->Fill(dali_edop->at(0));
+      hdop[35]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[36]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[37]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[38]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[39]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[45]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[46]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[47]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[48]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[49]->Fill(dali_edop_ab->at(0));
-      }
+    if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
+      hdop[40]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[41]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[42]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[43]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[44]->Fill(dali_edop->at(0));
 
-      if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
-        hdop[50]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[51]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[52]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[53]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[54]->Fill(dali_edop->at(0));
+      hdop[45]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[46]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[47]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[48]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[49]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[55]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[56]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[57]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[58]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[59]->Fill(dali_edop_ab->at(0));
-      }
+    if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
+      hdop[50]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[51]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[52]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[53]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[54]->Fill(dali_edop->at(0));
 
-      if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
-        hdop[60]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 1)
-          hdop[61]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 2)
-          hdop[62]->Fill(dali_edop->at(0));
-        if(DALI_Multi == 3)
-          hdop[63]->Fill(dali_edop->at(0));
-        if(DALI_Multi < 4)
-          hdop[64]->Fill(dali_edop->at(0));
+      hdop[55]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[56]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[57]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[58]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[59]->Fill(dali_edop_ab->at(0));
+    }
 
-        hdop[65]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[66]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[67]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[68]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[69]->Fill(dali_edop_ab->at(0));
-      }
+    if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
+      hdop[60]->Fill(dali_edop->at(0));
+      if(dali_multi == 1)
+        hdop[61]->Fill(dali_edop->at(0));
+      if(dali_multi == 2)
+        hdop[62]->Fill(dali_edop->at(0));
+      if(dali_multi == 3)
+        hdop[63]->Fill(dali_edop->at(0));
+      if(dali_multi < 4)
+        hdop[64]->Fill(dali_edop->at(0));
 
-      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-        hdopsimple[0]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[1]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[2]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[3]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[4]->Fill(dali_edop_simple->at(0));
-      }
+      hdop[65]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 1)
+        hdop[66]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 2)
+        hdop[67]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab == 3)
+        hdop[68]->Fill(dali_edop_ab->at(0));
+      if(dali_multi_ab < 4)
+        hdop[69]->Fill(dali_edop_ab->at(0));
+    }
 
-      if(br56ca && sa55ca) {
-        hdopsimple[5]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[6]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[7]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[8]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[9]->Fill(dali_edop_simple->at(0));
-      }
+    if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+      hdopsimple[0]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[1]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[2]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[3]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[4]->Fill(dali_edop_simple->at(0));
+    }
 
-      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-        hdopsimple[10]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[11]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[12]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[13]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[14]->Fill(dali_edop_simple->at(0));
-      }
+    if(br56ca && sa55ca) {
+      hdopsimple[5]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[6]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[7]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[8]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[9]->Fill(dali_edop_simple->at(0));
+    }
 
-      if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
-        hdopsimple[15]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[16]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[17]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[18]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[19]->Fill(dali_edop_simple->at(0));
-      }
+    if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
+      hdopsimple[10]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[11]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[12]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[13]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[14]->Fill(dali_edop_simple->at(0));
+    }
 
-      if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
-        hdopsimple[20]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[21]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[22]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[23]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[24]->Fill(dali_edop_simple->at(0));
-      }
+    if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
+      hdopsimple[15]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[16]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[17]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[18]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[19]->Fill(dali_edop_simple->at(0));
+    }
 
-      if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
-        hdopsimple[25]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[26]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[27]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[28]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[29]->Fill(dali_edop_simple->at(0));
-      }
+    if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
+      hdopsimple[20]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[21]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[22]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[23]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[24]->Fill(dali_edop_simple->at(0));
+    }
 
-      if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
-        hdopsimple[30]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 1)
-          hdopsimple[31]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 2)
-          hdopsimple[32]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi == 3)
-          hdopsimple[33]->Fill(dali_edop_simple->at(0));
-        if(DALI_Multi < 4)
-          hdopsimple[34]->Fill(dali_edop_simple->at(0));
-      }
+    if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
+      hdopsimple[25]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[26]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[27]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[28]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[29]->Fill(dali_edop_simple->at(0));
+    }
 
-    }  //-while loop
+    if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
+      hdopsimple[30]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 1)
+        hdopsimple[31]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 2)
+        hdopsimple[32]->Fill(dali_edop_simple->at(0));
+      if(dali_multi == 3)
+        hdopsimple[33]->Fill(dali_edop_simple->at(0));
+      if(dali_multi < 4)
+        hdopsimple[34]->Fill(dali_edop_simple->at(0));
+    }
 
-    std::clog << std::endl;
+  }  //-while loop
 
-    outfile->cd();
-    for(int i = 0; i < 70; i++)
-      hdop[i]->Write();
-    for(int i = 0; i < 35; i++)
-      hdopsimple[i]->Write();
+  std::clog << std::endl;
 
-    outfile->Write();
-    outfile->Close("R");
+  outfile->cd();
+  for(int i = 0; i < 70; i++)
+    hdop[i]->Write();
+  for(int i = 0; i < 35; i++)
+    hdopsimple[i]->Write();
 
-    delete DALI_Energy;
-    delete DALI_Time;
-    delete DALI_CosTheta;
-    delete DALI_X;
-    delete DALI_Y;
-    delete DALI_Z;
-    delete DALI_ID;
+  outfile->Write();
+  outfile->Close("R");
 
-    delete dali_e;
-    delete dali_t;
-    delete dali_cos;
-    delete dali_x;
-    delete dali_y;
-    delete dali_z;
-    delete dali_id;
+  delete dali_e;
+  delete dali_t;
+  delete dali_cos;
+  delete dali_x;
+  delete dali_y;
+  delete dali_z;
+  delete dali_id;
 
-    delete dali_edop;
-    delete dali_edop_simple;
-    delete dali_edop_beta;
-    delete dali_edop_theta;
+  delete dali_edop;
+  delete dali_edop_simple;
+  delete dali_edop_beta;
+  delete dali_edop_theta;
 
-    delete dali_e_ab;
-    delete dali_t_ab;
-    delete dali_cos_ab;
-    delete dali_x_ab;
-    delete dali_y_ab;
-    delete dali_z_ab;
-    delete dali_id_ab;
+  delete dali_e_ab;
+  delete dali_t_ab;
+  delete dali_cos_ab;
+  delete dali_x_ab;
+  delete dali_y_ab;
+  delete dali_z_ab;
+  delete dali_id_ab;
 
-    delete dali_edop_ab;
-    delete dali_edop_simple_ab;
-    delete dali_edop_beta_ab;
-    delete dali_edop_theta_ab;
+  delete dali_edop_ab;
+  delete dali_edop_simple_ab;
+  delete dali_edop_beta_ab;
+  delete dali_edop_theta_ab;
 
-    stop_timer_tk(FileNumber, AllEntry);
+  stop_timer_tk(FileNumber, AllEntry);
 
-    return 0;
-  }  //main()
+  return 0;
+}  //main()
 
-  void SortDaliHit(Int_t left, Int_t right, vector<Int_t> * DALI_ID, vector<Double_t> * DALI_Energy, vector<Double_t> * DALI_Time, vector<Double_t> * DALI_X, vector<Double_t> * DALI_Y, vector<Double_t> * DALI_Z, vector<Double_t> * DALI_CosTheta) {
-    Int_t    TempID;
-    Double_t TempEnergy;
-    Double_t TempTime;
-    Double_t TempX;
-    Double_t TempY;
-    Double_t TempZ;
-    Double_t TempCosTheta;
+void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_t> *DALI_Energy, vector<Double_t> *DALI_Time, vector<Double_t> *DALI_X, vector<Double_t> *DALI_Y, vector<Double_t> *DALI_Z, vector<Double_t> *DALI_CosTheta) {
+  Int_t    TempID;
+  Double_t TempEnergy;
+  Double_t TempTime;
+  Double_t TempX;
+  Double_t TempY;
+  Double_t TempZ;
+  Double_t TempCosTheta;
 
-    int    i = left, j = right;
-    double pivot = DALI_Energy->at((left + right) / 2);
+  int    i = left, j = right;
+  double pivot = DALI_Energy->at((left + right) / 2);
 
-    //--partition---/
-    while(i <= j) {
-      while(DALI_Energy->at(i) > pivot)
-        i++;
-      while(DALI_Energy->at(j) < pivot)
-        j--;
-      if(i <= j) {
-        TempID       = DALI_ID->at(j);
-        TempEnergy   = DALI_Energy->at(j);
-        TempTime     = DALI_Time->at(j);
-        TempX        = DALI_X->at(j);
-        TempY        = DALI_Y->at(j);
-        TempZ        = DALI_Z->at(j);
-        TempCosTheta = DALI_CosTheta->at(j);
+  //--partition---/
+  while(i <= j) {
+    while(DALI_Energy->at(i) > pivot)
+      i++;
+    while(DALI_Energy->at(j) < pivot)
+      j--;
+    if(i <= j) {
+      TempID       = DALI_ID->at(j);
+      TempEnergy   = DALI_Energy->at(j);
+      TempTime     = DALI_Time->at(j);
+      TempX        = DALI_X->at(j);
+      TempY        = DALI_Y->at(j);
+      TempZ        = DALI_Z->at(j);
+      TempCosTheta = DALI_CosTheta->at(j);
 
-        DALI_ID->at(j)       = DALI_ID->at(i);
-        DALI_Energy->at(j)   = DALI_Energy->at(i);
-        DALI_Time->at(j)     = DALI_Time->at(i);
-        DALI_X->at(j)        = DALI_X->at(i);
-        DALI_Y->at(j)        = DALI_Y->at(i);
-        DALI_Z->at(j)        = DALI_Z->at(i);
-        DALI_CosTheta->at(j) = DALI_CosTheta->at(i);
+      DALI_ID->at(j)       = DALI_ID->at(i);
+      DALI_Energy->at(j)   = DALI_Energy->at(i);
+      DALI_Time->at(j)     = DALI_Time->at(i);
+      DALI_X->at(j)        = DALI_X->at(i);
+      DALI_Y->at(j)        = DALI_Y->at(i);
+      DALI_Z->at(j)        = DALI_Z->at(i);
+      DALI_CosTheta->at(j) = DALI_CosTheta->at(i);
 
-        DALI_ID->at(i)       = TempID;
-        DALI_Energy->at(i)   = TempEnergy;
-        DALI_Time->at(i)     = TempTime;
-        DALI_X->at(i)        = TempX;
-        DALI_Y->at(i)        = TempY;
-        DALI_Z->at(i)        = TempZ;
-        DALI_CosTheta->at(i) = TempCosTheta;
+      DALI_ID->at(i)       = TempID;
+      DALI_Energy->at(i)   = TempEnergy;
+      DALI_Time->at(i)     = TempTime;
+      DALI_X->at(i)        = TempX;
+      DALI_Y->at(i)        = TempY;
+      DALI_Z->at(i)        = TempZ;
+      DALI_CosTheta->at(i) = TempCosTheta;
 
-        i++;
-        j--;
-      }
-    };
+      i++;
+      j--;
+    }
+  };
 
-    // recursion //
-    if(left < j)
-      SortDaliHit(left, j, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
-    if(i < right)
-      SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
-  }
+  // recursion //
+  if(left < j)
+    SortDaliHit(left, j, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
+  if(i < right)
+    SortDaliHit(i, right, DALI_ID, DALI_Energy, DALI_Time, DALI_X, DALI_Y, DALI_Z, DALI_CosTheta);
+}
 
-  Double_t DopplerCorrection(Double_t GammaDopplerEnergy, Double_t Beta, Double_t CosTheta) {
-    Double_t Gamma            = 1 / TMath::Sqrt(1 - Beta * Beta);
-    Double_t DopplerCorrected = GammaDopplerEnergy * Gamma * (1 - Beta * CosTheta);
-    return DopplerCorrected;
-  }
+Double_t DopplerCorrection(Double_t GammaDopplerEnergy, Double_t Beta, Double_t CosTheta) {
+  Double_t Gamma            = 1 / TMath::Sqrt(1 - Beta * Beta);
+  Double_t DopplerCorrected = GammaDopplerEnergy * Gamma * (1 - Beta * CosTheta);
+  return DopplerCorrected;
+}
 
-  inline bool exists_test(const std::string &name) {
-    return (access(name.c_str(), F_OK) != -1);
-  }
-  inline bool exists_test(const TString &name) {
-    return (access(name.Data(), F_OK) != -1);
-  }
+inline bool exists_test(const std::string &name) {
+  return (access(name.c_str(), F_OK) != -1);
+}
+inline bool exists_test(const TString &name) {
+  return (access(name.Data(), F_OK) != -1);
+}
