@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   const double DALIoffset   = 96.5;
   const double DALITimeGate = 15.;
 
-  //===== Load input files =====
+  //+===== Load input files =====
   TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
   TFile * infileB  = TFile::Open(infnameB);
   TTree * intrB    = (TTree *)infileB->Get("anatrB");
@@ -173,15 +173,6 @@ int main(int argc, char *argv[]) {
     //- done in cal_dali
 
     //+===== INIT ==================================================================
-    dali_e->clear();
-    dali_t->clear();
-    dali_cos->clear();
-    dali_x->clear();
-    dali_y->clear();
-    dali_z->clear();
-    dali_id->clear();
-    dali_multi = 0;
-
     dali_edop->clear();
     dali_edop_simple->clear();
     dali_edop_beta->clear();
