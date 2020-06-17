@@ -192,6 +192,8 @@ int main(int argc, char *argv[]) {
     dali_edop_beta_ab->clear();
     dali_edop_theta_ab->clear();
 
+    //+===== ADD BACK =====
+
     if(dali_multi > 1) {
       dali_e_ab->push_back(dali_e->at(0));
       dali_t_ab->push_back(dali_t->at(0));
@@ -201,38 +203,37 @@ int main(int argc, char *argv[]) {
       dali_z_ab->push_back(dali_z->at(0));
       dali_id_ab->push_back(dali_id->at(0));
 
-      //+===== ADD BACK =====
-
       Bool_t AddBack_flag = false;
+
+      //TODO: DALI_Vector(dali_x,dali_y,dali_z);
 
       for(Int_t i = 1; i < dali_multi; i++) {
         AddBack_flag  = false;
         dali_multi_ab = dali_id_ab->size();
         for(Int_t k = 0; k < dali_multi_ab; k++) {
-          for(Int_t j = 0; j < 7; j++) {  //TODOfor dali_e.size()
+          for(Int_t j = 0; j < 7; j++) {  //TODO: for dali_e.size()
+                                          //TODO: if(mag.(DALI_Vector1 - DALI_Vector2) < addbackRadius) perform addback
             //  if(dali_id->at(i) == AddBackTable[dali_id_ab->at(k)][j] && dali_Energy->at(i) > 300) {
             //    dali_e_ab->at(k) = dali_e_ab->at(k) + dali_Energy->at(i);
             //    AddBack_flag     = true;
             //    break;
             //  }
-            //}
-            if(AddBack_flag == true) break;
           }
+          if(AddBack_flag == true) break;
+        }
 
-          if(AddBack_flag == false) {
-            dali_e_ab->push_back(dali_e->at(i));
-            dali_t_ab->push_back(dali_t->at(i));
-            dali_cos_ab->push_back(dali_cos->at(i));
-            dali_x_ab->push_back(dali_x->at(i));
-            dali_y_ab->push_back(dali_y->at(i));
-            dali_z_ab->push_back(dali_z->at(i));
-            dali_id_ab->push_back(dali_id->at(i));
-          }
-        }  //for dali_Multi
+        if(AddBack_flag == false) {
+          dali_e_ab->push_back(dali_e->at(i));
+          dali_t_ab->push_back(dali_t->at(i));
+          dali_cos_ab->push_back(dali_cos->at(i));
+          dali_x_ab->push_back(dali_x->at(i));
+          dali_y_ab->push_back(dali_y->at(i));
+          dali_z_ab->push_back(dali_z->at(i));
+          dali_id_ab->push_back(dali_id->at(i));
+        }
+      }
 
-        dali_multi_ab = dali_id_ab->size();
-
-      }  //dali_Multi>1
+      dali_multi_ab = dali_id_ab->size();
 
     } else if(dali_multi == 1) {
       dali_e_ab->push_back(dali_e->at(0));
@@ -251,12 +252,9 @@ int main(int argc, char *argv[]) {
 
     //-===== ADD BACK END =====
 
-    //+===== Timing gate =====
-    for(int i = 0; i < dali_multi_ab; i++) {
-      if(-13.851 > dali_t_ab->at(i) || dali_t_ab->at(i) > 13.621) continue;  //5 sigma
-    }
     //? if(!goodEvt) continue;
 
+    //+===== Reconstruct gamma-ray vector =====
     //for(Int_t i=0;i<dali_multi_ab;i++){
     //  dali_pos->push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
     //  gamma_pos.push_back(dali_pos.at(i)-vertex);
