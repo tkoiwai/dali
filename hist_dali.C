@@ -53,15 +53,6 @@ int main(int argc, char *argv[]) {
     std::cerr << " You should provide a runnumber" << endl;
     exit(EXIT_FAILURE);
   }
-  //if(argc < 2 || argc > 5) {
-  //  printf("Usage: ./cal_dali RUNNUMBER\nOR     ./cal_dali RUNNUMBER MAXEVENTS\nOR     ./cal_dali RUNNUMBER MAXEVENTS TEST\n");
-  //  exit(EXIT_FAILURE);
-  //}
-
-  //if(argc > 2) {
-  //  MaxEventNumber = TString(argv[2]).Atoi();
-  //  printf(" You will process %d events\n", MaxEventNumber);
-  //}
 
   const double MINOSoffsetZ = 12.37;
   const double DALIoffset   = 96.5;
@@ -154,7 +145,8 @@ int main(int argc, char *argv[]) {
   Int_t nEntry = intr->GetEntries();
   int   iEntry = 0;
   int   AllEntry;
-  if(argc > 2 && MaxEventNumber < nEntry)
+  //if(argc > 2 && MaxEventNumber < nEntry)
+  if(ENum_flag && MaxEventNumber < nEntry)
     AllEntry = MaxEventNumber;
   else
     AllEntry = nEntry;
