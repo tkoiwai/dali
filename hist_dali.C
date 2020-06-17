@@ -13,11 +13,11 @@ int main(int argc, char *argv[]) {
   double addbackRadius  = -1.;
 
   struct option longopts[] = {
-      {"ab", required_argument, NULL, "a"},
-      {"eventnumber", required_argument, NULL, "e"},
-      {"runnumber", required_argument, NULL, "r"},
-      {"testmode", no_argument, NULL, "t"},
-      //    {0, 0, 0, 0},
+      {"ab", required_argument, NULL, 'a'},
+      {"eventnumber", required_argument, NULL, 'e'},
+      {"runnumber", required_argument, NULL, 'r'},
+      {"testmode", no_argument, NULL, 't'},
+      {0, 0, 0, 0},
   };
 
   int opt;
@@ -44,8 +44,14 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  if(argc == 1) {
+    printf("Usage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)");
+    exit(EXIT_FAILURE);
+  }
+
   if(FileNumber == -1) {
-    std::cerr << " You should provide either a runnumber" << endl;
+    std::cerr << " You should provide a runnumber" << endl;
+    exit(EXIT_FAILURE);
   }
   //if(argc < 2 || argc > 5) {
   //  printf("Usage: ./cal_dali RUNNUMBER\nOR     ./cal_dali RUNNUMBER MAXEVENTS\nOR     ./cal_dali RUNNUMBER MAXEVENTS TEST\n");
@@ -63,7 +69,7 @@ int main(int argc, char *argv[]) {
   //===== Load input files =====
   TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
   TFile * infileB  = TFile::Open(infnameB);
-  TTree * intrB    = (TTree *)infile->Get("anatrB");
+  TTree * intrB    = (TTree *)infileB->Get("anatrB");
 
   Get_Branch_beam(intrB);
 
