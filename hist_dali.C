@@ -207,12 +207,26 @@ int main(int argc, char *argv[]) {
 
       //TODO: DALI_Vector(dali_x,dali_y,dali_z);
 
+      //! flow of addback
+      for(int i = 0; i < dali_multi_ab; i++) {
+        for(int j = 1; j < dali_multi; j++) {
+          if(mag.(dali_vector->at(i) - dali_vector->at(i + j)) < addbackRadius)
+            dali_e_ab->at(i) += dali_e->at(i + j);
+          else if(j == i + 1) {
+            dali_e_ab->push_back(dali_e->at(i + 1));
+            dali_multi_ab++;
+          }
+        }
+      }
+
+      //!
+
       for(Int_t i = 1; i < dali_multi; i++) {
         AddBack_flag  = false;
         dali_multi_ab = dali_id_ab->size();
         for(Int_t k = 0; k < dali_multi_ab; k++) {
           for(Int_t j = 0; j < 7; j++) {  //TODO: for dali_e.size()
-                                          //TODO: if(mag.(DALI_Vector1 - DALI_Vector2) < addbackRadius) perform addback
+            //TODO: if(mag.(DALI_Vector1 - DALI_Vector2) < addbackRadius) perform addback
             //  if(dali_id->at(i) == AddBackTable[dali_id_ab->at(k)][j] && dali_Energy->at(i) > 300) {
             //    dali_e_ab->at(k) = dali_e_ab->at(k) + dali_Energy->at(i);
             //    AddBack_flag     = true;
