@@ -8,20 +8,33 @@ int main(int argc, char *argv[]) {
 
   //Int_t FileNumber = TString(argv[1]).Atoi();
 
-  bool TestMode = false;
-  bool ENum_flag = false;
-  int FileNumber = -1;
-  int MaxEventNumber = 0;
+  bool TestMode        = false;
+  bool ENum_flag       = false;
+  int FileNumber       = -1;
+  int MaxEventNumber   = 0;
+  double addbackRadius = -1.;
+
+  struct option longopts[] = {
+      {"ab", required_argument, NULL, "a"},
+      {"eventnumber", required_argument, NULL, "e"},
+      {"runnumber", required_argument, NULL, "r"},
+      {"testmode", no_argument, NULL, "t"},
+      {0, 0, 0, 0},
+  };
 
   int opt;
+  int longindex;
 
-  while((opt = getopt(argc, argv, "tr:e:")) != -1) {
+  while((opt = getopt_long(argc, argv, "a:tr:e:" n longopts, &longindex)) != -1) {
     switch(opt) {
+      case 'a':
+        addbackRadius = atoi(optarg);
+        break;
       case 'r':
         FileNumber = atoi(optarg);
         break;
       case 'e':
-        ENum_flag = true;
+        ENum_flag      = true;
         MaxEventNumber = atoi(optarg);
         break;
       case 't':
@@ -47,30 +60,30 @@ int main(int argc, char *argv[]) {
   //}
 
   const double MINOSoffsetZ = 12.37;
-  const double DALIoffset = 96.5;
+  const double DALIoffset   = 96.5;
 
   //===== Load input files =====
   TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
-  TFile *infileB = TFile::Open(infnameB);
-  TTree *intrB = (TTree *)infile->Get("anatrB");
+  TFile *infileB   = TFile::Open(infnameB);
+  TTree *intrB     = (TTree *)infile->Get("anatrB");
 
   Get_Branch_beam(intrB);
 
   TString infnameS = Form("/home/koiwai/rootfiles/ana/smri/ana_smri%04d.root", FileNumber);
-  TFile *infileS = TFile::Open(infnameS);
-  TTree *intrS = (TTree *)infileS->Get("anatrS");
+  TFile *infileS   = TFile::Open(infnameS);
+  TTree *intrS     = (TTree *)infileS->Get("anatrS");
 
   Get_Branch_smri(intrS);
 
   TString infnameV = Form("/home/koiwai/rootfiles/minos/vertex/vertex_frank%04d.root", FileNumber);
-  TFile *infileV = TFile::Open(infnameV);
-  TTree *intrV = (TTree *)infileV->Get("tr");
+  TFile *infileV   = TFile::Open(infnameV);
+  TTree *intrV     = (TTree *)infileV->Get("tr");
 
   Get_Branch_vertex(intrV);
 
   TString infname = Form("/home/koiwai/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
-  TFile *infile = TFile::Open(infname);
-  TTree *intr = (TTree *)infile->Get("tr");
+  TFile *infile   = TFile::Open(infname);
+  TTree *intr     = (TTree *)infile->Get("tr");
 
   Get_Branch_calD(intr);
 
@@ -78,236 +91,7 @@ int main(int argc, char *argv[]) {
   intr->AddFriend(intrS);
   intr->AddFriend(intrV);
 
-  int AddBackTable[226][7] = {
-      {10, 19, -1, -1, -1, -1, -1},  //0
-      {10, 11, -1, -1, -1, -1, -1},
-      {11, 12, -1, -1, -1, -1, -1},
-      {12, 13, -1, -1, -1, -1, -1},
-      {13, 14, -1, -1, -1, -1, -1},
-      {14, 15, -1, -1, -1, -1, -1},
-      {15, 16, -1, -1, -1, -1, -1},
-      {16, 17, -1, -1, -1, -1, -1},
-      {17, 18, -1, -1, -1, -1, -1},
-      {18, 19, -1, -1, -1, -1, -1},
-      {0, 1, 20, -1, -1, -1, -1},  //10
-      {1, 2, 22, -1, -1, -1, -1},
-      {2, 3, 23, -1, -1, -1, -1},
-      {3, 4, 24, -1, -1, -1, -1},
-      {4, 5, 25, -1, -1, -1, -1},
-      {5, 6, 26, -1, -1, -1, -1},
-      {6, 7, 28, -1, -1, -1, -1},
-      {7, 8, 29, -1, -1, -1, -1},
-      {8, 9, 30, -1, -1, -1, -1},
-      {0, 9, 31, -1, -1, -1, -1},
-      {10, 32, -1, -1, -1, -1, -1},  //20
-      {33, -1, -1, -1, -1, -1, -1},
-      {11, 34, -1, -1, -1, -1, -1},
-      {12, 35, 36, -1, -1, -1, -1},
-      {13, 37, -1, -1, -1, -1, -1},
-      {14, 38, -1, -1, -1, -1, -1},
-      {15, 39, -1, -1, -1, -1, -1},
-      {40, -1, -1, -1, -1, -1, -1},
-      {16, 41, -1, -1, -1, -1, -1},
-      {17, 42, 43, -1, -1, -1, -1},
-      {18, 44, -1, -1, -1, -1, -1},  //30
-      {19, 45, -1, -1, -1, -1, -1},
-      {20, -1, -1, -1, -1, -1, -1},
-      {21, -1, -1, -1, -1, -1, -1},
-      {22, 48, -1, -1, -1, -1, -1},
-      {23, 49, 50, -1, -1, -1, -1},
-      {23, 51, 52, -1, -1, -1, -1},
-      {24, 53, -1, -1, -1, -1, -1},
-      {25, 54, -1, -1, -1, -1, -1},
-      {26, -1, -1, -1, -1, -1, -1},
-      {27, -1, -1, -1, -1, -1, -1},  //40
-      {28, 58, -1, -1, -1, -1, -1},
-      {29, 59, 60, -1, -1, -1, -1},
-      {29, 61, 62, -1, -1, -1, -1},
-      {30, 63, -1, -1, -1, -1, -1},
-      {31, 64, -1, -1, -1, -1, -1},
-      {66, -1, -1, -1, -1, -1, -1},
-      {67, -1, -1, -1, -1, -1, -1},
-      {34, 49, 68, -1, -1, -1, -1},
-      {35, 48, 50, 69, -1, -1, -1},
-      {35, 49, 51, 70, -1, -1, -1},  //50
-      {36, 50, 52, 71, -1, -1, -1},
-      {36, 51, 53, 72, -1, -1, -1},
-      {37, 52, 73, -1, -1, -1, -1},
-      {38, 74, -1, -1, -1, -1, -1},
-      {75, -1, -1, -1, -1, -1, -1},
-      {76, -1, -1, -1, -1, -1, -1},
-      {77, -1, -1, -1, -1, -1, -1},
-      {41, 59, 78, -1, -1, -1, -1},
-      {42, 58, 60, 79, -1, -1, -1},
-      {42, 59, 61, 80, -1, -1, -1},  //60
-      {43, 60, 62, 81, -1, -1, -1},
-      {43, 61, 63, 82, -1, -1, -1},
-      {44, 62, 83, -1, -1, -1, -1},
-      {45, 84, -1, -1, -1, -1, -1},
-      {85, -1, -1, -1, -1, -1, -1},
-      {46, 86, -1, -1, -1, -1, -1},
-      {47, 87, -1, -1, -1, -1, -1},
-      {48, 69, 88, -1, -1, -1, -1},
-      {49, 68, 70, 89, -1, -1, -1},
-      {50, 69, 71, 90, -1, -1, -1},  //70
-      {51, 70, 72, 91, -1, -1, -1},
-      {52, 71, 73, 92, -1, -1, -1},
-      {53, 72, 93, -1, -1, -1, -1},
-      {54, 94, -1, -1, -1, -1, -1},
-      {55, 95, -1, -1, -1, -1, -1},
-      {56, 96, -1, -1, -1, -1, -1},
-      {57, 97, -1, -1, -1, -1, -1},
-      {58, 79, 98, -1, -1, -1, -1},
-      {59, 78, 80, 99, -1, -1, -1},
-      {60, 79, 81, 100, -1, -1, -1},  //80
-      {61, 80, 82, 101, -1, -1, -1},
-      {62, 81, 83, 102, -1, -1, -1},
-      {63, 82, 103, -1, -1, -1, -1},
-      {64, 104, -1, -1, -1, -1, -1},
-      {65, 105, -1, -1, -1, -1, -1},
-      {66, 106, 107, -1, -1, -1, -1},
-      {67, 108, 109, -1, -1, -1, -1},
-      {68, 89, 110, -1, -1, -1, -1},
-      {69, 88, 90, 110, 111, -1, -1},
-      {70, 89, 91, 111, 112, -1, -1},  //90
-      {71, 90, 92, 113, 114, -1, -1},
-      {72, 91, 93, 114, 115, -1, -1},
-      {73, 92, 115, -1, -1, -1, -1},
-      {74, 116, 117, -1, -1, -1, -1},
-      {75, 118, 119, -1, -1, -1, -1},
-      {76, 120, 121, -1, -1, -1, -1},
-      {77, 122, 123, -1, -1, -1, -1},
-      {78, 99, 124, -1, -1, -1, -1},
-      {79, 98, 100, 124, 125, -1, -1},
-      {80, 99, 101, 125, 126, -1, -1},  //100
-      {81, 100, 102, 127, 128, -1, -1},
-      {82, 101, 103, 128, 129, -1, -1},
-      {83, 102, 129, -1, -1, -1, -1},
-      {84, 130, 131, -1, -1, -1, -1},
-      {85, 132, 133, -1, -1, -1, -1},
-      {86, 107, 133, 134, -1, -1, -1},
-      {86, 106, 108, 135, -1, -1, -1},
-      {87, 107, 109, 136, -1, -1, -1},
-      {87, 108, 137, -1, -1, -1, -1},
-      {88, 89, 111, 138, -1, -1, -1},  //110
-      {89, 90, 110, 112, 139, -1, -1},
-      {90, 111, 113, 140, -1, -1, -1},
-      {91, 112, 114, 141, -1, -1, -1},
-      {91, 92, 113, 115, 142, -1, -1},
-      {92, 93, 114, 143, -1, -1, -1},
-      {94, 117, 144, -1, -1, -1, -1},
-      {94, 116, 118, 145, -1, -1, -1},
-      {95, 117, 119, 146, -1, -1, -1},
-      {95, 118, 120, 147, -1, -1, -1},
-      {96, 119, 121, 148, -1, -1, -1},  //120
-      {96, 120, 122, 149, -1, -1, -1},
-      {97, 121, 123, 150, -1, -1, -1},
-      {97, 122, 151, -1, -1, -1, -1},
-      {98, 99, 125, 152, -1, -1, -1},
-      {99, 100, 124, 126, 153, -1, -1},
-      {100, 125, 127, 154, -1, -1, -1},
-      {101, 126, 128, 155, -1, -1, -1},
-      {101, 102, 127, 129, 156, -1, -1},
-      {102, 103, 128, 157, -1, -1, -1},
-      {104, 131, 158, -1, -1, -1, -1},  //130
-      {104, 130, 132, 159, -1, -1, -1},
-      {105, 131, 133, 160, -1, -1, -1},
-      {105, 106, 132, 161, -1, -1, -1},
-      {106, 135, 161, -1, -1, -1, -1},
-      {107, 134, 136, -1, -1, -1, -1},
-      {108, 135, 137, -1, -1, -1, -1},
-      {109, 136, 138, -1, -1, -1, -1},
-      {110, 137, 139, -1, -1, -1, -1},
-      {111, 138, 140, -1, -1, -1, -1},
-      {112, 139, 141, -1, -1, -1, -1},  //140
-      {113, 140, 142, -1, -1, -1, -1},
-      {114, 141, 143, -1, -1, -1, -1},
-      {115, 142, 144, -1, -1, -1, -1},
-      {116, 143, 145, -1, -1, -1, -1},
-      {117, 144, 146, -1, -1, -1, -1},
-      {118, 145, 147, -1, -1, -1, -1},
-      {119, 146, 148, -1, -1, -1, -1},
-      {120, 147, 149, -1, -1, -1, -1},
-      {121, 148, 150, -1, -1, -1, -1},
-      {122, 149, 151, -1, -1, -1, -1},  //150
-      {123, 150, 152, -1, -1, -1, -1},
-      {124, 151, 153, -1, -1, -1, -1},
-      {125, 152, 154, -1, -1, -1, -1},
-      {126, 153, 155, -1, -1, -1, -1},
-      {127, 154, 156, -1, -1, -1, -1},
-      {128, 155, 157, -1, -1, -1, -1},
-      {129, 156, 158, -1, -1, -1, -1},
-      {130, 157, 159, -1, -1, -1, -1},
-      {131, 158, 160, -1, -1, -1, -1},
-      {132, 159, 161, -1, -1, -1, -1},  //160
-      {133, 134, 160, -1, -1, -1, -1},
-      {163, 171, 172, 191, -1, -1, -1},
-      {162, 172, 173, 192, -1, -1, -1},
-      {165, 176, 177, 195, -1, -1, -1},
-      {164, 177, 178, 196, -1, -1, -1},
-      {167, 181, 182, 199, -1, -1, -1},
-      {166, 182, 183, 200, -1, -1, -1},
-      {169, 186, 187, 203, -1, -1, -1},
-      {168, 187, 188, 204, -1, -1, -1},
-      {171, 189, 190, -1, -1, -1, -1},  //170
-      {162, 170, 172, 190, 191, -1, -1},
-      {162, 163, 171, 173, 191, 192, 207},
-      {163, 172, 174, 192, 193, -1, -1},
-      {173, 175, 193, -1, -1, -1, -1},
-      {174, 176, 194, -1, -1, -1, -1},
-      {164, 175, 177, 194, 195, -1, -1},
-      {164, 165, 176, 178, 195, 196, 210},
-      {165, 177, 179, 196, 197, -1, -1},
-      {178, 180, 197, -1, -1, -1, -1},
-      {179, 181, 198, -1, -1, -1, -1},  //180
-      {166, 180, 182, 198, 199, -1, -1},
-      {166, 167, 181, 183, 199, 200, 213},
-      {167, 182, 184, 200, 201, -1, -1},
-      {183, 185, 201, -1, -1, -1, -1},
-      {184, 186, 202, -1, -1, -1, -1},
-      {168, 185, 187, 202, 203, -1, -1},
-      {168, 169, 186, 188, 203, 204, 216},
-      {169, 187, 189, 204, 205, -1, -1},
-      {170, 188, 205, -1, -1, -1, -1},
-      {170, 171, 191, 205, 206, -1, -1},  //190
-      {162, 171, 172, 190, 192, 206, 207},
-      {163, 172, 173, 191, 193, 207, 208},
-      {173, 174, 192, 194, 208, -1, -1},
-      {175, 176, 193, 195, 209, -1, -1},
-      {164, 176, 177, 194, 196, 209, 210},
-      {165, 177, 178, 195, 197, 210, 211},
-      {178, 179, 196, 198, 211, -1, -1},
-      {180, 181, 197, 199, 212, -1, -1},
-      {166, 181, 182, 198, 200, 212, 213},
-      {167, 182, 183, 199, 201, 213, 214},  //200
-      {183, 184, 200, 202, 214, -1, -1},
-      {185, 186, 201, 203, 215, -1, -1},
-      {168, 186, 187, 202, 204, 215, 216},
-      {169, 187, 188, 203, 205, 216, 217},
-      {188, 189, 190, 204, 217, -1, -1},
-      {190, 191, 207, 217, 218, -1, -1},
-      {172, 191, 192, 206, 208, 218, 219},
-      {192, 193, 207, 209, 219, -1, -1},
-      {194, 195, 208, 210, 220, -1, -1},
-      {177, 195, 196, 209, 211, 220, 221},  //210
-      {196, 197, 210, 212, 221, -1, -1},
-      {198, 199, 211, 213, 222, -1, -1},
-      {182, 199, 200, 212, 214, 222, 223},
-      {200, 201, 213, 215, 223, -1, -1},
-      {202, 203, 214, 216, 224, -1, -1},
-      {187, 203, 204, 215, 217, 224, 225},
-      {204, 205, 206, 216, 225, -1, -1},
-      {206, 207, 219, 225, -1, -1, -1},
-      {207, 208, 218, 220, -1, -1, -1},
-      {209, 210, 219, 221, -1, -1, -1},  //220
-      {210, 211, 220, 222, -1, -1, -1},
-      {212, 213, 221, 223, -1, -1, -1},
-      {213, 214, 222, 224, -1, -1, -1},
-      {215, 216, 223, 225, -1, -1, -1},
-      {216, 217, 218, 224, -1, -1, -1}  //225
-  };
-
-  //=====ROOT file setting==========================================================
+  //*=====ROOT file setting==========================================================
   //TString ofname =  Form("rootfiles/hist_dali%04d.root",FileNumber);
   TString ofname;
 
@@ -321,12 +105,12 @@ int main(int argc, char *argv[]) {
   //=====Define variables===================================================
   //done in header
 
-  //===== LOAD CUTS =====================================================================
-  TFile *fcutSA_K = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
+  //*===== LOAD CUTS =====================================================================
+  TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
   TFile *fcutSA_Ca_MINOS = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca_wMINOS.root");
-  TFile *fcutBR_Sc = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
-  TFile *fcutSA_50Ar = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
-  TFile *fcutBR_51K = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
+  TFile *fcutBR_Sc       = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
+  TFile *fcutSA_50Ar     = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
+  TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
   TCutG *csa55k = (TCutG *)fcutSA_K->Get("sa55k");
 
@@ -339,13 +123,13 @@ int main(int argc, char *argv[]) {
   TCutG *cbr58sc = (TCutG *)fcutBR_Sc->Get("br58sc");
   TCutG *cbr59sc = (TCutG *)fcutBR_Sc->Get("br59sc");
 
-  TCutG *cbr51k = (TCutG *)fcutBR_51K->Get("br51k");
+  TCutG *cbr51k  = (TCutG *)fcutBR_51K->Get("br51k");
   TCutG *csa50ar = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //===== DEFINE HIST ====================================================================
   char *cnamebr[10] = {(char *)"br54ca", (char *)"br56ca", (char *)"br56ca", (char *)"br56sc", (char *)"br58sc", (char *)"br59sc", (char *)"br51k", (char *)"", (char *)"", (char *)""};
   char *cnamesa[10] = {(char *)"sa53ca", (char *)"sa55ca", (char *)"sa55k", (char *)"sa55ca", (char *)"sa57ca", (char *)"sa57ca", (char *)"sa50ar", (char *)"", (char *)"", (char *)""};
-  char *hnames[10] = {(char *)"all", (char *)"m1", (char *)"m2", (char *)"m3", (char *)"mle3", (char *)"all_ab", (char *)"m1_ab", (char *)"m2_ab", (char *)"m3_ab", (char *)"mle3_ab"};
+  char *hnames[10]  = {(char *)"all", (char *)"m1", (char *)"m2", (char *)"m3", (char *)"mle3", (char *)"all_ab", (char *)"m1_ab", (char *)"m2_ab", (char *)"m3_ab", (char *)"mle3_ab"};
   TH1F *hdop[100];
   TH1F *hdopsimple[100];
 
@@ -361,7 +145,7 @@ int main(int argc, char *argv[]) {
   //===== LOOP =========================================================================
 
   Int_t nEntry = intr->GetEntries();
-  int iEntry = 0;
+  int iEntry   = 0;
   int AllEntry;
   if(argc > 2 && MaxEventNumber < nEntry)
     AllEntry = MaxEventNumber;
@@ -370,13 +154,13 @@ int main(int argc, char *argv[]) {
 
   prepare_timer_tk();
 
-  //todo===== LOOP =================================================================================
+  //&===== LOOP =================================================================================
   for(Int_t iEntry = 0; iEntry < AllEntry; iEntry++) {
     intr->GetEntry(iEntry);
 
     start_timer_tk(iEntry, AllEntry, 1000);
 
-    RunNumber = FileNumber;
+    RunNumber   = FileNumber;
     EventNumber = EventNumber_calD;
 
     //*===== GATES =================================================================
@@ -417,18 +201,19 @@ int main(int argc, char *argv[]) {
       Bool_t AddBack_flag = false;
 
       for(Int_t i = 1; i < DALI_Multi; i++) {
-        AddBack_flag = false;
+        AddBack_flag  = false;
         dali_multi_ab = dali_id_ab->size();
         for(Int_t k = 0; k < dali_multi_ab; k++) {
           for(Int_t j = 0; j < 7; j++) {
             if(DALI_ID->at(i) == AddBackTable[dali_id_ab->at(k)][j] && DALI_Energy->at(i) > 300) {
               dali_e_ab->at(k) = dali_e_ab->at(k) + DALI_Energy->at(i);
-              AddBack_flag = true;
+              AddBack_flag     = true;
               break;
             }
           }
           if(AddBack_flag == true) break;
         }
+
         if(AddBack_flag == false) {
           dali_e_ab->push_back(DALI_Energy->at(i));
           dali_id_ab->push_back(DALI_ID->at(i));
@@ -477,7 +262,7 @@ int main(int argc, char *argv[]) {
     if(dali_multi_ab >= 1) {
       for(Int_t i = 0; i < dali_multi_ab; i++) {
         Double_t dali_edop_tmp = Sqrt(-1);
-        dali_edop_tmp = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos->at(i));
+        dali_edop_tmp          = dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * gamma_cos->at(i));
         dali_edop_ab->push_back(dali_edop_tmp);
       }
     }
@@ -488,7 +273,7 @@ int main(int argc, char *argv[]) {
 
     //beta_vertex_simple  = 0.5*(betaF7F13 + beta_minoshodo);
     //gamma_vertex_simple = 1/Sqrt(1 - beta_vertex_simple*beta_vertex_simple);
-    const Double_t beta_mid = 0.57;
+    const Double_t beta_mid  = 0.57;
     const Double_t gamma_mid = 1 / Sqrt(1 - beta_mid * beta_mid);
     if(dali_multi_ab >= 1) {
       for(Int_t i = 0; i < dali_multi_ab; i++) {
@@ -797,28 +582,28 @@ void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_
     while(DALI_Energy->at(j) < pivot)
       j--;
     if(i <= j) {
-      TempID = DALI_ID->at(j);
-      TempEnergy = DALI_Energy->at(j);
-      TempTime = DALI_Time->at(j);
-      TempX = DALI_X->at(j);
-      TempY = DALI_Y->at(j);
-      TempZ = DALI_Z->at(j);
+      TempID       = DALI_ID->at(j);
+      TempEnergy   = DALI_Energy->at(j);
+      TempTime     = DALI_Time->at(j);
+      TempX        = DALI_X->at(j);
+      TempY        = DALI_Y->at(j);
+      TempZ        = DALI_Z->at(j);
       TempCosTheta = DALI_CosTheta->at(j);
 
-      DALI_ID->at(j) = DALI_ID->at(i);
-      DALI_Energy->at(j) = DALI_Energy->at(i);
-      DALI_Time->at(j) = DALI_Time->at(i);
-      DALI_X->at(j) = DALI_X->at(i);
-      DALI_Y->at(j) = DALI_Y->at(i);
-      DALI_Z->at(j) = DALI_Z->at(i);
+      DALI_ID->at(j)       = DALI_ID->at(i);
+      DALI_Energy->at(j)   = DALI_Energy->at(i);
+      DALI_Time->at(j)     = DALI_Time->at(i);
+      DALI_X->at(j)        = DALI_X->at(i);
+      DALI_Y->at(j)        = DALI_Y->at(i);
+      DALI_Z->at(j)        = DALI_Z->at(i);
       DALI_CosTheta->at(j) = DALI_CosTheta->at(i);
 
-      DALI_ID->at(i) = TempID;
-      DALI_Energy->at(i) = TempEnergy;
-      DALI_Time->at(i) = TempTime;
-      DALI_X->at(i) = TempX;
-      DALI_Y->at(i) = TempY;
-      DALI_Z->at(i) = TempZ;
+      DALI_ID->at(i)       = TempID;
+      DALI_Energy->at(i)   = TempEnergy;
+      DALI_Time->at(i)     = TempTime;
+      DALI_X->at(i)        = TempX;
+      DALI_Y->at(i)        = TempY;
+      DALI_Z->at(i)        = TempZ;
       DALI_CosTheta->at(i) = TempCosTheta;
 
       i++;
@@ -886,7 +671,7 @@ while (i <= j) {
 */
 
 Double_t DopplerCorrection(Double_t GammaDopplerEnergy, Double_t Beta, Double_t CosTheta) {
-  Double_t Gamma = 1 / TMath::Sqrt(1 - Beta * Beta);
+  Double_t Gamma            = 1 / TMath::Sqrt(1 - Beta * Beta);
   Double_t DopplerCorrected = GammaDopplerEnergy * Gamma * (1 - Beta * CosTheta);
   return DopplerCorrected;
 }
