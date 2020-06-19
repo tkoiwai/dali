@@ -1,4 +1,4 @@
-#include "../include/anadalidef.h"
+#include "/home/koiwai/analysis/include/anadalidef.h"
 
 //&=====main Function==========================================================
 int main(int argc, char *argv[]) {
@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
   const double MINOSoffsetZ = 12.37;
   const double DALIoffset   = 96.5;
   const double DALITimeGate = 15.;
+  const double TPClength    = 151.;
 
   //+===== Load input files =====
   TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
@@ -191,6 +192,24 @@ int main(int argc, char *argv[]) {
     dali_edop_simple_ab->clear();
     dali_edop_beta_ab->clear();
     dali_edop_theta_ab->clear();
+
+    //+===== calculate velocities =====
+
+    MINOS_Z_cor = MINOS_Z + MINOSoffsetZ;
+    beta_vertex = betaF7F13 - (betaF7F13 - betaTH) * MINOS_Z_cor / TPClength;
+    //gamma_vertex = 1 / Sqrt(1 - beta_vertex * beta_vertex);
+    vertex.SetXYZ(MINOS_X, MINOS_Y, MINOS_Z_cor - DALIoffset);
+
+    //+===== Create DALI crystal vector =====
+
+    dali_pos->resize(dali_multi);
+    gamma_pos->resize(dali_multi);
+
+    for(int i = 0; i < dali_multi; i++) {
+      dali_pos->push_back(TVector3(10 * dali_x->at(i), 10 * dali_y->at(i), 10 * dali_z->at(i)));
+      gamma_pos->push_back(dali_pos->at(i) - vertex);
+      gamma_cos->push_back((gamma_pos->at(i)).CosTheta());
+    }
 
     //+===== ADD BACK =====
 
