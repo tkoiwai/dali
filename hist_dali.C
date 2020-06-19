@@ -111,13 +111,11 @@ int main(int argc, char *argv[]) {
   TFile *fcutSA_50Ar = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
   //TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
+    TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
+  TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("sa57ca");
+  TCutG *csa55ca       = (TCutG *)fcutSA_Ca->Get("sa55ca");
+
   TCutG *csa55k = (TCutG *)fcutSA_K->Get("sa55k");
-
-  TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
-  TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("csa57ca");
-  TCutG *csa55ca       = (TCutG *)fcutSA_Ca->Get("csa55ca");
-
-  TCutG *csa55k = (TCutG *)fcutSA_K->Get("csa55k");
 
   //TCutG *cbr54sc = (TCutG *)fcutBR_Sc->Get("br54sc");
   //TCutG *cbr55sc = (TCutG *)fcutBR_Sc->Get("br55sc");
