@@ -62,25 +62,25 @@ int main(int argc, char *argv[]) {
   const double TPClength    = 151.;
 
   //+===== Load input files =====
-  TString infnameB = Form("/home/koiwai/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
+  TString infnameB = Form("/home/koiwai/analysis/rootfiles/ana/beam/ana_beam%04d.root", FileNumber);
   TFile * infileB  = TFile::Open(infnameB);
   TTree * intrB    = (TTree *)infileB->Get("anatrB");
 
   Get_Branch_beam(intrB);
 
-  TString infnameS = Form("/home/koiwai/rootfiles/ana/smri/ana_smri%04d.root", FileNumber);
+  TString infnameS = Form("/home/koiwai/analysis/rootfiles/ana/smri/ana_smri%04d.root", FileNumber);
   TFile * infileS  = TFile::Open(infnameS);
   TTree * intrS    = (TTree *)infileS->Get("anatrS");
 
   Get_Branch_smri(intrS);
 
-  TString infnameV = Form("/home/koiwai/rootfiles/minos/vertex/vertex_frank%04d.root", FileNumber);
+  TString infnameV = Form("/home/koiwai/analysis/rootfiles/minos/vertex/vertex_frank%04d.root", FileNumber);
   TFile * infileV  = TFile::Open(infnameV);
   TTree * intrV    = (TTree *)infileV->Get("tr");
 
   Get_Branch_vertex(intrV);
 
-  TString infname = Form("/home/koiwai/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
+  TString infname = Form("/home/koiwai/analysis/rootfiles/ana/dali/unpack_dali%04d.root", FileNumber);
   TFile * infile  = TFile::Open(infname);
   TTree * intr    = (TTree *)infile->Get("tr");
 
