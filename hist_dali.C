@@ -251,10 +251,13 @@ int main(int argc, char *argv[]) {
 
       Bool_t AddBack_flag = false;
 
+      cout << "ok1" << endl;
+
       //! flow of addback
       for(int i = 0; i < dali_multi_ab; i++) {
         for(int j = 1; j < dali_multi - i; j++) {
           TVector3 dali_pos_tmp = dali_pos.at(i) - dali_pos.at(i + j);
+          cout << "ok2" << endl;
           //if((dali_pos->at(i) - dali_pos->at(i + j).Mag()) < addbackRadius)
           if((dali_pos_tmp.Mag()) < addbackRadius)
             dali_e_ab->at(i) += dali_e->at(i + j);
