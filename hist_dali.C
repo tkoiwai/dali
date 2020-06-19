@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   }
 
   if(argc == 1) {
-    printf("Usage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)");
+    printf("\nUsage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)\n");
     exit(EXIT_FAILURE);
   }
 
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
   TFile *fcutSA_50Ar = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
   //TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
-    TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
+  TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
   TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("sa57ca");
   TCutG *csa55ca       = (TCutG *)fcutSA_Ca->Get("sa55ca");
 
