@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   }
 
   if(argc == 1) {
-    printf("\nUsage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)\n");
+    printf("\nUsage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)\n \n");
     exit(EXIT_FAILURE);
   }
 
