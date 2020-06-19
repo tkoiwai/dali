@@ -106,22 +106,27 @@ int main(int argc, char *argv[]) {
   //+===== LOAD CUTS =====================================================================
   TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
   TFile *fcutSA_Ca_MINOS = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca_wMINOS.root");
-  TFile *fcutBR_Sc       = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
-  TFile *fcutSA_50Ar     = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
-  TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
+  TFile *fcutSA_Ca       = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca.root");
+  //TFile *fcutBR_Sc       = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
+  TFile *fcutSA_50Ar = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
+  //TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
   TCutG *csa55k = (TCutG *)fcutSA_K->Get("sa55k");
 
   TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
+  TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("csa57ca");
+  TCutG *csa55ca       = (TCutG *)fcutSA_Ca->Get("csa55ca");
 
-  TCutG *cbr54sc = (TCutG *)fcutBR_Sc->Get("br54sc");
-  TCutG *cbr55sc = (TCutG *)fcutBR_Sc->Get("br55sc");
-  TCutG *cbr56sc = (TCutG *)fcutBR_Sc->Get("br56sc");
-  TCutG *cbr57sc = (TCutG *)fcutBR_Sc->Get("br57sc");
-  TCutG *cbr58sc = (TCutG *)fcutBR_Sc->Get("br58sc");
-  TCutG *cbr59sc = (TCutG *)fcutBR_Sc->Get("br59sc");
+  TCutG *csa55k = (TCutG *)fcutSA_K->Get("csa55k");
 
-  TCutG *cbr51k  = (TCutG *)fcutBR_51K->Get("br51k");
+  //TCutG *cbr54sc = (TCutG *)fcutBR_Sc->Get("br54sc");
+  //TCutG *cbr55sc = (TCutG *)fcutBR_Sc->Get("br55sc");
+  //TCutG *cbr56sc = (TCutG *)fcutBR_Sc->Get("br56sc");
+  //TCutG *cbr57sc = (TCutG *)fcutBR_Sc->Get("br57sc");
+  //TCutG *cbr58sc = (TCutG *)fcutBR_Sc->Get("br58sc");
+  //TCutG *cbr59sc = (TCutG *)fcutBR_Sc->Get("br59sc");
+
+  //TCutG *cbr51k  = (TCutG *)fcutBR_51K->Get("br51k");
   TCutG *csa50ar = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //+===== DEFINE HIST ====================================================================
@@ -163,6 +168,9 @@ int main(int argc, char *argv[]) {
 
     RunNumber   = FileNumber;
     EventNumber = EventNumber_calD;
+
+    if(!br59sc && !br58sc && !br56sc && !br56ca && !br54ca && !br51k)
+      continue;
 
     //+===== GATES =================================================================
 
@@ -373,7 +381,7 @@ int main(int argc, char *argv[]) {
         hdop[9]->Fill(dali_edop_ab->at(0));
     }
 
-    if(br56ca && sa55ca) {
+    if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
       hdop[10]->Fill(dali_edop->at(0));
       if(dali_multi == 1)
         hdop[11]->Fill(dali_edop->at(0));
@@ -417,7 +425,7 @@ int main(int argc, char *argv[]) {
         hdop[29]->Fill(dali_edop_ab->at(0));
     }
 
-    if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
+    if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
       hdop[30]->Fill(dali_edop->at(0));
       if(dali_multi == 1)
         hdop[31]->Fill(dali_edop->at(0));
@@ -439,7 +447,7 @@ int main(int argc, char *argv[]) {
         hdop[39]->Fill(dali_edop_ab->at(0));
     }
 
-    if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
+    if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
       hdop[40]->Fill(dali_edop->at(0));
       if(dali_multi == 1)
         hdop[41]->Fill(dali_edop->at(0));
@@ -461,7 +469,7 @@ int main(int argc, char *argv[]) {
         hdop[49]->Fill(dali_edop_ab->at(0));
     }
 
-    if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
+    if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
       hdop[50]->Fill(dali_edop->at(0));
       if(dali_multi == 1)
         hdop[51]->Fill(dali_edop->at(0));
@@ -483,7 +491,7 @@ int main(int argc, char *argv[]) {
         hdop[59]->Fill(dali_edop_ab->at(0));
     }
 
-    if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
+    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
       hdop[60]->Fill(dali_edop->at(0));
       if(dali_multi == 1)
         hdop[61]->Fill(dali_edop->at(0));
@@ -517,7 +525,7 @@ int main(int argc, char *argv[]) {
         hdopsimple[4]->Fill(dali_edop_simple->at(0));
     }
 
-    if(br56ca && sa55ca) {
+    if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
       hdopsimple[5]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
         hdopsimple[6]->Fill(dali_edop_simple->at(0));
@@ -541,7 +549,7 @@ int main(int argc, char *argv[]) {
         hdopsimple[14]->Fill(dali_edop_simple->at(0));
     }
 
-    if(cbr56sc->IsInside(aoqBR, zetBR) && sa55ca) {
+    if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
       hdopsimple[15]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
         hdopsimple[16]->Fill(dali_edop_simple->at(0));
@@ -553,7 +561,7 @@ int main(int argc, char *argv[]) {
         hdopsimple[19]->Fill(dali_edop_simple->at(0));
     }
 
-    if(cbr58sc->IsInside(aoqBR, zetBR) && sa57ca) {
+    if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
       hdopsimple[20]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
         hdopsimple[21]->Fill(dali_edop_simple->at(0));
@@ -565,7 +573,7 @@ int main(int argc, char *argv[]) {
         hdopsimple[24]->Fill(dali_edop_simple->at(0));
     }
 
-    if(cbr59sc->IsInside(aoqBR, zetBR) && sa57ca) {
+    if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
       hdopsimple[25]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
         hdopsimple[26]->Fill(dali_edop_simple->at(0));
@@ -577,7 +585,7 @@ int main(int argc, char *argv[]) {
         hdopsimple[29]->Fill(dali_edop_simple->at(0));
     }
 
-    if(cbr51k->IsInside(aoqBR, zetBR) && csa50ar->IsInside(aoqSA, zetSA)) {
+    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
       hdopsimple[30]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
         hdopsimple[31]->Fill(dali_edop_simple->at(0));
