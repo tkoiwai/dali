@@ -227,6 +227,9 @@ int main(int argc, char *argv[]) {
       gamma_pos.push_back(dali_pos.at(i) - vertex);
       gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
     }
+
+    cout << "ok-3" << endl;
+
     //+===== ADD BACK =====
 
     int       DALI_NClust                                 = 0;
@@ -268,6 +271,7 @@ int main(int argc, char *argv[]) {
         }
         DALI_NClust++;
       }
+
       dali_multi_ab = DALI_NClust;
       for(int j = 0; j < DALI_NClust; j++) {
         dali_e_ab->push_back(DUMM_Energy[j]);
@@ -337,7 +341,7 @@ int main(int argc, char *argv[]) {
     //-===== ADD BACK END =====
 
     //? if(!goodEvt) continue;
-
+    cout << "ok-2" << endl;
     //+===== Reconstruct gamma-ray vector =====
     //+===== Create DALI crystal vector (AddBack) =====
 
@@ -354,7 +358,7 @@ int main(int argc, char *argv[]) {
     //  gamma_pos.push_back(dali_pos.at(i)-vertex);
     //  gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
     //}
-
+    cout << "ok-1" << endl;
     //+===== DOPPLER CORRECTION =====
 
     if(dali_multi_ab >= 1) {
@@ -364,7 +368,7 @@ int main(int argc, char *argv[]) {
         dali_edop_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex, gamma_cos_ab.at(i)));
       }
     }
-
+    cout << "ok0" << endl;
     //-===== DOPPLER CORRECTION END =====
 
     //+===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
@@ -389,245 +393,251 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    cout << dali_edop->size() << endl;
+    cout << "ok1" << endl;
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
-    if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-      hdop[0]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[1]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[2]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[3]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[4]->Fill(dali_edop->at(0));
+    if(dali_edop->size() > 0) {
+      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+        hdop[0]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[1]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[2]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[3]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[4]->Fill(dali_edop->at(0));
 
-      hdop[5]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[6]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[7]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[8]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[9]->Fill(dali_edop_ab->at(0));
+        hdop[5]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[6]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[7]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[8]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[9]->Fill(dali_edop_ab->at(0));
+      }
+      cout << "ok2" << endl;
+      if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
+        hdop[10]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[11]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[12]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[13]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[14]->Fill(dali_edop->at(0));
+
+        hdop[15]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[16]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[17]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[18]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[19]->Fill(dali_edop_ab->at(0));
+      }
+
+      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
+        hdop[20]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[21]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[22]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[23]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[24]->Fill(dali_edop->at(0));
+
+        hdop[25]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[26]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[27]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[28]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[29]->Fill(dali_edop_ab->at(0));
+      }
+
+      if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
+        hdop[30]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[31]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[32]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[33]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[34]->Fill(dali_edop->at(0));
+
+        hdop[35]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[36]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[37]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[38]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[39]->Fill(dali_edop_ab->at(0));
+      }
+
+      if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
+        hdop[40]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[41]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[42]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[43]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[44]->Fill(dali_edop->at(0));
+
+        hdop[45]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[46]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[47]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[48]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[49]->Fill(dali_edop_ab->at(0));
+      }
+
+      if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
+        hdop[50]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[51]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[52]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[53]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[54]->Fill(dali_edop->at(0));
+
+        hdop[55]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[56]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[57]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[58]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[59]->Fill(dali_edop_ab->at(0));
+      }
+
+      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+        hdop[60]->Fill(dali_edop->at(0));
+        if(dali_multi == 1)
+          hdop[61]->Fill(dali_edop->at(0));
+        if(dali_multi == 2)
+          hdop[62]->Fill(dali_edop->at(0));
+        if(dali_multi == 3)
+          hdop[63]->Fill(dali_edop->at(0));
+        if(dali_multi < 4)
+          hdop[64]->Fill(dali_edop->at(0));
+
+        hdop[65]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 1)
+          hdop[66]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 2)
+          hdop[67]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab == 3)
+          hdop[68]->Fill(dali_edop_ab->at(0));
+        if(dali_multi_ab < 4)
+          hdop[69]->Fill(dali_edop_ab->at(0));
+      }
     }
 
-    if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
-      hdop[10]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[11]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[12]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[13]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[14]->Fill(dali_edop->at(0));
+    if(dali_edop_simple->size() > 0) {
+      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+        hdopsimple[0]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[1]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[2]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[3]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[4]->Fill(dali_edop_simple->at(0));
+      }
 
-      hdop[15]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[16]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[17]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[18]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[19]->Fill(dali_edop_ab->at(0));
-    }
+      if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
+        hdopsimple[5]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[6]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[7]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[8]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[9]->Fill(dali_edop_simple->at(0));
+      }
 
-    if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-      hdop[20]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[21]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[22]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[23]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[24]->Fill(dali_edop->at(0));
+      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
+        hdopsimple[10]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[11]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[12]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[13]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[14]->Fill(dali_edop_simple->at(0));
+      }
 
-      hdop[25]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[26]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[27]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[28]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[29]->Fill(dali_edop_ab->at(0));
-    }
+      if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
+        hdopsimple[15]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[16]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[17]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[18]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[19]->Fill(dali_edop_simple->at(0));
+      }
 
-    if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
-      hdop[30]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[31]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[32]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[33]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[34]->Fill(dali_edop->at(0));
+      if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
+        hdopsimple[20]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[21]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[22]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[23]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[24]->Fill(dali_edop_simple->at(0));
+      }
 
-      hdop[35]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[36]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[37]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[38]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[39]->Fill(dali_edop_ab->at(0));
-    }
+      if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
+        hdopsimple[25]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[26]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[27]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[28]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[29]->Fill(dali_edop_simple->at(0));
+      }
 
-    if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
-      hdop[40]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[41]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[42]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[43]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[44]->Fill(dali_edop->at(0));
-
-      hdop[45]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[46]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[47]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[48]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[49]->Fill(dali_edop_ab->at(0));
-    }
-
-    if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
-      hdop[50]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[51]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[52]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[53]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[54]->Fill(dali_edop->at(0));
-
-      hdop[55]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[56]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[57]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[58]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[59]->Fill(dali_edop_ab->at(0));
-    }
-
-    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-      hdop[60]->Fill(dali_edop->at(0));
-      if(dali_multi == 1)
-        hdop[61]->Fill(dali_edop->at(0));
-      if(dali_multi == 2)
-        hdop[62]->Fill(dali_edop->at(0));
-      if(dali_multi == 3)
-        hdop[63]->Fill(dali_edop->at(0));
-      if(dali_multi < 4)
-        hdop[64]->Fill(dali_edop->at(0));
-
-      hdop[65]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 1)
-        hdop[66]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 2)
-        hdop[67]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab == 3)
-        hdop[68]->Fill(dali_edop_ab->at(0));
-      if(dali_multi_ab < 4)
-        hdop[69]->Fill(dali_edop_ab->at(0));
-    }
-
-    if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-      hdopsimple[0]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[1]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[2]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[3]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[4]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
-      hdopsimple[5]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[6]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[7]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[8]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[9]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-      hdopsimple[10]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[11]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[12]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[13]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[14]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
-      hdopsimple[15]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[16]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[17]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[18]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[19]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
-      hdopsimple[20]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[21]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[22]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[23]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[24]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
-      hdopsimple[25]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[26]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[27]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[28]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[29]->Fill(dali_edop_simple->at(0));
-    }
-
-    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-      hdopsimple[30]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[31]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[32]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[33]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[34]->Fill(dali_edop_simple->at(0));
+      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+        hdopsimple[30]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[31]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[32]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[33]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[34]->Fill(dali_edop_simple->at(0));
+      }
     }
 
   }  //-while loop
