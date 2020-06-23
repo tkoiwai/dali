@@ -214,7 +214,6 @@ int main(int argc, char *argv[]) {
 
     MINOS_Z_cor = MINOS_Z + MINOSoffsetZ;
     beta_vertex = betaF7F13 - (betaF7F13 - betaTH) * MINOS_Z_cor / TPClength;
-    //Double_t gamma_vertex = 1 / Sqrt(1 - beta_vertex * beta_vertex);
     vertex.SetXYZ(MINOS_X, MINOS_Y, MINOS_Z_cor - DALIoffset);
 
     //+===== Create DALI crystal vector =====
@@ -227,8 +226,6 @@ int main(int argc, char *argv[]) {
       gamma_pos.push_back(dali_pos.at(i) - vertex);
       gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
     }
-
-    cout << "ok-3" << endl;
 
     //+===== ADD BACK =====
 
@@ -284,64 +281,10 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    /*
-    if(dali_multi == 1) {
-      dali_e_ab->push_back(dali_e->at(0));
-      dali_t_ab->push_back(dali_t->at(0));
-      dali_cos_ab->push_back(dali_cos->at(0));
-      dali_x_ab->push_back(dali_x->at(0));
-      dali_y_ab->push_back(dali_y->at(0));
-      dali_z_ab->push_back(dali_z->at(0));
-      dali_id_ab->push_back(dali_id->at(0));
-
-      dali_multi_ab = 1;
-    } else if(dali_multi == 0) {
-      //tr->Fill();
-      continue;
-    } else if(dali_multi > 1) {
-      dali_e_ab->push_back(dali_e->at(0));
-      dali_t_ab->push_back(dali_t->at(0));
-      dali_cos_ab->push_back(dali_cos->at(0));
-      dali_x_ab->push_back(dali_x->at(0));
-      dali_y_ab->push_back(dali_y->at(0));
-      dali_z_ab->push_back(dali_z->at(0));
-      dali_id_ab->push_back(dali_id->at(0));
-
-      Bool_t AddBack_flag = false;
-
-      cout << "ok1" << endl;
-
-      //! flow of addback
-      for(int i = 0; i < dali_multi_ab; i++) {
-        for(int j = 1; j < dali_multi - i; j++) {
-          TVector3 dali_pos_tmp = dali_pos.at(i) - dali_pos.at(i + j);
-          cout << "ok2" << endl;
-          //if((dali_pos->at(i) - dali_pos->at(i + j).Mag()) < addbackRadius)
-          if((dali_pos_tmp.Mag()) < addbackRadius)
-            dali_e_ab->at(i) += dali_e->at(i + j);
-          else if(j == i + 1) {
-            dali_e_ab->push_back(dali_e->at(i + 1));
-            dali_t_ab->push_back(dali_t->at(i + 1));
-            dali_cos_ab->push_back(dali_cos->at(i + 1));
-            dali_x_ab->push_back(dali_x->at(i + 1));
-            dali_y_ab->push_back(dali_y->at(i + 1));
-            dali_z_ab->push_back(dali_z->at(i + 1));
-            dali_id_ab->push_back(dali_id->at(i + 1));
-            dali_multi_ab++;
-          }
-        }
-      }
-
-      //!
-    }
-
-    //dali_multi_ab = dali_id_ab->size();
-    //}
-*/
     //-===== ADD BACK END =====
 
     //? if(!goodEvt) continue;
-    cout << "ok-2" << endl;
+
     //+===== Reconstruct gamma-ray vector =====
     //+===== Create DALI crystal vector (AddBack) =====
 
@@ -353,12 +296,7 @@ int main(int argc, char *argv[]) {
       gamma_pos_ab.push_back(dali_pos_ab.at(i) - vertex);
       gamma_cos_ab.push_back((gamma_pos_ab.at(i)).CosTheta());
     }
-    //for(Int_t i=0;i<dali_multi_ab;i++){
-    //  dali_pos->push_back(TVector3(10*dali_x_ab->at(i),10*dali_y_ab->at(i),10*dali_z_ab->at(i)));
-    //  gamma_pos.push_back(dali_pos.at(i)-vertex);
-    //  gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
-    //}
-    cout << "ok-1" << endl;
+
     //+===== DOPPLER CORRECTION =====
 
     if(dali_multi_ab >= 1) {
@@ -368,15 +306,14 @@ int main(int argc, char *argv[]) {
         dali_edop_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex, gamma_cos_ab.at(i)));
       }
     }
-    cout << "ok0" << endl;
+
     //-===== DOPPLER CORRECTION END =====
 
     //+===== SINPLE DOPPLER CORRECTIOMN (WITHOUT MINOS )=====
 
-    beta_vertex_simple = 0.5 * (betaF7F13 + betaTH);
-    //gamma_vertex_simple     = 1 / Sqrt(1 - beta_vertex_simple * beta_vertex_simple);
+    beta_vertex_simple      = 0.5 * (betaF7F13 + betaTH);
     const Double_t beta_mid = 0.57;
-    //const Double_t gamma_mid = 1 / Sqrt(1 - beta_mid * beta_mid);
+
     if(dali_multi_ab >= 1) {
       for(Int_t i = 0; i < dali_multi; i++) {
         dali_edop_simple->push_back(DopplerCorrection(dali_e->at(i), beta_vertex_simple, dali_cos->at(i)));
@@ -384,11 +321,8 @@ int main(int argc, char *argv[]) {
         dali_edop_theta->push_back(DopplerCorrection(dali_e->at(i), beta_vertex_simple, gamma_cos.at(i)));
       }
       for(Int_t i = 0; i < dali_multi_ab; i++) {
-        //dali_edop_simple_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * dali_cos_ab->at(i)));
         dali_edop_simple_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex_simple, dali_cos_ab->at(i)));
-        //dali_edop_beta_ab->push_back(dali_e_ab->at(i) * gamma_vertex * (1 - beta_vertex * dali_cos_ab->at(i)));
         dali_edop_beta_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex, dali_cos_ab->at(i)));
-        //dali_edop_theta_ab->push_back(dali_e_ab->at(i) * gamma_mid * (1 - beta_mid * gamma_cos->at(i)));
         dali_edop_theta_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex_simple, gamma_cos_ab.at(i)));
       }
     }
@@ -688,7 +622,7 @@ int main(int argc, char *argv[]) {
   stop_timer_tk(FileNumber, AllEntry);
 
   return 0;
-}  //main()
+}  //-main()
 
 void SortDaliHit(Int_t left, Int_t right, vector<Int_t> *DALI_ID, vector<Double_t> *DALI_Energy, vector<Double_t> *DALI_Time, vector<Double_t> *DALI_X, vector<Double_t> *DALI_Y, vector<Double_t> *DALI_Z, vector<Double_t> *DALI_CosTheta) {
   Int_t    TempID;
