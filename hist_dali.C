@@ -150,6 +150,10 @@ int main(int argc, char *argv[]) {
 
   TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
   TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
+  TH1F *hgamma_cos   = new TH1F("gamma_cos", "gamma_cos", 100, -1.1, 1.1);
+  TH1F *hgamma_posX  = new TH1F("gamma_posX", "gamma_posX", 100, -500, 500);
+  TH1F *hgamma_posY  = new TH1F("gamma_posY", "gamma_posY", 100, -500, 500);
+  TH1F *hgamma_posZ  = new TH1F("gamma_posZ", "gamma_posZ", 100, -500, 500);
 
   //&===== LOOP =========================================================================
 
@@ -226,8 +230,11 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < dali_multi; i++) {
       dali_pos.push_back(TVector3(10 * dali_x->at(i), 10 * dali_y->at(i), 10 * dali_z->at(i)));
-      gamma_pos.push_back(dali_pos.at(i) - vertex);
-      gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
+      //gamma_pos.push_back(dali_pos.at(i) - vertex);
+      TVector3 gamma_pos_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - vertex.Z());
+      gamma_pos.push_back(gamma_pos_tmp);
+      //gamma_cos.push_back((gamma_pos.at(i)).CosTheta());
+      gamma_cos.push_back(gamma_pos_tmp.CosTheta());
     }
 
     //+===== ADD BACK =====
@@ -297,7 +304,9 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < dali_multi_ab; i++) {
       dali_pos_ab.push_back(TVector3(10 * dali_x_ab->at(i), 10 * dali_y_ab->at(i), 10 * dali_z_ab->at(i)));
       gamma_pos_ab.push_back(dali_pos_ab.at(i) - vertex);
-      gamma_cos_ab.push_back((gamma_pos_ab.at(i)).CosTheta());
+      TVector3 gamma_pos_ab_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - vertex.Z());
+      //gamma_cos_ab.push_back((gamma_pos_ab.at(i)).CosTheta());
+      gamma_cos_ab.push_back(gamma_pos_ab_tmp.CosTheta());
     }
 
     //+===== DOPPLER CORRECTION =====
@@ -336,6 +345,13 @@ int main(int argc, char *argv[]) {
 
     hMINOSZ->Fill(MINOS_Z_cor);
     hbeta_vertex->Fill(beta_vertex);
+    if(gamma_cos.size() > 0)
+      hgamma_cos->Fill(gamma_cos.at(0));
+    if(gamma_pos.size() > 0) {
+      hgamma_posX->Fill((gamma_pos.at(0)).X());
+      hgamma_posY->Fill((gamma_pos.at(0)).Y());
+      hgamma_posZ->Fill((gamma_pos.at(0)).Z());
+    }
 
     if(dali_edop->size() > 0) {
       if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
@@ -590,6 +606,10 @@ int main(int argc, char *argv[]) {
     hdopsimple[i]->Write();
   hMINOSZ->Write();
   hbeta_vertex->Write();
+  hgamma_cos->Write();
+  hgamma_posX->Write();
+  hgamma_posY->Write();
+  hgamma_posZ->Write();
 
   outfile->Write();
   outfile->Close("R");
