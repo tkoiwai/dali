@@ -148,6 +148,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
+  TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
+
   //&===== LOOP =========================================================================
 
   Int_t nEntry = intr->GetEntries();
@@ -257,7 +260,7 @@ int main(int argc, char *argv[]) {
           if(crystalUsedForAddback[k] == true)
             continue;
           TVector3 dali_pos_tmp = dali_pos.at(j) - dali_pos.at(k);
-          if(dali_pos_tmp.Mag() < addbackRadius)
+          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold)
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
           //for(int l = 0; l < fNumberOfAddbackPartners[DUMM_ID[DALI_NClust]]; l++) {
           //  if(DALI_ID_C->at(k) == fAddbackTable[DUMM_ID[DALI_NClust]][l] && dali_e->at(k) > AddBackTreshold) {
@@ -330,6 +333,10 @@ int main(int argc, char *argv[]) {
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
+
+    hMINOSZ->Fill(MINOS_Z_cor);
+    hbeta_vertex->Fill(beta_vertex);
+
     if(dali_edop->size() > 0) {
       if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
         hdop[0]->Fill(dali_edop->at(0));
@@ -581,6 +588,8 @@ int main(int argc, char *argv[]) {
     hdop[i]->Write();
   for(int i = 0; i < 35; i++)
     hdopsimple[i]->Write();
+  hMINOSZ->Write();
+  hbeta_vertex->Write();
 
   outfile->Write();
   outfile->Close("R");
