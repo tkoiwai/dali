@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
   int    FileNumber     = -1;
   int    MaxEventNumber = 0;
   double addbackRadius  = -1.;
+  bool   addback_flag   = false;
 
   struct option longopts[] = {
       {"ab", required_argument, NULL, 'a'},
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
   while((opt = getopt_long(argc, argv, "a:tr:e:", longopts, &longindex)) != -1) {
     switch(opt) {
       case 'a':
+        addback_flag  = true;
         addbackRadius = atoi(optarg);
         break;
       case 'r':
@@ -227,6 +229,8 @@ int main(int argc, char *argv[]) {
     }
     //+===== ADD BACK =====
 
+    //TODO if(addback_flag)
+
     if(dali_multi == 1) {
       dali_e_ab->push_back(dali_e->at(0));
       dali_t_ab->push_back(dali_t->at(0));
@@ -275,31 +279,6 @@ int main(int argc, char *argv[]) {
       }
 
       //!
-
-      //for(Int_t i = 1; i < dali_multi; i++) {
-      //  AddBack_flag  = false;
-      //  dali_multi_ab = dali_id_ab->size();
-      //  for(Int_t k = 0; k < dali_multi_ab; k++) {
-      //    for(Int_t j = 0; j < 7; j++) {  //TODO: for dali_e.size()
-      //      //TODO: if(mag.(DALI_Vector1 - DALI_Vector2) < addbackRadius) perform addback
-      //      //  if(dali_id->at(i) == AddBackTable[dali_id_ab->at(k)][j] && dali_Energy->at(i) > 300) {
-      //      //    dali_e_ab->at(k) = dali_e_ab->at(k) + dali_Energy->at(i);
-      //      //    AddBack_flag     = true;
-      //      //    break;
-      //      //  }
-      //    }
-      //    if(AddBack_flag == true) break;
-      //  }
-
-      //if(AddBack_flag == false) {
-      //  dali_e_ab->push_back(dali_e->at(i));
-      //  dali_t_ab->push_back(dali_t->at(i));
-      //  dali_cos_ab->push_back(dali_cos->at(i));
-      //  dali_x_ab->push_back(dali_x->at(i));
-      //  dali_y_ab->push_back(dali_y->at(i));
-      //  dali_z_ab->push_back(dali_z->at(i));
-      //  dali_id_ab->push_back(dali_id->at(i));
-      //}
     }
 
     //dali_multi_ab = dali_id_ab->size();
