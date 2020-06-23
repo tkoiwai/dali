@@ -229,8 +229,58 @@ int main(int argc, char *argv[]) {
     }
     //+===== ADD BACK =====
 
-    //TODO if(addback_flag)
+    int       DALI_NClust                                = 0;
+    Double_t  addbackThreshold                           = 300.;  //! keV
+    const int NUMBEROFDALICRYSTAL                        = 226;
+    bool      crystalUsedForAddback[NUMBEROFDALICRYSTAL] = {false};
+    double    DUMM_Energy[NUMBEROFDALICRYSTALS]          = {sqrt(-1.)};
+    double    DUMM_Time[NUMBEROFDALICRYSTALS]            = {sqrt(-1.)};
+    double    DUMM_Cos[NUMBEROFDALICRYSTALS]             = {sqrt(-1.)};
+    double    DUMM_X[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
+    double    DUMM_Y[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
+    double    DUMM_Z[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
+    int       DUMM_ID[NUMBEROFDALICRYSTALS]              = {-1};
 
+    if(addback_flag) {
+      for(int j = 0; j < dali_multi; j++) {
+        if(crystalUsedForAddback[j] == true)
+          continue;
+        DUMM_Energy[DALI_NClust] = dali_e->at(j);
+        DUMM_Time[DALI_NClust]   = dali_t->at(j);
+        DUMM_Cos[DALI_NClust]    = dali_cos->at(j);
+        DUMM_X[DALI_NClust]      = dali_x->at(j);
+        DUMM_Y[DALI_NClust]      = dali_y->at(j);
+        DUMM_Z[DALI_NClust]      = dali_z->at(j);
+        DUMM_ID[DALI_NClust]     = dali_id->at(j);
+        crystalUsedForAddback[j] = true;
+        for(unsigned int k = j + 1; k < dali_id->size(); k++) {
+          if(crystalUsedForAddback[k] == true)
+            continue;
+          TVector3 dali_pos_tmp = dali_pos.at(j) - dali_pos.at(k);
+          if(dali_pos_tmp.Mag() < addbackRadius)
+            DUMM_Energy[DALI_NClust] += dali_e->at(k);
+          //for(int l = 0; l < fNumberOfAddbackPartners[DUMM_ID[DALI_NClust]]; l++) {
+          //  if(DALI_ID_C->at(k) == fAddbackTable[DUMM_ID[DALI_NClust]][l] && dali_e->at(k) > AddBackTreshold) {
+          //    crystalUsedForAddback[k] = true;
+          //    DUMM_Energy[DALI_NClust] += dali_e->at(k);
+          //  }
+          //}
+        }
+        DALI_NClust++;
+      }
+      dali_multi_ab = DALI_NClust;
+      for(int j = 0; j < DALI_NClust; j++) {
+        dali_e_ab->push_back(DUMM_Energy[j]);
+        dali_t_ab->push_back(DUMM_Time[j]);
+        dali_x_ab->push_back(DUMM_X[j]);
+        dali_y_ab->push_back(DUMM_Y[j]);
+        dali_z_ab->push_back(DUMM_Z[j]);
+        dali_cos_ab->push_back(DUMM_Cos[j]);
+        dali_id_ab->push_back(DUMM_ID[j]);
+      }
+    }
+
+    /*
     if(dali_multi == 1) {
       dali_e_ab->push_back(dali_e->at(0));
       dali_t_ab->push_back(dali_t->at(0));
@@ -283,7 +333,7 @@ int main(int argc, char *argv[]) {
 
     //dali_multi_ab = dali_id_ab->size();
     //}
-
+*/
     //-===== ADD BACK END =====
 
     //? if(!goodEvt) continue;
