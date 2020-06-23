@@ -229,17 +229,17 @@ int main(int argc, char *argv[]) {
     }
     //+===== ADD BACK =====
 
-    int       DALI_NClust                                = 0;
-    Double_t  addbackThreshold                           = 300.;  //! keV
-    const int NUMBEROFDALICRYSTAL                        = 226;
-    bool      crystalUsedForAddback[NUMBEROFDALICRYSTAL] = {false};
-    double    DUMM_Energy[NUMBEROFDALICRYSTALS]          = {sqrt(-1.)};
-    double    DUMM_Time[NUMBEROFDALICRYSTALS]            = {sqrt(-1.)};
-    double    DUMM_Cos[NUMBEROFDALICRYSTALS]             = {sqrt(-1.)};
-    double    DUMM_X[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
-    double    DUMM_Y[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
-    double    DUMM_Z[NUMBEROFDALICRYSTALS]               = {sqrt(-1.)};
-    int       DUMM_ID[NUMBEROFDALICRYSTALS]              = {-1};
+    int       DALI_NClust                                 = 0;
+    Double_t  addbackThreshold                            = 300.;  //! keV
+    const int NUMBEROFDALICRYSTALS                        = 226;
+    bool      crystalUsedForAddback[NUMBEROFDALICRYSTALS] = {false};
+    double    DUMM_Energy[NUMBEROFDALICRYSTALS]           = {sqrt(-1.)};
+    double    DUMM_Time[NUMBEROFDALICRYSTALS]             = {sqrt(-1.)};
+    double    DUMM_Cos[NUMBEROFDALICRYSTALS]              = {sqrt(-1.)};
+    double    DUMM_X[NUMBEROFDALICRYSTALS]                = {sqrt(-1.)};
+    double    DUMM_Y[NUMBEROFDALICRYSTALS]                = {sqrt(-1.)};
+    double    DUMM_Z[NUMBEROFDALICRYSTALS]                = {sqrt(-1.)};
+    int       DUMM_ID[NUMBEROFDALICRYSTALS]               = {-1};
 
     if(addback_flag) {
       for(int j = 0; j < dali_multi; j++) {
