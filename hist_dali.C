@@ -327,8 +327,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    cout << dali_edop->size() << endl;
-    cout << "ok1" << endl;
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
@@ -354,7 +352,7 @@ int main(int argc, char *argv[]) {
         if(dali_multi_ab < 4)
           hdop[9]->Fill(dali_edop_ab->at(0));
       }
-      cout << "ok2" << endl;
+
       if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
         hdop[10]->Fill(dali_edop->at(0));
         if(dali_multi == 1)
