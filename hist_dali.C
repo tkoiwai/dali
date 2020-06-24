@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
       hdop[i * 10 + j] = new TH1F(Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), 4000, 0, 4000);
     }
     for(int jj = 0; jj < 7; jj++) {
-      hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 8000, 0, 8000);
+      hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 4000, 0, 4000);
     }
   }
   TH1F *h_minoseff = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
