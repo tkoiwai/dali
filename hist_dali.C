@@ -327,9 +327,11 @@ int main(int argc, char *argv[]) {
 
     //+===== FILL HIST ==============================================================================
 
-    h_dalit->Fill(dali_t->at(0));
-    for(int i = 0; i < dali_multi; i++)
-      h_dalit_all->Fill(dali_t->at(i));
+    if(dali_t->size() > 0) {
+      h_dalit->Fill(dali_t->at(0));
+      for(int i = 0; i < dali_multi; i++)
+        h_dalit_all->Fill(dali_t->at(i));
+    }
 
     hMINOSZ->Fill(MINOS_Z_cor);
     hbeta_vertex->Fill(beta_vertex);
