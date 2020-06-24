@@ -146,7 +146,8 @@ int main(int argc, char *argv[]) {
       hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 4000, 0, 4000);
     }
   }
-  TH1F *h_minoseff = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
+  TH1F *h_minoseff_50ar = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
+  TH1F *h_minoseff_53ca = new TH1F("h_edop_simple_br54ca_sa53ca_all_wvertex", "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
 
   TH1F *h_dalit     = new TH1F("h_dalit", "DALI time of first hit", 300, -50, 50);
   TH1F *h_dalit_all = new TH1F("h_dalit_all", "DALI time of all hits", 300, -50, 50);
@@ -505,6 +506,9 @@ int main(int argc, char *argv[]) {
           hdopsimple[3]->Fill(dali_edop_simple->at(0));
         if(dali_multi < 4)
           hdopsimple[4]->Fill(dali_edop_simple->at(0));
+
+        if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
+          h_minoseff_53ca->Fill(dali_edop_simple->at(0));
       }
 
       if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
@@ -579,7 +583,7 @@ int main(int argc, char *argv[]) {
           hdopsimple[34]->Fill(dali_edop_simple->at(0));
 
         if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
-          h_minoseff->Fill(dali_edop_simple->at(0));
+          h_minoseff_50ar->Fill(dali_edop_simple->at(0));
       }
     }
 
@@ -597,7 +601,8 @@ int main(int argc, char *argv[]) {
   hMINOSZ->Write();
   hbeta_vertex->Write();
   hgamma_cos->Write();
-  h_minoseff->Write();
+  h_minoseff_50ar->Write();
+  h_minoseff_53ca->Write();
   h_dalit->Write();
   h_dalit_all->Write();
 
