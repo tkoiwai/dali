@@ -140,16 +140,18 @@ int main(int argc, char *argv[]) {
 
   for(int i = 0; i < 7; i++) {
     for(int j = 0; j < 10; j++) {
-      hdop[i * 10 + j] = new TH1F(Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), 4000, 0, 4000);
+      hdop[i * 10 + j] = new TH1F(Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), 8000, 0, 8000);
     }
     for(int jj = 0; jj < 7; jj++) {
-      hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 4000, 0, 4000);
+      hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 8000, 0, 8000);
     }
   }
 
   TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
   TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
   TH1F *hgamma_cos   = new TH1F("gamma_cos", "gamma_cos", 100, -1.1, 1.1);
+
+  TH1F *h_minoseff = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "MINOS effciency (simple edop plus MINOS vertex reco.ed", 8000, 0, 8000);
 
   //&===== LOOP =========================================================================
 
@@ -566,6 +568,9 @@ int main(int argc, char *argv[]) {
           hdopsimple[33]->Fill(dali_edop_simple->at(0));
         if(dali_multi < 4)
           hdopsimple[34]->Fill(dali_edop_simple->at(0));
+
+        if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
+          h_minoseff->Fill(dali_edop_simple->at(0));
       }
     }
 
@@ -573,7 +578,9 @@ int main(int argc, char *argv[]) {
 
   std::clog << std::endl;
 
+  //+===== Write to the output file
   outfile->cd();
+
   for(int i = 0; i < 70; i++)
     hdop[i]->Write();
   for(int i = 0; i < 35; i++)
@@ -581,9 +588,12 @@ int main(int argc, char *argv[]) {
   hMINOSZ->Write();
   hbeta_vertex->Write();
   hgamma_cos->Write();
+  h_minoseff->Write();
 
   outfile->Write();
   outfile->Close("R");
+
+  //+===== Delete vectors
 
   delete dali_e;
   delete dali_t;
