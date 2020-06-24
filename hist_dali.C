@@ -146,12 +146,14 @@ int main(int argc, char *argv[]) {
       hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 8000, 0, 8000);
     }
   }
+  TH1F *h_minoseff = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "MINOS effciency (simple edop plus MINOS vertex reco.ed", 8000, 0, 8000);
+
+  TH1F *h_dalit     = new TH1F("h_dalit", "DALI time of first hit", 300, -50, 50);
+  TH1F *h_dalit_all = new TH1F("h_dalit_all", "DALI time of all hits", 300, -50, 50);
 
   TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
   TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
   TH1F *hgamma_cos   = new TH1F("gamma_cos", "gamma_cos", 100, -1.1, 1.1);
-
-  TH1F *h_minoseff = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "MINOS effciency (simple edop plus MINOS vertex reco.ed", 8000, 0, 8000);
 
   //&===== LOOP =========================================================================
 
@@ -180,8 +182,8 @@ int main(int argc, char *argv[]) {
     //+===== GATES =================================================================
 
     //+===== DALI timing gate ======================================================
-    for(int i = 0; i < dali_multi; i++)
-      if(abs(dali_t->at(i)) > DALITimeGate) continue;
+    //for(int i = 0; i < dali_multi; i++)
+    // if(abs(dali_t->at(i)) > DALITimeGate) continue;
 
     //+===== PID gate ==============================================================
     //- done in cal_dali
@@ -253,7 +255,8 @@ int main(int argc, char *argv[]) {
         for(unsigned int k = j + 1; k < dali_id->size(); k++) {
           if(crystalUsedForAddback[k] == true)
             continue;
-          TVector3 dali_pos_tmp = dali_pos.at(j) - dali_pos.at(k);
+          //TVector3 dali_pos_tmp = dali_pos.at(j) - dali_pos.at(k);
+          TVector3 dali_pos_tmp(dali_x->at(j) - dali_x->at(k), dali_y->at(j) - dali_y->at(k), dali_z->at(j) - dali_z->at(k));
           if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold)
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
           //for(int l = 0; l < fNumberOfAddbackPartners[DUMM_ID[DALI_NClust]]; l++) {
@@ -323,6 +326,10 @@ int main(int argc, char *argv[]) {
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
+
+    h_dalit->Fill(dali_t->at(0));
+    for(int i = 0; i < dali_multi; i++)
+      h_dalit_all->Fill(dali_t->at(i));
 
     hMINOSZ->Fill(MINOS_Z_cor);
     hbeta_vertex->Fill(beta_vertex);
@@ -589,6 +596,8 @@ int main(int argc, char *argv[]) {
   hbeta_vertex->Write();
   hgamma_cos->Write();
   h_minoseff->Write();
+  h_dalit->Write();
+  h_dalit_all->Write();
 
   outfile->Write();
   outfile->Close("R");
