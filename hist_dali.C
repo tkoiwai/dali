@@ -181,14 +181,14 @@ int main(int argc, char *argv[]) {
 
   for(int i = 0; i < 11; i++) {
     for(int j = 0; j < 10; j++) {
-      hdop[i * 10 + j] = new TH1F(
+      hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
           //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
           //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
-    for(int jj = 0; jj < 11; jj++) {
+    for(int jj = 0; jj < 5; jj++) {
       hdopsimple[i * 5 + jj] = new TH1F(
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
