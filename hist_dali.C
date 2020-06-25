@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
-    for(int jj = 0; jj < 7; jj++) {
+    for(int jj = 0; jj < 11; jj++) {
       hdopsimple[i * 5 + jj] = new TH1F(
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
