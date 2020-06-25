@@ -109,9 +109,9 @@ int main(int argc, char *argv[]) {
   //TFile *fcutBR_Sc       = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
   //TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
-  TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
   TFile *fcutSA_Ca_MINOS = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca_wMINOS.root");
   TFile *fcutSA_Ca       = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca.root");
+  TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
   TFile *fcutSA_50Ar     = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
 
   //TCutG *cbr54sc = (TCutG *)fcutBR_Sc->Get("br54sc");
@@ -126,6 +126,8 @@ int main(int argc, char *argv[]) {
   TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("sa57ca");
   TCutG *csa55ca       = (TCutG *)fcutSA_Ca->Get("sa55ca");
   TCutG *csa55k        = (TCutG *)fcutSA_K->Get("sa55k");
+  TCutG *csa53k        = (TCutG *)fcutSA_K->Get("sa53k");
+  TCutG *csa51k        = (TCutG *)fcutSA_K->Get("sa51k");
   TCutG *csa50ar       = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //+===== DEFINE HIST ====================================================================
@@ -151,34 +153,51 @@ int main(int argc, char *argv[]) {
                        (char *)"",
                        (char *)""};
 
+  char *cnamech[11] = {(char *)"br54ca_sa53ca",
+                       (char *)"br51k_sa50ar",
+                       (char *)"br52ca_sa51k",
+                       (char *)"br54ca_sa53k",
+                       (char *)"br56ca_sa55k",
+                       (char *)"br56ca_sa55ca",
+                       (char *)"br56sc_sa55ca",
+                       (char *)"br58sc_sa57ca",
+                       (char *)"br59sc_sa57ca",
+                       (char *)"br59ti_sa57ca",
+                       (char *)"br60ti_sa57ca"};
+
   char *hnames[10] = {(char *)"all",
                       (char *)"m1",
                       (char *)"m2",
                       (char *)"m3",
-                      (char *)"mle3",
+                      (char *)"mle4",
                       (char *)"all_ab",
                       (char *)"m1_ab",
                       (char *)"m2_ab",
                       (char *)"m3_ab",
-                      (char *)"mle3_ab"};
+                      (char *)"mle4_ab"};
 
   TH1F *hdop[100];
   TH1F *hdopsimple[100];
 
-  for(int i = 0; i < 7; i++) {
+  for(int i = 0; i < 11; i++) {
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(
-          Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
-          Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+          //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+          //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+          Form("h_edop_%s_%s", cnamech[i], hnames[j]),
+          Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
     for(int jj = 0; jj < 7; jj++) {
       hdopsimple[i * 5 + jj] = new TH1F(
-          Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
-          Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+          //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+          //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+          Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
+          Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
           4000, 0, 4000);
     }
   }
+
   TH1F *h_minoseff_50ar = new TH1F(
       "h_edop_simple_br51k_sa50ar_all_wvertex",
       "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
@@ -216,7 +235,7 @@ int main(int argc, char *argv[]) {
     RunNumber   = FileNumber;
     EventNumber = EventNumber_calD;
 
-    if(!br59sc && !br58sc && !br56sc && !br56ca && !br54ca && !br51k)
+    if(!br58ti && !br60ti && !br59sc && !br58sc && !br56sc && !br56ca && !br54ca && !br52ca && !br51k)
       continue;
 
     //+===== GATES =================================================================
