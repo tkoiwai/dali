@@ -339,8 +339,7 @@ int main(int argc, char *argv[]) {
 
     //? if(!goodEvt) continue;
 
-    //+===== Reconstruct gamma-ray vector =====
-    //+===== Create DALI crystal vector (AddBack) =====
+    //+===== Reconstruct gamma-ray vector (cos theta) =====
 
     for(int i = 0; i < dali_multi_ab; i++) {
       TVector3 gamma_pos_ab_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - vertex.Z());
