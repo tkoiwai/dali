@@ -129,25 +129,64 @@ int main(int argc, char *argv[]) {
   TCutG *csa50ar       = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //+===== DEFINE HIST ====================================================================
-  char *cnamebr[10] = {(char *)"br54ca", (char *)"br56ca", (char *)"br56ca", (char *)"br56sc", (char *)"br58sc",
-                       (char *)"br59sc", (char *)"br51k", (char *)"", (char *)"", (char *)""};
-  char *cnamesa[10] = {(char *)"sa53ca", (char *)"sa55ca", (char *)"sa55k", (char *)"sa55ca", (char *)"sa57ca",
-                       (char *)"sa57ca", (char *)"sa50ar", (char *)"", (char *)"", (char *)""};
-  char *hnames[10]  = {(char *)"all", (char *)"m1", (char *)"m2", (char *)"m3", (char *)"mle3", (char *)"all_ab",
-                      (char *)"m1_ab", (char *)"m2_ab", (char *)"m3_ab", (char *)"mle3_ab"};
+  char *cnamebr[10] = {(char *)"br54ca",
+                       (char *)"br56ca",
+                       (char *)"br56ca",
+                       (char *)"br56sc",
+                       (char *)"br58sc",
+                       (char *)"br59sc",
+                       (char *)"br51k",
+                       (char *)"",
+                       (char *)"",
+                       (char *)""};
+
+  char *cnamesa[10] = {(char *)"sa53ca",
+                       (char *)"sa55ca",
+                       (char *)"sa55k",
+                       (char *)"sa55ca",
+                       (char *)"sa57ca",
+                       (char *)"sa57ca",
+                       (char *)"sa50ar",
+                       (char *)"",
+                       (char *)"",
+                       (char *)""};
+
+  char *hnames[10] = {(char *)"all",
+                      (char *)"m1",
+                      (char *)"m2",
+                      (char *)"m3",
+                      (char *)"mle3",
+                      (char *)"all_ab",
+                      (char *)"m1_ab",
+                      (char *)"m2_ab",
+                      (char *)"m3_ab",
+                      (char *)"mle3_ab"};
+
   TH1F *hdop[100];
   TH1F *hdopsimple[100];
 
   for(int i = 0; i < 7; i++) {
     for(int j = 0; j < 10; j++) {
-      hdop[i * 10 + j] = new TH1F(Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]), 4000, 0, 4000);
+      hdop[i * 10 + j] = new TH1F(
+          Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+          Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+          4000, 0, 4000);
     }
     for(int jj = 0; jj < 7; jj++) {
-      hdopsimple[i * 5 + jj] = new TH1F(Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]), 4000, 0, 4000);
+      hdopsimple[i * 5 + jj] = new TH1F(
+          Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+          Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+          4000, 0, 4000);
     }
   }
-  TH1F *h_minoseff_50ar = new TH1F("h_edop_simple_br51k_sa50ar_all_wvertex", "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
-  TH1F *h_minoseff_53ca = new TH1F("h_edop_simple_br54ca_sa53ca_all_wvertex", "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed", 4000, 0, 4000);
+  TH1F *h_minoseff_50ar = new TH1F(
+      "h_edop_simple_br51k_sa50ar_all_wvertex",
+      "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
+      4000, 0, 4000);
+  TH1F *h_minoseff_53ca = new TH1F(
+      "h_edop_simple_br54ca_sa53ca_all_wvertex",
+      "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
+      4000, 0, 4000);
 
   TH1F *h_dalit     = new TH1F("h_dalit", "DALI time of first hit", 300, -50, 50);
   TH1F *h_dalit_all = new TH1F("h_dalit_all", "DALI time of all hits", 300, -50, 50);
