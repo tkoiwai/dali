@@ -314,16 +314,11 @@ int main(int argc, char *argv[]) {
         for(unsigned int k = j + 1; k < dali_id->size(); k++) {
           if(crystalUsedForAddback[k] == true)
             continue;
-          //TVector3 dali_pos_tmp = dali_pos.at(j) - dali_pos.at(k);
           TVector3 dali_pos_tmp(dali_x->at(j) - dali_x->at(k), dali_y->at(j) - dali_y->at(k), dali_z->at(j) - dali_z->at(k));
-          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold)
+          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold) {
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
-          //for(int l = 0; l < fNumberOfAddbackPartners[DUMM_ID[DALI_NClust]]; l++) {
-          //  if(DALI_ID_C->at(k) == fAddbackTable[DUMM_ID[DALI_NClust]][l] && dali_e->at(k) > AddBackTreshold) {
-          //    crystalUsedForAddback[k] = true;
-          //    DUMM_Energy[DALI_NClust] += dali_e->at(k);
-          //  }
-          //}
+            crystalUsedForAddback[k] = true;
+          }
         }
         DALI_NClust++;
       }
