@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
     if(dali_edop->size() > 0) {
       for(int i = 0; i < 11; i++) {
         if(PIDgates[i]) {
-          for(int j = 0; j < dali_edop->size(); j++) {
+          for(unsigned int j = 0; j < dali_edop->size(); j++) {
             hdop[i * 10]->Fill(dali_edop->at(j));
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
             hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
@@ -449,7 +449,7 @@ int main(int argc, char *argv[]) {
     if(dali_edop_simple->size() > 0) {
       for(int i = 0; i < 11; i++) {
         if(PIDgates[i]) {
-          for(int j = 0; j < dali_edop_simple->size(); j++) {
+          for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
             hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 1)
               hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(0));
