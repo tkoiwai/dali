@@ -180,12 +180,18 @@ int main(int argc, char *argv[]) {
   TH1F *hdopsimple[100];
 
   TH2F *hdopmult[100];
+  TH2F *hdoptime[100];
 
   for(int i = 0; i < 11; i++) {
     hdopmult[i] = new TH2F(
         Form("h_edopmult_%s", cnamech[i]),
         Form("Multiplicity vs Doppler corrected E (%s)", cnamech[i]),
         10, 0, 10, 4000, 0, 4000);
+
+    hdoptime[i] = new TH2F(
+        Form("h_edopmult_%s", cnamech[i]),
+        Form("DALI_Time vs Doppler corrected E (%s)", cnamech[i]),
+        300, -50, 50, 4000, 0, 4000);
 
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
