@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
         10, 0, 10, 4000, 0, 4000);
 
     hdoptime[i] = new TH2F(
-        Form("h_edopmult_%s", cnamech[i]),
+        Form("h_edoptime_%s", cnamech[i]),
         Form("DALI_Time vs Doppler corrected E (%s)", cnamech[i]),
         300, -50, 50, 4000, 0, 4000);
 
@@ -424,23 +424,24 @@ int main(int argc, char *argv[]) {
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
             hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
             if(dali_multi == 1)
-              hdop[i * 10 + 1]->Fill(dali_edop->at(0));
+              hdop[i * 10 + 1]->Fill(dali_edop->at(j));
             if(dali_multi == 2)
-              hdop[i * 10 + 2]->Fill(dali_edop->at(0));
+              hdop[i * 10 + 2]->Fill(dali_edop->at(j));
             if(dali_multi == 3)
-              hdop[i * 10 + 3]->Fill(dali_edop->at(0));
+              hdop[i * 10 + 3]->Fill(dali_edop->at(j));
             if(dali_multi < 4)
-              hdop[i * 10 + 4]->Fill(dali_edop->at(0));
-
-            hdop[i * 10 + 5]->Fill(dali_edop_ab->at(0));
+              hdop[i * 10 + 4]->Fill(dali_edop->at(j));
+          }
+          for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
+            hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             if(dali_multi_ab == 1)
-              hdop[i * 10 + 6]->Fill(dali_edop_ab->at(0));
+              hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
             if(dali_multi_ab == 2)
-              hdop[i * 10 + 7]->Fill(dali_edop_ab->at(0));
+              hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
             if(dali_multi_ab == 3)
-              hdop[i * 10 + 8]->Fill(dali_edop_ab->at(0));
+              hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
             if(dali_multi_ab < 4)
-              hdop[i * 10 + 9]->Fill(dali_edop_ab->at(0));
+              hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
           }
         }
       }
@@ -452,23 +453,24 @@ int main(int argc, char *argv[]) {
           for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
             hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 1)
-              hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(0));
+              hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 2)
-              hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(0));
+              hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 3)
-              hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(0));
+              hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
             if(dali_multi < 4)
-              hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(0));
-
-            hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(0));
+              hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
+          }
+          for(unsigned int j = 0; j < dali_edop_simple_ab->size(); j++) {
+            hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab == 1)
-              hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(0));
+              hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab == 2)
-              hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(0));
+              hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab == 3)
-              hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(0));
+              hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab < 4)
-              hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(0));
+              hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
           }
         }
       }
