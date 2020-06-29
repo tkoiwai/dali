@@ -131,27 +131,27 @@ int main(int argc, char *argv[]) {
   TCutG *csa50ar       = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //+===== DEFINE HIST ====================================================================
-  char *cnamebr[10] = {(char *)"br54ca",
-                       (char *)"br56ca",
-                       (char *)"br56ca",
-                       (char *)"br56sc",
-                       (char *)"br58sc",
-                       (char *)"br59sc",
-                       (char *)"br51k",
-                       (char *)"",
-                       (char *)"",
-                       (char *)""};
-
-  char *cnamesa[10] = {(char *)"sa53ca",
-                       (char *)"sa55ca",
-                       (char *)"sa55k",
-                       (char *)"sa55ca",
-                       (char *)"sa57ca",
-                       (char *)"sa57ca",
-                       (char *)"sa50ar",
-                       (char *)"",
-                       (char *)"",
-                       (char *)""};
+  //char *cnamebr[10] = {(char *)"br54ca",
+  //                     (char *)"br56ca",
+  //                     (char *)"br56ca",
+  //                     (char *)"br56sc",
+  //                     (char *)"br58sc",
+  //                     (char *)"br59sc",
+  //                     (char *)"br51k",
+  //                     (char *)"",
+  //                     (char *)"",
+  //                     (char *)""};
+  //
+  //char *cnamesa[10] = {(char *)"sa53ca",
+  //                     (char *)"sa55ca",
+  //                     (char *)"sa55k",
+  //                     (char *)"sa55ca",
+  //                     (char *)"sa57ca",
+  //                     (char *)"sa57ca",
+  //                     (char *)"sa50ar",
+  //                     (char *)"",
+  //                     (char *)"",
+  //                     (char *)""};
 
   char *cnamech[11] = {(char *)"br54ca_sa53ca",
                        (char *)"br51k_sa50ar",
@@ -179,7 +179,14 @@ int main(int argc, char *argv[]) {
   TH1F *hdop[100];
   TH1F *hdopsimple[100];
 
+  TH2F *hdopmult[100];
+
   for(int i = 0; i < 11; i++) {
+    hdopmult[i] = new TH2F(
+        Form("h_edopmult_%s", cnamech[i]),
+        Form("Multiplicity vs Doppler corrected E (%s)", cnamech[i]),
+        10, 0, 10, 4000, 0, 4000);
+
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
           //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
@@ -235,7 +242,7 @@ int main(int argc, char *argv[]) {
     RunNumber   = FileNumber;
     EventNumber = EventNumber_calD;
 
-    if(!br58ti && !br60ti && !br59sc && !br58sc && !br56sc && !br56ca && !br54ca && !br52ca && !br51k)
+    if(!br59ti && !br60ti && !br59sc && !br58sc && !br56sc && !br56ca && !br54ca && !br52ca && !br51k)
       continue;
 
     //+===== GATES =================================================================
@@ -390,6 +397,10 @@ int main(int argc, char *argv[]) {
     hbeta_vertex->Fill(beta_vertex);
     if(gamma_cos.size() > 0)
       hgamma_cos->Fill(gamma_cos.at(0));
+
+    //TODO bool PIDgates[11] = reaction channels
+
+    //TODO for(i<dali_edop.size())  1
 
     if(dali_edop->size() > 0) {
       if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
