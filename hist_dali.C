@@ -164,26 +164,35 @@ int main(int argc, char *argv[]) {
 
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
-
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
     for(int jj = 0; jj < 10; jj++) {
       hdopsimple[i * 10 + jj] = new TH1F(
-
           Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
           Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
           4000, 0, 4000);
     }
   }
 
-  TH1F *h_minoseff_50ar = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_wvertex",
+  TH1F *h_minoseff_50ar[2];
+  TH1F *h_minoseff_53ca[2];
+
+  h_minoseff_50ar[0] = new TH1F(
+      "h_edop_simple_br51k_sa50ar_all_wo-vertex",
+      "50Ar: MINOS effciency (simple edop)",
+      4000, 0, 4000);
+  h_minoseff_50ar[1] = new TH1F(
+      "h_edop_simple_br51k_sa50ar_all_w-vertex",
       "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
       4000, 0, 4000);
-  TH1F *h_minoseff_53ca = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_wvertex",
+  h_minoseff_53ca[0] = new TH1F(
+      "h_edop_simple_br54ca_sa53ca_all_wo-vertex",
+      "53Ca: MINOS effciency (simple edop)",
+      4000, 0, 4000);
+  h_minoseff_53ca[1] = new TH1F(
+      "h_edop_simple_br54ca_sa53ca_all_w-vertex",
       "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
       4000, 0, 4000);
 
@@ -383,63 +392,76 @@ int main(int argc, char *argv[]) {
     if(gamma_cos.size() > 0)
       hgamma_cos->Fill(gamma_cos.at(0));
 
+    for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {  //+ w/o Addback
+      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+        h_minoseff_50ar[0]->Fill(dali_edop_simple->at(j));
+        if(MINOS_NumberTracks > 0)
+          h_minoseff_50ar[1]->Fill(dali_edop_simple->at(j));
+      }
+      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+        h_minoseff_53ca[0]->Fill(dali_edop_simple->at(j));
+        if(MINOS_NumberTracks > 0)
+          h_minoseff_53ca[1]->Fill(dali_edop_simple->at(j));
+      }
+    }
+
     for(int i = 0; i < 11; i++) {
       if(PIDgates[i]) {
-        for(unsigned int j = 0; j < dali_edop->size(); j++) {
+        for(unsigned int j = 0; j < dali_edop->size(); j++) {  //+ w/o Addback
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
+
           if(-5 < dali_t->at(j) && dali_t->at(j) < 15) {
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
-            hdop[i * 10]->Fill(dali_edop->at(j));
-            if(dali_multi == 1)
-              hdop[i * 10 + 1]->Fill(dali_edop->at(j));
-            if(dali_multi == 2)
-              hdop[i * 10 + 2]->Fill(dali_edop->at(j));
-            if(dali_multi == 3)
-              hdop[i * 10 + 3]->Fill(dali_edop->at(j));
-            if(dali_multi < 4)
-              hdop[i * 10 + 4]->Fill(dali_edop->at(j));
 
-            hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
-            if(dali_multi == 1)
+            hdop[i * 10 + 0]->Fill(dali_edop->at(j));
+            hdopsimple[i * 10 + 0]->Fill(dali_edop_simple->at(j));
+            if(dali_multi == 1) {
+              hdop[i * 10 + 1]->Fill(dali_edop->at(j));
               hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(j));
-            if(dali_multi == 2)
+            }
+            if(dali_multi == 2) {
+              hdop[i * 10 + 2]->Fill(dali_edop->at(j));
               hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(j));
-            if(dali_multi == 3)
+            }
+            if(dali_multi == 3) {
+              hdop[i * 10 + 3]->Fill(dali_edop->at(j));
               hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
-            if(dali_multi < 4)
+            }
+            if(dali_multi < 4) {
+              hdop[i * 10 + 4]->Fill(dali_edop->at(j));
               hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
+            }
 
             //if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160) {
-            if(MINOS_NumberTracks > 0) {
-              if(PIDgates[1])
-                h_minoseff_50ar->Fill(dali_edop_simple->at(j));
-              if(PIDgates[0])
-                h_minoseff_53ca->Fill(dali_edop_simple->at(j));
-            }
+            //if(MINOS_NumberTracks > 0) {
+            //  if(PIDgates[1])
+            //    h_minoseff_50ar->Fill(dali_edop_simple->at(j));
+            //  if(PIDgates[0])
+            //    h_minoseff_53ca->Fill(dali_edop_simple->at(j));
+            //}
           }
         }
 
-        for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
+        for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
           if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < 15) {
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
-            if(dali_multi_ab == 1)
-              hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
-            if(dali_multi_ab == 2)
-              hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
-            if(dali_multi_ab == 3)
-              hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
-            if(dali_multi_ab < 4)
-              hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
-
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
-            if(dali_multi_ab == 1)
+            if(dali_multi_ab == 1) {
+              hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
               hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
-            if(dali_multi_ab == 2)
+            }
+            if(dali_multi_ab == 2) {
+              hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
               hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(j));
-            if(dali_multi_ab == 3)
+            }
+            if(dali_multi_ab == 3) {
+              hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
               hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(j));
-            if(dali_multi_ab < 4)
+            }
+            if(dali_multi_ab < 4) {
+              hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
               hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
+            }
           }
         }
       }
@@ -459,8 +481,10 @@ int main(int argc, char *argv[]) {
   hMINOSZ->Write();
   hbeta_vertex->Write();
   hgamma_cos->Write();
-  h_minoseff_50ar->Write();
-  h_minoseff_53ca->Write();
+  for(int i = 0; i < 2; i++) {
+    h_minoseff_50ar[i]->Write();
+    h_minoseff_53ca[i]->Write();
+  }
   h_dalit->Write();
   h_dalit_all->Write();
   for(int i = 0; i < 11; i++) {
