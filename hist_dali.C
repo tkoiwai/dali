@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
 
     //+===== ADD BACK ============================================================
     int       DALI_NClust                                 = 0;
-    Double_t  addbackThreshold                            = 300.;  //! keV
+    Double_t  addbackThreshold                            = 200.;  //! keV
     const int NUMBEROFDALICRYSTALS                        = 226;
     bool      crystalUsedForAddback[NUMBEROFDALICRYSTALS] = {false};
     double    DUMM_Energy[NUMBEROFDALICRYSTALS]           = {sqrt(-1.)};
