@@ -409,8 +409,12 @@ int main(int argc, char *argv[]) {
             if(dali_multi < 4)
               hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
 
-            if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
-              h_minoseff_50ar->Fill(dali_edop_simple->at(j));
+            if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160) {
+              if(PIDgates[1])
+                h_minoseff_50ar->Fill(dali_edop_simple->at(j));
+              if(PIDgates[0])
+                h_minoseff_53ca->Fill(dali_edop_simple->at(j));
+            }
           }
         }
 
