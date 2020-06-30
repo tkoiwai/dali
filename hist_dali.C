@@ -363,14 +363,14 @@ int main(int argc, char *argv[]) {
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== DEBUG =====
-    if(dali_edop->size() != dali_edop_simple->size()) {
-      cout << "dali_edop->size()!= dali_edop_simple->size()" << endl;
-      exit(EXIT_FAILURE);
-    }
-    if(dali_edop_ab->size() != dali_edop_simple_ab->size()) {
-      cout << "dali_edop_ab->size()!= dali_edop_simple_ab->size()" << endl;
-      exit(EXIT_FAILURE);
-    }
+    //if(dali_edop->size() != dali_edop_simple->size()) {
+    //  cout << "dali_edop->size()!= dali_edop_simple->size()" << endl;
+    //  exit(EXIT_FAILURE);
+    //}
+    //if(dali_edop_ab->size() != dali_edop_simple_ab->size()) {
+    //  cout << "dali_edop_ab->size()!= dali_edop_simple_ab->size()" << endl;
+    //  exit(EXIT_FAILURE);
+    //}
 
     //+===== FILL HIST ==============================================================================
 
@@ -386,77 +386,77 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < 11; i++) {
       if(PIDgates[i]) {
         for(unsigned int j = 0; j < dali_edop->size(); j++) {
-          hdop[i * 10]->Fill(dali_edop->at(j));
-          hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
-          if(dali_multi == 1)
-            hdop[i * 10 + 1]->Fill(dali_edop->at(j));
-          if(dali_multi == 2)
-            hdop[i * 10 + 2]->Fill(dali_edop->at(j));
-          if(dali_multi == 3)
-            hdop[i * 10 + 3]->Fill(dali_edop->at(j));
-          if(dali_multi < 4)
-            hdop[i * 10 + 4]->Fill(dali_edop->at(j));
-        }
+          if(-5 < dali_t->at(j) && dali_t->at(j) < 15) {
+            hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
+            hdop[i * 10]->Fill(dali_edop->at(j));
+            if(dali_multi == 1)
+              hdop[i * 10 + 1]->Fill(dali_edop->at(j));
+            if(dali_multi == 2)
+              hdop[i * 10 + 2]->Fill(dali_edop->at(j));
+            if(dali_multi == 3)
+              hdop[i * 10 + 3]->Fill(dali_edop->at(j));
+            if(dali_multi < 4)
+              hdop[i * 10 + 4]->Fill(dali_edop->at(j));
 
-        for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
-          hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
-          if(dali_multi == 1)
-            hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(j));
-          if(dali_multi == 2)
-            hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(j));
-          if(dali_multi == 3)
-            hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
-          if(dali_multi < 4)
-            hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
+            hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
+            if(dali_multi == 1)
+              hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(j));
+            if(dali_multi == 2)
+              hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(j));
+            if(dali_multi == 3)
+              hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
+            if(dali_multi < 4)
+              hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
+
+            if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
+              h_minoseff_50ar->Fill(dali_edop_simple->at(j));
+          }
         }
 
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
-          hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 1)
-            hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 2)
-            hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 3)
-            hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab < 4)
-            hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
-        }
+          if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < 15) {
+            hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
+            if(dali_multi_ab == 1)
+              hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
+            if(dali_multi_ab == 2)
+              hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
+            if(dali_multi_ab == 3)
+              hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
+            if(dali_multi_ab < 4)
+              hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
 
-        for(unsigned int j = 0; j < dali_edop_simple_ab->size(); j++) {
-          hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
-          if(dali_multi_ab == 1)
-            hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
-          if(dali_multi_ab == 2)
-            hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(j));
-          if(dali_multi_ab == 3)
-            hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(j));
-          if(dali_multi_ab < 4)
-            hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
+            hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
+            if(dali_multi_ab == 1)
+              hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
+            if(dali_multi_ab == 2)
+              hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(j));
+            if(dali_multi_ab == 3)
+              hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(j));
+            if(dali_multi_ab < 4)
+              hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
+          }
         }
       }
     }
 
-    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-      hdopsimple[30]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[31]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[32]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[33]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[34]->Fill(dali_edop_simple->at(0));
-
-      if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
-        h_minoseff_50ar->Fill(dali_edop_simple->at(0));
-    }
+    //if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+    //  hdopsimple[30]->Fill(dali_edop_simple->at(0));
+    //  if(dali_multi == 1)
+    //    hdopsimple[31]->Fill(dali_edop_simple->at(0));
+    //  if(dali_multi == 2)
+    //    hdopsimple[32]->Fill(dali_edop_simple->at(0));
+    //  if(dali_multi == 3)
+    //    hdopsimple[33]->Fill(dali_edop_simple->at(0));
+    //  if(dali_multi < 4)
+    //    hdopsimple[34]->Fill(dali_edop_simple->at(0));
+    //}
 
   }  //-while loop
 
   std::clog << std::endl;
 
-  //+===== Write to the output file
+  //+===== Write to the output file =====
   outfile->cd();
 
   for(int i = 0; i < 110; i++)
@@ -478,7 +478,7 @@ int main(int argc, char *argv[]) {
   outfile->Write();
   outfile->Close("R");
 
-  //+===== Delete vectors
+  //+===== Delete vectors =====
 
   delete dali_e;
   delete dali_t;
