@@ -362,6 +362,16 @@ int main(int argc, char *argv[]) {
 
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
+    //+===== DEBUG =====
+    if(dali_edop->size() != dali_edop_simple->size()) {
+      cout << "dali_edop->size()!= dali_edop_simple->size()" << endl;
+      exit(EXIT_FAILURE);
+    }
+    if(dali_edop_ab->size() != dali_edop_simple_ab->size()) {
+      cout << "dali_edop_ab->size()!= dali_edop_simple_ab->size()" << endl;
+      exit(EXIT_FAILURE);
+    }
+
     //+===== FILL HIST ==============================================================================
 
     h_dalit->Fill(dali_t->at(0));
@@ -389,18 +399,6 @@ int main(int argc, char *argv[]) {
             hdop[i * 10 + 4]->Fill(dali_edop->at(j));
         }
 
-        for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
-          hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 1)
-            hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 2)
-            hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab == 3)
-            hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
-          if(dali_multi_ab < 4)
-            hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
-        }
-
         for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
           hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
           if(dali_multi == 1)
@@ -411,6 +409,18 @@ int main(int argc, char *argv[]) {
             hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
           if(dali_multi < 4)
             hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
+        }
+
+        for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
+          hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
+          if(dali_multi_ab == 1)
+            hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
+          if(dali_multi_ab == 2)
+            hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
+          if(dali_multi_ab == 3)
+            hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
+          if(dali_multi_ab < 4)
+            hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
         }
 
         for(unsigned int j = 0; j < dali_edop_simple_ab->size(); j++) {
