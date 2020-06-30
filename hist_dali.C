@@ -106,21 +106,11 @@ int main(int argc, char *argv[]) {
   //- done in header
 
   //+===== LOAD CUTS =====================================================================
-  //TFile *fcutBR_Sc       = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_Sc.root");
-  //TFile *fcutBR_51K      = TFile::Open("/home/koiwai/analysis/cutfiles/cutBR_51K.root");
 
   TFile *fcutSA_Ca_MINOS = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca_wMINOS.root");
   TFile *fcutSA_Ca       = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_Ca.root");
   TFile *fcutSA_K        = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_K.root");
   TFile *fcutSA_50Ar     = TFile::Open("/home/koiwai/analysis/cutfiles/cutSA_50Ar.root");
-
-  //TCutG *cbr54sc = (TCutG *)fcutBR_Sc->Get("br54sc");
-  //TCutG *cbr55sc = (TCutG *)fcutBR_Sc->Get("br55sc");
-  //TCutG *cbr56sc = (TCutG *)fcutBR_Sc->Get("br56sc");
-  //TCutG *cbr57sc = (TCutG *)fcutBR_Sc->Get("br57sc");
-  //TCutG *cbr58sc = (TCutG *)fcutBR_Sc->Get("br58sc");
-  //TCutG *cbr59sc = (TCutG *)fcutBR_Sc->Get("br59sc");
-  //TCutG *cbr51k  = (TCutG *)fcutBR_51K->Get("br51k");
 
   TCutG *csa53ca_minos = (TCutG *)fcutSA_Ca_MINOS->Get("csa53ca_wminos");
   TCutG *csa57ca       = (TCutG *)fcutSA_Ca->Get("sa57ca");
@@ -131,27 +121,6 @@ int main(int argc, char *argv[]) {
   TCutG *csa50ar       = (TCutG *)fcutSA_50Ar->Get("sa50ar");
 
   //+===== DEFINE HIST ====================================================================
-  //char *cnamebr[10] = {(char *)"br54ca",
-  //                     (char *)"br56ca",
-  //                     (char *)"br56ca",
-  //                     (char *)"br56sc",
-  //                     (char *)"br58sc",
-  //                     (char *)"br59sc",
-  //                     (char *)"br51k",
-  //                     (char *)"",
-  //                     (char *)"",
-  //                     (char *)""};
-  //
-  //char *cnamesa[10] = {(char *)"sa53ca",
-  //                     (char *)"sa55ca",
-  //                     (char *)"sa55k",
-  //                     (char *)"sa55ca",
-  //                     (char *)"sa57ca",
-  //                     (char *)"sa57ca",
-  //                     (char *)"sa50ar",
-  //                     (char *)"",
-  //                     (char *)"",
-  //                     (char *)""};
 
   char *cnamech[11] = {(char *)"br54ca_sa53ca",
                        (char *)"br51k_sa50ar",
@@ -195,16 +164,14 @@ int main(int argc, char *argv[]) {
 
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
-          //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
-          //Form("h_edop_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[j]),
+
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
     for(int jj = 0; jj < 10; jj++) {
       hdopsimple[i * 10 + jj] = new TH1F(
-          //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
-          //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
+
           Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
           Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
           4000, 0, 4000);
@@ -476,239 +443,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    /*
-    if(dali_edop->size() > 0) {
-      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-        hdop[0]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[1]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[2]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[3]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[4]->Fill(dali_edop->at(0));
-
-        hdop[5]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[6]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[7]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[8]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[9]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
-        hdop[10]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[11]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[12]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[13]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[14]->Fill(dali_edop->at(0));
-
-        hdop[15]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[16]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[17]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[18]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[19]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-        hdop[20]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[21]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[22]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[23]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[24]->Fill(dali_edop->at(0));
-
-        hdop[25]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[26]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[27]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[28]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[29]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
-        hdop[30]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[31]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[32]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[33]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[34]->Fill(dali_edop->at(0));
-
-        hdop[35]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[36]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[37]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[38]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[39]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
-        hdop[40]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[41]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[42]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[43]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[44]->Fill(dali_edop->at(0));
-
-        hdop[45]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[46]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[47]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[48]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[49]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
-        hdop[50]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[51]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[52]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[53]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[54]->Fill(dali_edop->at(0));
-
-        hdop[55]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[56]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[57]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[58]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[59]->Fill(dali_edop_ab->at(0));
-      }
-
-      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-        hdop[60]->Fill(dali_edop->at(0));
-        if(dali_multi == 1)
-          hdop[61]->Fill(dali_edop->at(0));
-        if(dali_multi == 2)
-          hdop[62]->Fill(dali_edop->at(0));
-        if(dali_multi == 3)
-          hdop[63]->Fill(dali_edop->at(0));
-        if(dali_multi < 4)
-          hdop[64]->Fill(dali_edop->at(0));
-
-        hdop[65]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 1)
-          hdop[66]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 2)
-          hdop[67]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab == 3)
-          hdop[68]->Fill(dali_edop_ab->at(0));
-        if(dali_multi_ab < 4)
-          hdop[69]->Fill(dali_edop_ab->at(0));
-      }
-    }
-
-    if(dali_edop_simple->size() > 0) {
-      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-        hdopsimple[0]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[1]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[2]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[3]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[4]->Fill(dali_edop_simple->at(0));
-
-        if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
-          h_minoseff_53ca->Fill(dali_edop_simple->at(0));
-      }
-
-      if(br56ca && csa55ca->IsInside(aoqSA, zetSA)) {
-        hdopsimple[5]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[6]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[7]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[8]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[9]->Fill(dali_edop_simple->at(0));
-      }
-
-      if(br56ca && csa55k->IsInside(aoqSA, zetSA)) {
-        hdopsimple[10]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[11]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[12]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[13]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[14]->Fill(dali_edop_simple->at(0));
-      }
-
-      if(br56sc && csa55ca->IsInside(aoqSA, zetSA)) {
-        hdopsimple[15]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[16]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[17]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[18]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[19]->Fill(dali_edop_simple->at(0));
-      }
-
-      if(br58sc && csa57ca->IsInside(aoqSA, zetSA)) {
-        hdopsimple[20]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[21]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[22]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[23]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[24]->Fill(dali_edop_simple->at(0));
-      }
-
-      if(br59sc && csa57ca->IsInside(aoqSA, zetSA)) {
-        hdopsimple[25]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 1)
-          hdopsimple[26]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 2)
-          hdopsimple[27]->Fill(dali_edop_simple->at(0));
-        if(dali_multi == 3)
-          hdopsimple[28]->Fill(dali_edop_simple->at(0));
-        if(dali_multi < 4)
-          hdopsimple[29]->Fill(dali_edop_simple->at(0));
-      }
-*/
     if(dali_edop_simple->size() > 0) {
       if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
         hdopsimple[30]->Fill(dali_edop_simple->at(0));
