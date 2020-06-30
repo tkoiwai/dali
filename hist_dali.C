@@ -445,18 +445,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    //if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-    //  hdopsimple[30]->Fill(dali_edop_simple->at(0));
-    //  if(dali_multi == 1)
-    //    hdopsimple[31]->Fill(dali_edop_simple->at(0));
-    //  if(dali_multi == 2)
-    //    hdopsimple[32]->Fill(dali_edop_simple->at(0));
-    //  if(dali_multi == 3)
-    //    hdopsimple[33]->Fill(dali_edop_simple->at(0));
-    //  if(dali_multi < 4)
-    //    hdopsimple[34]->Fill(dali_edop_simple->at(0));
-    //}
-
   }  //-while loop
 
   std::clog << std::endl;
