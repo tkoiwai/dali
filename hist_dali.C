@@ -180,19 +180,19 @@ int main(int argc, char *argv[]) {
   TH1F *h_minoseff_53ca[2];
 
   h_minoseff_50ar[0] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_wo-vertex",
+      "h_edop_simple_br51k_sa50ar_all_wovertex",
       "50Ar: MINOS effciency (simple edop)",
       4000, 0, 4000);
   h_minoseff_50ar[1] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_w-vertex",
+      "h_edop_simple_br51k_sa50ar_all_wvertex",
       "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
       4000, 0, 4000);
   h_minoseff_53ca[0] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_wo-vertex",
+      "h_edop_simple_br54ca_sa53ca_all_wovertex",
       "53Ca: MINOS effciency (simple edop)",
       4000, 0, 4000);
   h_minoseff_53ca[1] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_w-vertex",
+      "h_edop_simple_br54ca_sa53ca_all_wvertex",
       "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
       4000, 0, 4000);
 
