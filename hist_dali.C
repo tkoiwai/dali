@@ -201,8 +201,8 @@ int main(int argc, char *argv[]) {
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
-    for(int jj = 0; jj < 5; jj++) {
-      hdopsimple[i * 5 + jj] = new TH1F(
+    for(int jj = 0; jj < 10; jj++) {
+      hdopsimple[i * 10 + jj] = new TH1F(
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
           //Form("h_edop_simple_%s_%s_%s", cnamebr[i], cnamesa[i], hnames[jj]),
           Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
@@ -416,9 +416,9 @@ int main(int argc, char *argv[]) {
     if(gamma_cos.size() > 0)
       hgamma_cos->Fill(gamma_cos.at(0));
 
-    if(dali_edop->size() > 0) {
-      for(int i = 0; i < 11; i++) {
-        if(PIDgates[i]) {
+    for(int i = 0; i < 11; i++) {
+      if(PIDgates[i]) {
+        if(dali_edop->size() > 0 && dali_t->size() > 0) {
           for(unsigned int j = 0; j < dali_edop->size(); j++) {
             hdop[i * 10]->Fill(dali_edop->at(j));
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
@@ -432,6 +432,8 @@ int main(int argc, char *argv[]) {
             if(dali_multi < 4)
               hdop[i * 10 + 4]->Fill(dali_edop->at(j));
           }
+        }
+        if(dali_edop_ab->size() > 0) {
           for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             if(dali_multi_ab == 1)
@@ -444,12 +446,8 @@ int main(int argc, char *argv[]) {
               hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
           }
         }
-      }
-    }
 
-    if(dali_edop_simple->size() > 0) {
-      for(int i = 0; i < 11; i++) {
-        if(PIDgates[i]) {
+        if(dali_edop_simple->size() > 0) {
           for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
             hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 1)
@@ -461,6 +459,8 @@ int main(int argc, char *argv[]) {
             if(dali_multi < 4)
               hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
           }
+        }
+        if(dali_edop_simple_ab->size() > 0) {
           for(unsigned int j = 0; j < dali_edop_simple_ab->size(); j++) {
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab == 1)
@@ -731,9 +731,9 @@ int main(int argc, char *argv[]) {
   //+===== Write to the output file
   outfile->cd();
 
-  for(int i = 0; i < 70; i++)
+  for(int i = 0; i < 110; i++)
     hdop[i]->Write();
-  for(int i = 0; i < 35; i++)
+  for(int i = 0; i < 110; i++)
     hdopsimple[i]->Write();
   hMINOSZ->Write();
   hbeta_vertex->Write();
@@ -742,6 +742,10 @@ int main(int argc, char *argv[]) {
   h_minoseff_53ca->Write();
   h_dalit->Write();
   h_dalit_all->Write();
+  for(int i = 0; i < 11; i++) {
+    hdoptime[i]->Write();
+    hdopmult[i]->Write();
+  }
 
   outfile->Write();
   outfile->Close("R");
