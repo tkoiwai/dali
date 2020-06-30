@@ -709,21 +709,22 @@ int main(int argc, char *argv[]) {
           hdopsimple[29]->Fill(dali_edop_simple->at(0));
       }
 */
-    if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-      hdopsimple[30]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 1)
-        hdopsimple[31]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 2)
-        hdopsimple[32]->Fill(dali_edop_simple->at(0));
-      if(dali_multi == 3)
-        hdopsimple[33]->Fill(dali_edop_simple->at(0));
-      if(dali_multi < 4)
-        hdopsimple[34]->Fill(dali_edop_simple->at(0));
+    if(dali_edop_simple->size() > 0) {
+      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+        hdopsimple[30]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 1)
+          hdopsimple[31]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 2)
+          hdopsimple[32]->Fill(dali_edop_simple->at(0));
+        if(dali_multi == 3)
+          hdopsimple[33]->Fill(dali_edop_simple->at(0));
+        if(dali_multi < 4)
+          hdopsimple[34]->Fill(dali_edop_simple->at(0));
 
-      if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
-        h_minoseff_50ar->Fill(dali_edop_simple->at(0));
+        if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
+          h_minoseff_50ar->Fill(dali_edop_simple->at(0));
+      }
     }
-
   }  //-while loop
 
   std::clog << std::endl;
