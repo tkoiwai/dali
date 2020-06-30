@@ -368,12 +368,8 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    if(dali_multi != dali_edop->size()) {
-      cout << "dali_multi != dali_edopsize" << endl;
-      exit(EXIT_FAILURE);
-    }
-    if(dali_multi_ab != dali_edop_ab->size()) {
-      cout << "dali_multi_ab != dali_edop_ab.size" << endl;
+    if(dali_multi == 0 && dali_multi_ab > 0) {
+      cout << "fail" << endl;
       exit(EXIT_FAILURE);
     }
 
