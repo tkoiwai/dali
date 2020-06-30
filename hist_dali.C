@@ -363,11 +363,10 @@ int main(int argc, char *argv[]) {
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
-    //if(dali_t->size() > 0) {
+
     h_dalit->Fill(dali_t->at(0));
     for(int i = 0; i < dali_multi; i++)
       h_dalit_all->Fill(dali_t->at(i));
-    //}
 
     hMINOSZ->Fill(MINOS_Z_cor);
     hbeta_vertex->Fill(beta_vertex);
@@ -376,7 +375,6 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < 11; i++) {
       if(PIDgates[i]) {
-        //  if(dali_edop->size() > 0 && dali_t->size() > 0) {
         for(unsigned int j = 0; j < dali_edop->size(); j++) {
           hdop[i * 10]->Fill(dali_edop->at(j));
           hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
@@ -390,8 +388,7 @@ int main(int argc, char *argv[]) {
           if(dali_multi < 4)
             hdop[i * 10 + 4]->Fill(dali_edop->at(j));
         }
-        //}
-        //if(dali_edop_ab->size() > 0) {
+
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {
           hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
           if(dali_multi_ab == 1)
@@ -403,9 +400,7 @@ int main(int argc, char *argv[]) {
           if(dali_multi_ab < 4)
             hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
         }
-        //}
 
-        //if(dali_edop_simple->size() > 0) {
         for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
           hdopsimple[i * 10]->Fill(dali_edop_simple->at(j));
           if(dali_multi == 1)
@@ -417,8 +412,7 @@ int main(int argc, char *argv[]) {
           if(dali_multi < 4)
             hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
         }
-        //}
-        //if(dali_edop_simple_ab->size() > 0) {
+
         for(unsigned int j = 0; j < dali_edop_simple_ab->size(); j++) {
           hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
           if(dali_multi_ab == 1)
@@ -430,11 +424,9 @@ int main(int argc, char *argv[]) {
           if(dali_multi_ab < 4)
             hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
         }
-        //}
       }
     }
 
-    //if(dali_edop_simple->size() > 0) {
     if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
       hdopsimple[30]->Fill(dali_edop_simple->at(0));
       if(dali_multi == 1)
@@ -449,7 +441,7 @@ int main(int argc, char *argv[]) {
       if(MINOS_Z_cor > -10 && MINOS_Z_cor < 160)
         h_minoseff_50ar->Fill(dali_edop_simple->at(0));
     }
-    //}
+
   }  //-while loop
 
   std::clog << std::endl;
