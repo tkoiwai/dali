@@ -368,6 +368,15 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    if(dali_multi != dali_edop->size()) {
+      cout << "dali_multi != dali_edopsize" << endl;
+      exit(EXIT_FAILURE);
+    }
+    if(dali_multi_ab != dali_edop_ab->size()) {
+      cout << "dali_multi_ab != dali_edop_ab.size" << endl;
+      exit(EXIT_FAILURE);
+    }
+
     //-===== SIMPLE DOPPLER CORRECTION END =====
 
     //+===== FILL HIST ==============================================================================
