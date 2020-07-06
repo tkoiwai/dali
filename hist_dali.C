@@ -176,24 +176,32 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  TH1F *h_minoseff_50ar[2];
-  TH1F *h_minoseff_53ca[2];
+  TH1F *h_minoseff_50ar[3];
+  TH1F *h_minoseff_53ca[3];
 
   h_minoseff_50ar[0] = new TH1F(
       "h_edop_simple_br51k_sa50ar_all_wovertex",
       "50Ar: MINOS effciency (simple edop)",
       4000, 0, 4000);
   h_minoseff_50ar[1] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_wvertex",
-      "50Ar: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
+      "h_edop_simple_br51k_sa50ar_all_wallvertex",
+      "50Ar: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
+      4000, 0, 4000);
+  h_minoseff_50ar[2] = new TH1F(
+      "h_edop_simple_br51k_sa50ar_all_w1or2vertex",
+      "50Ar: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
       4000, 0, 4000);
   h_minoseff_53ca[0] = new TH1F(
       "h_edop_simple_br54ca_sa53ca_all_wovertex",
       "53Ca: MINOS effciency (simple edop)",
       4000, 0, 4000);
   h_minoseff_53ca[1] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_wvertex",
-      "53Ca: MINOS effciency (simple edop plus MINOS vertex reco.ed)",
+      "h_edop_simple_br54ca_sa53ca_all_wallvertex",
+      "53Ca: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
+      4000, 0, 4000);
+  h_minoseff_53ca[2] = new TH1F(
+      "h_edop_simple_br54ca_sa53ca_all_w1or2vertex",
+      "53Ca: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
       4000, 0, 4000);
 
   TH1F *h_dalit     = new TH1F("h_dalit", "DALI time of first hit", 300, -50, 50);
@@ -285,7 +293,7 @@ int main(int argc, char *argv[]) {
 
     //+===== ADD BACK ============================================================
     int       DALI_NClust                                 = 0;
-    Double_t  addbackThreshold                            = 200.;  //! keV
+    Double_t  addbackThreshold                            = 150.;  //! keV
     const int NUMBEROFDALICRYSTALS                        = 226;
     bool      crystalUsedForAddback[NUMBEROFDALICRYSTALS] = {false};
     double    DUMM_Energy[NUMBEROFDALICRYSTALS]           = {sqrt(-1.)};
@@ -312,7 +320,7 @@ int main(int argc, char *argv[]) {
           if(crystalUsedForAddback[k] == true)
             continue;
           TVector3 dali_pos_tmp(dali_x->at(j) - dali_x->at(k), dali_y->at(j) - dali_y->at(k), dali_z->at(j) - dali_z->at(k));
-          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold) {
+          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold) {  //TODO apply Time gate here
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
             crystalUsedForAddback[k] = true;
           }
@@ -399,11 +407,15 @@ int main(int argc, char *argv[]) {
         h_minoseff_50ar[0]->Fill(dali_edop_simple->at(j));
         if(MINOS_NumberTracks > 0)
           h_minoseff_50ar[1]->Fill(dali_edop_simple->at(j));
+        if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
+          h_minoseff_50ar[2]->Fill(dali_edop_simple->at(j));
       }
       if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
         h_minoseff_53ca[0]->Fill(dali_edop_simple->at(j));
         if(MINOS_NumberTracks > 0)
           h_minoseff_53ca[1]->Fill(dali_edop_simple->at(j));
+        if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
+          h_minoseff_53ca[2]->Fill(dali_edop_simple->at(j));
       }
     }
 
@@ -484,7 +496,7 @@ int main(int argc, char *argv[]) {
   hbeta_vertex->Write();
   hgamma_cos->Write();
   hNumTracks->Write();
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < 3; i++) {
     h_minoseff_50ar[i]->Write();
     h_minoseff_53ca[i]->Write();
   }
