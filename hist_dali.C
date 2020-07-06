@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
           if(crystalUsedForAddback[k] == true)
             continue;
           TVector3 dali_pos_tmp(dali_x->at(j) - dali_x->at(k), dali_y->at(j) - dali_y->at(k), dali_z->at(j) - dali_z->at(k));
-          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold && (-5 < dali_t->at(k) && dali_t->at(k) < 10)) {  //TODO apply Time gate here
+          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold && (-5 < dali_t->at(k) && dali_t->at(k) < 5)) {  //TODO apply Time gate here
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
             crystalUsedForAddback[k] = true;
           }
@@ -424,7 +424,7 @@ int main(int argc, char *argv[]) {
         for(unsigned int j = 0; j < dali_edop->size(); j++) {  //+ w/o Addback
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
 
-          if(-5 < dali_t->at(j) && dali_t->at(j) < 10) {
+          if(-5 < dali_t->at(j) && dali_t->at(j) < 5) {
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
 
             hdop[i * 10 + 0]->Fill(dali_edop->at(j));
@@ -457,7 +457,7 @@ int main(int argc, char *argv[]) {
         }
 
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
-          if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < 10) {
+          if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < 5) {
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
             if(dali_multi_ab == 1) {
