@@ -434,6 +434,9 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < 11; i++) {
       if(PIDgates[i]) {
+        hbetaF7F13[i]->Fill(betaF7F13);
+        hzvertex[i]->Fill(MINOS_Z_cor);
+
         for(unsigned int j = 0; j < dali_edop->size(); j++) {  //+ w/o Addback
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
 
@@ -510,6 +513,10 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < 11; i++) {
     hdoptime[i]->Write();
     hdopmult[i]->Write();
+  }
+  for(int i = 0; i < 11; i++) {
+    hbetaF7F13[i]->Write();
+    hzvertex[i]->Write();
   }
 
   outfile->Write();
