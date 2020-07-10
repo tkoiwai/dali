@@ -17,7 +17,6 @@ int main(int argc, char *argv[]) {
       {"ab", required_argument, NULL, 'a'},
       {"eventnumber", required_argument, NULL, 'e'},
       {"runnumber", required_argument, NULL, 'r'},
-
       {"testmode", no_argument, NULL, 't'},
       {0, 0, 0, 0},
   };
@@ -333,7 +332,7 @@ int main(int argc, char *argv[]) {
           if(crystalUsedForAddback[k] == true)
             continue;
           TVector3 dali_pos_tmp(dali_x->at(j) - dali_x->at(k), dali_y->at(j) - dali_y->at(k), dali_z->at(j) - dali_z->at(k));
-          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold && (-5 < dali_t->at(k) && dali_t->at(k) < 3)) {  //TODO apply Time gate here
+          if(dali_pos_tmp.Mag() < addbackRadius && dali_e->at(k) > addbackThreshold && (-5 < dali_t->at(k) && dali_t->at(k) < 3)) {
             DUMM_Energy[DALI_NClust] += dali_e->at(k);
             crystalUsedForAddback[k] = true;
           }
