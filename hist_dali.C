@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
     hbetaF7F13[i] = new TH1F(
         Form("h_betaF7F13_%s", cnamech[i]),
         Form("h_betaF7F13_%s", cnamech[i]),
-        100, 0.3, 0.8);
+        500, 0.3, 0.8);
     hzvertex[i] = new TH1F(
         Form("h_zvertex_%s", cnamech[i]),
         Form("h_zvertex_%s", cnamech[i]),
