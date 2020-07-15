@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   int opt;
   int longindex;
 
-  while((opt = getopt_long(argc, argv, "a:tr:e:", longopts, &longindex)) != -1) {
+  while((opt = getopt_long(argc, argv, "a:tr:e:u:", longopts, &longindex)) != -1) {
     switch(opt) {
       case 'a':
         addback_flag  = true;
