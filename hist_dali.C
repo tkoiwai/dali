@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   }
 
   if(argc == 1) {
-    printf("\nUsage: ./hist_dali -r <run number> -e <max event number to treat> -t (to activate test mode)\n \n");
+    printf("\nUsage: ./hist_dali \n -r <run number> \n -e <max event number to treat> \n -t (to activate test mode)\n -a <addback radius>\n -u <time gate upper limit> \n");
     exit(EXIT_FAILURE);
   }
 
@@ -491,7 +491,7 @@ int main(int argc, char *argv[]) {
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
 
             hdopggcoin[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(j));
-            if(dali_multi > 2 && j == 0) {
+            if(dali_multi_ab > 2 && j == 0) {
               hdopggsym[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(1));
               hdopggsym[i]->Fill(dali_edop_ab->at(1), dali_edop_ab->at(0));
             }
