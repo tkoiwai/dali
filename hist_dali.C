@@ -153,8 +153,12 @@ int main(int argc, char *argv[]) {
   TH1F *hdop[110];
   TH1F *hdopsimple[110];
 
+  TH2F *hdopggcoin[11];
+  TH2F *hdopggsym[11];
+
   TH2F *hdopmult[11];
   TH2F *hdoptime[11];
+  TH2F *hdopID[11];
 
   TH1F *hbetaF7F13[11];
   TH1F *hzvertex[11];
@@ -170,18 +174,32 @@ int main(int argc, char *argv[]) {
         Form("DALI_Time vs Doppler corrected E (%s)", cnamech[i]),
         300, -50, 50, 4000, 0, 4000);
 
+    hdopID[i] = new TH2F(
+        Form("h_edopID_%s", cnamech[i]),
+        Form("DALI ID vs Doppler corrected E (%s)", cnamech[i]),
+        230, 0, 230, 4000, 0, 4000);
+
     for(int j = 0; j < 10; j++) {
       hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
-    }
-    for(int jj = 0; jj < 10; jj++) {
-      hdopsimple[i * 10 + jj] = new TH1F(
-          Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
-          Form("h_edop_simple_%s_%s", cnamech[i], hnames[jj]),
+
+      hdopsimple[i * 10 + j] = new TH1F(
+          Form("h_edop_simple_%s_%s", cnamech[i], hnames[j]),
+          Form("h_edop_simple_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
     }
+
+    hdopggcoin[i] = new TH2F(
+        Form("h_edop_ggcoin_%s", cnamech[i]),
+        Form("GG coin: First hit vs else (%s)", cnamech[i]),
+        4000, 0, 4000, 4000, 0, 4000);
+
+    hdopggsym[i] = new TH2F(
+        Form("h_edop_ggsym_%s", cnamech[i]),
+        Form("GG coin: G1&G2 vs G2&G1 (%s)", cnamech[i]),
+        4000, 0, 4000, 4000, 0, 4000);
 
     hbetaF7F13[i] = new TH1F(
         Form("h_betaF7F13_%s", cnamech[i]),
@@ -443,10 +461,8 @@ int main(int argc, char *argv[]) {
 
         for(unsigned int j = 0; j < dali_edop->size(); j++) {  //+ w/o Addback
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
-
           if(-5 < dali_t->at(j) && dali_t->at(j) < DALITimegateUp) {
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
-
             hdop[i * 10 + 0]->Fill(dali_edop->at(j));
             hdopsimple[i * 10 + 0]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 1) {
@@ -470,8 +486,15 @@ int main(int argc, char *argv[]) {
 
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
           if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < DALITimegateUp) {
+            hdopID[i]->Fill(dali_id, dali_edop_ab->at(j));
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
+
+            hdopggcoin[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(j));
+            if(dali_multi > 2 && j == 0) {
+              hdopggsym[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(1));
+              hdopggsym[i]->Fill(dali_edop_ab->at(1), dali_edop_ab->at(0));
+            }
             if(dali_multi_ab == 1) {
               hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
               hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
@@ -517,6 +540,9 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < 11; i++) {
     hdoptime[i]->Write();
     hdopmult[i]->Write();
+    hdopID[i]->Write();
+    hdopggcoin[i]->Write();
+    hdopggsym[i]->Write();
   }
   for(int i = 0; i < 11; i++) {
     hbetaF7F13[i]->Write();
