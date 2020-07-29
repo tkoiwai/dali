@@ -486,7 +486,7 @@ int main(int argc, char *argv[]) {
 
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
           if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < DALITimegateUp) {
-            hdopID[i]->Fill(dali_id, dali_edop_ab->at(j));
+            hdopID[i]->Fill(dali_id->at(j), dali_edop_ab->at(j));
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
 
