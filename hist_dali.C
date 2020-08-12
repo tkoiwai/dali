@@ -375,6 +375,17 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    if(dali_multi_ab > 1) {
+      SortDaliHit(0, dali_multi_ab - 1,
+                  dali_id_ab,
+                  dali_e_ab,
+                  dali_t_ab,
+                  dali_x_ab,
+                  dali_y_ab,
+                  dali_z_ab,
+                  dali_cos_ab);
+    }
+
     //-===== ADD BACK END =====
 
     //? if(!goodEvt) continue;
@@ -486,11 +497,11 @@ int main(int argc, char *argv[]) {
 
         for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
           if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < DALITimegateUp) {
-            hdopID[i]->Fill(dali_id->at(j), dali_edop_ab->at(j));
+            hdopID[i]->Fill(dali_id_ab->at(j), dali_edop_ab->at(j));
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
-
-            hdopggcoin[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(j));
+            if(j != 0)
+              hdopggcoin[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(j));
             if(dali_multi_ab > 2 && j == 0) {
               hdopggsym[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(1));
               hdopggsym[i]->Fill(dali_edop_ab->at(1), dali_edop_ab->at(0));
