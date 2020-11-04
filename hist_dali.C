@@ -151,6 +151,7 @@ int main(int argc, char *argv[]) {
                       (char *)"mle4_ab"};
 
   TH1F *hdop[110];
+  TH1F *hdopafter[110];
   TH1F *hdopsimple[110];
 
   TH2F *hdopggcoin[11];
@@ -181,9 +182,13 @@ int main(int argc, char *argv[]) {
         230, 0, 230, 4000, 0, 4000);
 
     for(int j = 0; j < 10; j++) {
-      hdop[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
+      hdop[i * 10 + j]      = new TH1F(  //TODO histo number to be re-considered
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
           Form("h_edop_%s_%s", cnamech[i], hnames[j]),
+          4000, 0, 4000);
+      hdopafter[i * 10 + j] = new TH1F(  //TODO histo number to be re-considered
+          Form("h_edopafter_%s_%s", cnamech[i], hnames[j]),
+          Form("h_edopafter_%s_%s", cnamech[i], hnames[j]),
           4000, 0, 4000);
 
       hdopsimple[i * 10 + j] = new TH1F(
@@ -404,10 +409,13 @@ int main(int argc, char *argv[]) {
 
     //+===== DOPPLER CORRECTION =====
     if(dali_multi_ab >= 1) {
-      for(Int_t i = 0; i < dali_multi; i++)
+      for(Int_t i = 0; i < dali_multi; i++) {
         dali_edop->push_back(DopplerCorrection(dali_e->at(i), beta_vertex, gamma_cos.at(i)));
+        dali_edopafter->push_back(DopplerCorrection(dali_e->at(i), betaTH, gamma_cos.at(i)));
+      }
       for(Int_t i = 0; i < dali_multi_ab; i++) {
         dali_edop_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex, gamma_cos_ab.at(i)));
+        dali_edopafter_ab->push_back(DopplerCorrection(dali_e_ab->at(i), betaTH, gamma_cos_ab.at(i)));
       }
     }
 
@@ -484,21 +492,26 @@ int main(int argc, char *argv[]) {
           if(-5 < dali_t->at(j) && dali_t->at(j) < DALITimegateUp) {
             hdopmult[i]->Fill(dali_multi, dali_edop->at(j));
             hdop[i * 10 + 0]->Fill(dali_edop->at(j));
+            hdopafter[i * 10 + 0]->Fill(dali_edopafter->at(j));
             hdopsimple[i * 10 + 0]->Fill(dali_edop_simple->at(j));
             if(dali_multi == 1) {
               hdop[i * 10 + 1]->Fill(dali_edop->at(j));
+              hdopafter[i * 10 + 1]->Fill(dali_edopafter->at(j));
               hdopsimple[i * 10 + 1]->Fill(dali_edop_simple->at(j));
             }
             if(dali_multi == 2) {
               hdop[i * 10 + 2]->Fill(dali_edop->at(j));
+              hdopafter[i * 10 + 2]->Fill(dali_edopafter->at(j));
               hdopsimple[i * 10 + 2]->Fill(dali_edop_simple->at(j));
             }
             if(dali_multi == 3) {
               hdop[i * 10 + 3]->Fill(dali_edop->at(j));
+              hdopafter[i * 10 + 3]->Fill(dali_edopafter->at(j));
               hdopsimple[i * 10 + 3]->Fill(dali_edop_simple->at(j));
             }
             if(dali_multi < 4) {
               hdop[i * 10 + 4]->Fill(dali_edop->at(j));
+              hdopafter[i * 10 + 4]->Fill(dali_edopafter->at(j));
               hdopsimple[i * 10 + 4]->Fill(dali_edop_simple->at(j));
             }
           }
@@ -508,6 +521,7 @@ int main(int argc, char *argv[]) {
           if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < DALITimegateUp) {
             hdopID[i]->Fill(dali_id_ab->at(j), dali_edop_ab->at(j));
             hdop[i * 10 + 5]->Fill(dali_edop_ab->at(j));
+            hdopafter[i * 10 + 5]->Fill(dali_edopafter_ab->at(j));
             hdopsimple[i * 10 + 5]->Fill(dali_edop_simple_ab->at(j));
             if(j != 0)
               hdopggcoin[i]->Fill(dali_edop_ab->at(0), dali_edop_ab->at(j));
@@ -517,18 +531,22 @@ int main(int argc, char *argv[]) {
             }
             if(dali_multi_ab == 1) {
               hdop[i * 10 + 6]->Fill(dali_edop_ab->at(j));
+              hdopafter[i * 10 + 6]->Fill(dali_edopafter_ab->at(j));
               hdopsimple[i * 10 + 6]->Fill(dali_edop_simple_ab->at(j));
             }
             if(dali_multi_ab == 2) {
               hdop[i * 10 + 7]->Fill(dali_edop_ab->at(j));
+              hdopafter[i * 10 + 7]->Fill(dali_edopafter_ab->at(j));
               hdopsimple[i * 10 + 7]->Fill(dali_edop_simple_ab->at(j));
             }
             if(dali_multi_ab == 3) {
               hdop[i * 10 + 8]->Fill(dali_edop_ab->at(j));
+              hdopafter[i * 10 + 8]->Fill(dali_edopafter_ab->at(j));
               hdopsimple[i * 10 + 8]->Fill(dali_edop_simple_ab->at(j));
             }
             if(dali_multi_ab < 4) {
               hdop[i * 10 + 9]->Fill(dali_edop_ab->at(j));
+              hdopafter[i * 10 + 9]->Fill(dali_edopafter_ab->at(j));
               hdopsimple[i * 10 + 9]->Fill(dali_edop_simple_ab->at(j));
             }
           }
@@ -543,8 +561,10 @@ int main(int argc, char *argv[]) {
   //+===== Write to the output file =====
   outfile->cd();
 
-  for(int i = 0; i < 110; i++)
+  for(int i = 0; i < 110; i++) {
     hdop[i]->Write();
+    hdopafter[i]->Write();
+  }
   //for(int i = 0; i < 110; i++)
   //  hdopsimple[i]->Write();
   hMINOSZ->Write();
