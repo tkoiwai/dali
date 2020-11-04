@@ -250,6 +250,7 @@ int main(int argc, char *argv[]) {
   TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
   TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
   TH1F *hgamma_cos   = new TH1F("gamma_cos", "gamma_cos", 100, -1.1, 1.1);
+  TH2F *hIDtheta     = new TH2F("h-IDtheta", "DALI ID vs DALI theta", 230, 0, 230, 100, -1.1, 1.1);
   TH1F *hNumTracks   = new TH1F("MINOS_NumberTracks", "MINOS NumberTracks", 10, 0, 10);
 
   //&===== LOOP =========================================================================
@@ -452,6 +453,7 @@ int main(int argc, char *argv[]) {
     if(gamma_cos.size() > 0)
       hgamma_cos->Fill(gamma_cos.at(0));
     hNumTracks->Fill(MINOS_NumberTracks);
+    hIDtheta->Fill(DALI_ID, DALI_Cos);
 
     for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
       if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
@@ -547,6 +549,7 @@ int main(int argc, char *argv[]) {
   hMINOSZ->Write();
   hbeta_vertex->Write();
   hgamma_cos->Write();
+  hIDtheta->Write();
   hNumTracks->Write();
   for(int i = 0; i < 3; i++) {
     h_minoseff_50ar[i]->Write();
