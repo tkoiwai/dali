@@ -303,6 +303,7 @@ int main(int argc, char *argv[]) {
 
     //+===== INIT ==================================================================
     dali_edop->clear();
+    dali_edopafter->clear();
     dali_edop_simple->clear();
     dali_edop_beta->clear();
     dali_edop_theta->clear();
@@ -317,6 +318,7 @@ int main(int argc, char *argv[]) {
     dali_multi_ab = 0;
 
     dali_edop_ab->clear();
+    dali_edopafter_ab->clear();
     dali_edop_simple_ab->clear();
     dali_edop_beta_ab->clear();
     dali_edop_theta_ab->clear();
@@ -605,6 +607,7 @@ int main(int argc, char *argv[]) {
   delete dali_id;
 
   delete dali_edop;
+  delete dali_edopafter;
   delete dali_edop_simple;
   delete dali_edop_beta;
   delete dali_edop_theta;
@@ -618,6 +621,7 @@ int main(int argc, char *argv[]) {
   delete dali_id_ab;
 
   delete dali_edop_ab;
+  delete dali_edopafter_ab;
   delete dali_edop_simple_ab;
   delete dali_edop_beta_ab;
   delete dali_edop_theta_ab;
