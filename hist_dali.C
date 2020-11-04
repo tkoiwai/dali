@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
   TH1F *hMINOSZ      = new TH1F("MINOS_Z_cor", "MINOS_Z_cor", 250, -50, 200);
   TH1F *hbeta_vertex = new TH1F("beta_vertex", "beta_vertex", 100, 0, 1);
   TH1F *hgamma_cos   = new TH1F("gamma_cos", "gamma_cos", 100, -1.1, 1.1);
-  TH2F *hIDtheta     = new TH2F("h-IDtheta", "DALI ID vs DALI theta", 230, 0, 230, 100, -1.1, 1.1);
+  TH2F *hIDtheta     = new TH2F("h_IDtheta", "DALI ID vs DALI theta", 230, 0, 230, 100, -1.1, 1.1);
   TH1F *hNumTracks   = new TH1F("MINOS_NumberTracks", "MINOS NumberTracks", 10, 0, 10);
 
   //&===== LOOP =========================================================================
@@ -445,15 +445,16 @@ int main(int argc, char *argv[]) {
     //+===== FILL HIST ==============================================================================
 
     h_dalit->Fill(dali_t->at(0));
-    for(int i = 0; i < dali_multi; i++)
+    for(int i = 0; i < dali_multi; i++) {
       h_dalit_all->Fill(dali_t->at(i));
+      hIDtheta->Fill(dali_id->at(i), dali_cos->at(i));
+    }
 
     hMINOSZ->Fill(MINOS_Z_cor);
     hbeta_vertex->Fill(beta_vertex);
     if(gamma_cos.size() > 0)
       hgamma_cos->Fill(gamma_cos.at(0));
     hNumTracks->Fill(MINOS_NumberTracks);
-    hIDtheta->Fill(DALI_ID, DALI_Cos);
 
     for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
       if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
