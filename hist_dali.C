@@ -324,7 +324,9 @@ int main(int argc, char *argv[]) {
     dali_edop_theta_ab->clear();
 
     gamma_cos.clear();
+    gamma_cosafter.clear();
     gamma_cos_ab.clear();
+    gamma_cosafter_ab.clear();
 
     vertex.SetXYZ(Sqrt(-1), Sqrt(-1), Sqrt(-1));
 
@@ -337,6 +339,9 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < dali_multi; i++) {
       TVector3 gamma_pos_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - vertex.Z());
       gamma_cos.push_back(gamma_pos_tmp.CosTheta());
+      TVector3 gamma_posafter_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - 150. - DALIoffset);
+      gamma_cos.push_back(gamma_pos_tmp.CosTheta());
+      gamma_cosafter.push_back(gamma_posafter_tmp.CosTheta());
     }
 
     //+===== ADD BACK ============================================================
@@ -407,17 +412,19 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < dali_multi_ab; i++) {
       TVector3 gamma_pos_ab_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - vertex.Z());
       gamma_cos_ab.push_back(gamma_pos_ab_tmp.CosTheta());
+      TVector3 gamma_posafter_ab_tmp(10 * dali_x->at(i) - MINOS_X, 10 * dali_y->at(i) - MINOS_Y, 10 * dali_z->at(i) - 150. - DALIoffset);
+      gamma_cosafter_ab.push_back(gamma_posafter_ab_tmp.CosTheta());
     }
 
     //+===== DOPPLER CORRECTION =====
     if(dali_multi_ab >= 1) {
       for(Int_t i = 0; i < dali_multi; i++) {
         dali_edop->push_back(DopplerCorrection(dali_e->at(i), beta_vertex, gamma_cos.at(i)));
-        dali_edopafter->push_back(DopplerCorrection(dali_e->at(i), betaTH, gamma_cos.at(i)));
+        dali_edopafter->push_back(DopplerCorrection(dali_e->at(i), betaTH, gamma_cosafter.at(i)));
       }
       for(Int_t i = 0; i < dali_multi_ab; i++) {
         dali_edop_ab->push_back(DopplerCorrection(dali_e_ab->at(i), beta_vertex, gamma_cos_ab.at(i)));
-        dali_edopafter_ab->push_back(DopplerCorrection(dali_e_ab->at(i), betaTH, gamma_cos_ab.at(i)));
+        dali_edopafter_ab->push_back(DopplerCorrection(dali_e_ab->at(i), betaTH, gamma_cosafter_ab.at(i)));
       }
     }
 
@@ -625,6 +632,11 @@ int main(int argc, char *argv[]) {
   delete dali_edop_simple_ab;
   delete dali_edop_beta_ab;
   delete dali_edop_theta_ab;
+
+  delete gamma_cos;
+  delete gamma_cosafter;
+  delete gamma_cos_ab;
+  delete gamma_cosafter_ab;
 
   stop_timer_tk(FileNumber, AllEntry);
 
