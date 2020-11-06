@@ -127,17 +127,25 @@ int main(int argc, char *argv[]) {
 
   //+===== DEFINE HIST ====================================================================
 
-  char *cnamech[11] = {(char *)"br54ca_sa53ca",
-                       (char *)"br51k_sa50ar",
-                       (char *)"br52ca_sa51k",
-                       (char *)"br54ca_sa53k",
-                       (char *)"br56ca_sa55k",
-                       (char *)"br56ca_sa55ca",
-                       (char *)"br56sc_sa55ca",
-                       (char *)"br58sc_sa57ca",
-                       (char *)"br59sc_sa57ca",
-                       (char *)"br59ti_sa57ca",
-                       (char *)"br60ti_sa57ca"};
+  //char *cnamech[11] = {(char *)"br54ca_sa53ca",
+  //                     (char *)"br51k_sa50ar",
+  //                     (char *)"br52ca_sa51k",
+  //                     (char *)"br54ca_sa53k",
+  //                     (char *)"br56ca_sa55k",
+  //                     (char *)"br56ca_sa55ca",
+  //                     (char *)"br56sc_sa55ca",
+  //                     (char *)"br58sc_sa57ca",
+  //                     (char *)"br59sc_sa57ca",
+  //                     (char *)"br59ti_sa57ca",
+  //                     (char *)"br60ti_sa57ca"};
+
+  char *cnamech[5] = {(char *)"br56ca_sa55k",
+                      (char *)"br56ca_sa55ca",
+                      (char *)"br56sc_sa55ca",
+                      (char *)"br58sc_sa57ca",
+                      (char *)"br59sc_sa57ca"};
+
+  int gatenum = 5;
 
   char *hnames[10] = {(char *)"all",
                       (char *)"m1",
@@ -165,7 +173,7 @@ int main(int argc, char *argv[]) {
   TH1F *hbetaTH[11];
   TH1F *hzvertex[11];
 
-  for(int i = 0; i < 11; i++) {
+  for(int i = 0; i < gatenum; i++) {
     hdopmult[i] = new TH2F(
         Form("h_edopmult_%s", cnamech[i]),
         Form("Multiplicity vs Doppler corrected E (%s)", cnamech[i]),
@@ -221,33 +229,40 @@ int main(int argc, char *argv[]) {
         150, 0, 150);
   }
 
-  TH1F *h_minoseff_50ar[3];
-  TH1F *h_minoseff_53ca[3];
+  TH1F *hdopFW[4];
 
-  h_minoseff_50ar[0] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_wovertex",
-      "50Ar: MINOS effciency (simple edop)",
-      4000, 0, 4000);
-  h_minoseff_50ar[1] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_wallvertex",
-      "50Ar: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
-      4000, 0, 4000);
-  h_minoseff_50ar[2] = new TH1F(
-      "h_edop_simple_br51k_sa50ar_all_w1or2vertex",
-      "50Ar: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
-      4000, 0, 4000);
-  h_minoseff_53ca[0] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_wovertex",
-      "53Ca: MINOS effciency (simple edop)",
-      4000, 0, 4000);
-  h_minoseff_53ca[1] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_wallvertex",
-      "53Ca: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
-      4000, 0, 4000);
-  h_minoseff_53ca[2] = new TH1F(
-      "h_edop_simple_br54ca_sa53ca_all_w1or2vertex",
-      "53Ca: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
-      4000, 0, 4000);
+  hdopFW[0] = new TH1F("h_edopFW31_br56ca_sa55ca", " BR56Ca -> SA55Ca (DALI ID > 31)", 4000, 0, 4000);
+  hdopFW[1] = new TH1F("h_edopFW45_br56ca_sa55ca", " BR56Ca -> SA55Ca (DALI ID > 45)", 4000, 0, 4000);
+  hdopFW[2] = new TH1F("h_edopFW67_br56ca_sa55ca", " BR56Ca -> SA55Ca (DALI ID > 67)", 4000, 0, 4000);
+  hdopFW[3] = new TH1F("h_edopFW85_br56ca_sa55ca", " BR56Ca -> SA55Ca (DALI ID > 85)", 4000, 0, 4000);
+
+  //TH1F *h_minoseff_50ar[3];
+  //TH1F *h_minoseff_53ca[3];
+  //
+  //h_minoseff_50ar[0] = new TH1F(
+  //    "h_edop_simple_br51k_sa50ar_all_wovertex",
+  //    "50Ar: MINOS effciency (simple edop)",
+  //    4000, 0, 4000);
+  //h_minoseff_50ar[1] = new TH1F(
+  //    "h_edop_simple_br51k_sa50ar_all_wallvertex",
+  //    "50Ar: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
+  //    4000, 0, 4000);
+  //h_minoseff_50ar[2] = new TH1F(
+  //    "h_edop_simple_br51k_sa50ar_all_w1or2vertex",
+  //    "50Ar: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
+  //    4000, 0, 4000);
+  //h_minoseff_53ca[0] = new TH1F(
+  //    "h_edop_simple_br54ca_sa53ca_all_wovertex",
+  //    "53Ca: MINOS effciency (simple edop)",
+  //    4000, 0, 4000);
+  //h_minoseff_53ca[1] = new TH1F(
+  //    "h_edop_simple_br54ca_sa53ca_all_wallvertex",
+  //    "53Ca: MINOS effciency (simple edop plus all MINOS verteces reco.ed)",
+  //    4000, 0, 4000);
+  //h_minoseff_53ca[2] = new TH1F(
+  //    "h_edop_simple_br54ca_sa53ca_all_w1or2vertex",
+  //    "53Ca: MINOS effciency (simple edop plus 1 or 2 MINOS vertex reco.ed)",
+  //    4000, 0, 4000);
 
   TH1F *h_dalit     = new TH1F("h_dalit", "DALI time of first hit", 300, -50, 50);
   TH1F *h_dalit_all = new TH1F("h_dalit_all", "DALI time of all hits", 300, -50, 50);
@@ -287,18 +302,26 @@ int main(int argc, char *argv[]) {
       continue;
 
     //+===== PID gate ==============================================================
-    bool PIDgates[11] = {
-        br54ca && csa53ca_minos->IsInside(aoqSA, zetSA),
-        br51k && csa50ar->IsInside(aoqSA, zetSA),
-        br52ca && csa51k->IsInside(aoqSA, zetSA),
-        br54ca && csa53k->IsInside(aoqSA, zetSA),
+    //bool PIDgates[11] = {
+    //    br54ca && csa53ca_minos->IsInside(aoqSA, zetSA),
+    //    br51k && csa50ar->IsInside(aoqSA, zetSA),
+    //    br52ca && csa51k->IsInside(aoqSA, zetSA),
+    //    br54ca && csa53k->IsInside(aoqSA, zetSA),
+    //    br56ca && csa55k->IsInside(aoqSA, zetSA),
+    //    br56ca && csa55ca->IsInside(aoqSA, zetSA),
+    //    br56sc && csa55ca->IsInside(aoqSA, zetSA),
+    //    br58sc && csa57ca->IsInside(aoqSA, zetSA),
+    //    br59sc && csa57ca->IsInside(aoqSA, zetSA),
+    //    br59ti && csa57ca->IsInside(aoqSA, zetSA),
+    //    br60ti && csa57ca->IsInside(aoqSA, zetSA),
+    //};
+
+    bool PIDgates[5] = {
         br56ca && csa55k->IsInside(aoqSA, zetSA),
         br56ca && csa55ca->IsInside(aoqSA, zetSA),
         br56sc && csa55ca->IsInside(aoqSA, zetSA),
         br58sc && csa57ca->IsInside(aoqSA, zetSA),
         br59sc && csa57ca->IsInside(aoqSA, zetSA),
-        br59ti && csa57ca->IsInside(aoqSA, zetSA),
-        br60ti && csa57ca->IsInside(aoqSA, zetSA),
     };
 
     //+===== INIT ==================================================================
@@ -473,24 +496,24 @@ int main(int argc, char *argv[]) {
       hgamma_cos->Fill(gamma_cos.at(0));
     hNumTracks->Fill(MINOS_NumberTracks);
 
-    for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
-      if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
-        h_minoseff_50ar[0]->Fill(dali_edop_simple->at(j));
-        if(MINOS_NumberTracks > 0)
-          h_minoseff_50ar[1]->Fill(dali_edop_simple->at(j));
-        if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
-          h_minoseff_50ar[2]->Fill(dali_edop_simple->at(j));
-      }
-      if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
-        h_minoseff_53ca[0]->Fill(dali_edop_simple->at(j));
-        if(MINOS_NumberTracks > 0)
-          h_minoseff_53ca[1]->Fill(dali_edop_simple->at(j));
-        if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
-          h_minoseff_53ca[2]->Fill(dali_edop_simple->at(j));
-      }
-    }
+    //for(unsigned int j = 0; j < dali_edop_simple->size(); j++) {
+    //  if(br51k && csa50ar->IsInside(aoqSA, zetSA)) {
+    //    h_minoseff_50ar[0]->Fill(dali_edop_simple->at(j));
+    //    if(MINOS_NumberTracks > 0)
+    //      h_minoseff_50ar[1]->Fill(dali_edop_simple->at(j));
+    //    if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
+    //      h_minoseff_50ar[2]->Fill(dali_edop_simple->at(j));
+    //  }
+    //  if(br54ca && csa53ca_minos->IsInside(aoqSA, zetSA)) {
+    //    h_minoseff_53ca[0]->Fill(dali_edop_simple->at(j));
+    //    if(MINOS_NumberTracks > 0)
+    //      h_minoseff_53ca[1]->Fill(dali_edop_simple->at(j));
+    //    if(MINOS_NumberTracks == 1 || MINOS_NumberTracks == 2)
+    //      h_minoseff_53ca[2]->Fill(dali_edop_simple->at(j));
+    //  }
+    //}
 
-    for(int i = 0; i < 11; i++) {
+    for(int i = 0; i < gatenum; i++) {
       if(PIDgates[i]) {
         hbetaF7F13[i]->Fill(betaF7F13);
         hbetaTH[i]->Fill(betaTH);
@@ -563,6 +586,21 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    if(PIDgates[1]) {
+      for(unsigned int j = 0; j < dali_edop_ab->size(); j++) {  //+ w/ Addback
+        if(-5 < dali_t_ab->at(j) && dali_t_ab->at(j) < DALITimegateUp) {
+          if(dali_id_ab->at(j) > 31)
+            hdopFW[0]->Fill(dali_edop_ab->at(j));
+          if(dali_id_ab->at(j) > 45)
+            hdopFW[1]->Fill(dali_edop_ab->at(j));
+          if(dali_id_ab->at(j) > 67)
+            hdopFW[2]->Fill(dali_edop_ab->at(j));
+          if(dali_id_ab->at(j) > 85)
+            hdopFW[3]->Fill(dali_edop_ab->at(j));
+        }
+      }
+    }
+
   }  //-while loop
 
   std::clog << std::endl;
@@ -581,10 +619,10 @@ int main(int argc, char *argv[]) {
   hgamma_cos->Write();
   hIDtheta->Write();
   hNumTracks->Write();
-  for(int i = 0; i < 3; i++) {
-    h_minoseff_50ar[i]->Write();
-    h_minoseff_53ca[i]->Write();
-  }
+  //for(int i = 0; i < 3; i++) {
+  //  h_minoseff_50ar[i]->Write();
+  //  h_minoseff_53ca[i]->Write();
+  //}
   h_dalit->Write();
   h_dalit_all->Write();
   for(int i = 0; i < 11; i++) {
@@ -599,7 +637,9 @@ int main(int argc, char *argv[]) {
     hbetaTH[i]->Write();
     hzvertex[i]->Write();
   }
-
+  for(int i = 0; i < 4; i++) {
+    hdopFW[i]->Write();
+  }
   outfile->Write();
   outfile->Close("R");
 
@@ -633,10 +673,10 @@ int main(int argc, char *argv[]) {
   delete dali_edop_beta_ab;
   delete dali_edop_theta_ab;
 
-  delete gamma_cos;
-  delete gamma_cosafter;
-  delete gamma_cos_ab;
-  delete gamma_cosafter_ab;
+  //delete gamma_cos;
+  //delete gamma_cosafter;
+  //delete gamma_cos_ab;
+  //delete gamma_cosafter_ab;
 
   stop_timer_tk(FileNumber, AllEntry);
 
