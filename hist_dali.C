@@ -158,9 +158,13 @@ int main(int argc, char *argv[]) {
                       (char *)"m3_ab",
                       (char *)"mle4_ab"};
 
-  TH1F *hdop[110];
-  TH1F *hdopafter[110];
-  TH1F *hdopsimple[110];
+  //TH1F *hdop[110];
+  //TH1F *hdopafter[110];
+  //TH1F *hdopsimple[110];
+
+  TH1F *hdop[50];
+  TH1F *hdopafter[50];
+  TH1F *hdopsimple[50];
 
   TH2F *hdopggcoin[11];
   TH2F *hdopggsym[11];
@@ -608,10 +612,11 @@ int main(int argc, char *argv[]) {
   //+===== Write to the output file =====
   outfile->cd();
 
-  for(int i = 0; i < 110; i++) {
+  for(int i = 0; i < 50; i++) {
     hdop[i]->Write();
     hdopafter[i]->Write();
   }
+
   //for(int i = 0; i < 110; i++)
   //  hdopsimple[i]->Write();
   hMINOSZ->Write();
@@ -623,16 +628,18 @@ int main(int argc, char *argv[]) {
   //  h_minoseff_50ar[i]->Write();
   //  h_minoseff_53ca[i]->Write();
   //}
+
   h_dalit->Write();
   h_dalit_all->Write();
-  for(int i = 0; i < 11; i++) {
+  for(int i = 0; i < gatenum; i++) {
     hdoptime[i]->Write();
     hdopmult[i]->Write();
     hdopID[i]->Write();
     hdopggcoin[i]->Write();
     hdopggsym[i]->Write();
   }
-  for(int i = 0; i < 11; i++) {
+
+  for(int i = 0; i < gatenum; i++) {
     hbetaF7F13[i]->Write();
     hbetaTH[i]->Write();
     hzvertex[i]->Write();
@@ -640,6 +647,7 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < 4; i++) {
     hdopFW[i]->Write();
   }
+
   outfile->Write();
   outfile->Close("R");
 
