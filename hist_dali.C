@@ -176,6 +176,7 @@ int main(int argc, char *argv[]) {
   TH1F *hbetaF7F13[11];
   TH1F *hbetaTH[11];
   TH1F *hzvertex[11];
+  TH1F *hbetavertex[11];
 
   for(int i = 0; i < gatenum; i++) {
     hdopmult[i] = new TH2F(
@@ -231,6 +232,10 @@ int main(int argc, char *argv[]) {
         Form("h_zvertex_%s", cnamech[i]),
         Form("h_zvertex_%s", cnamech[i]),
         150, 0, 150);
+    hbetavertex[i] = new TH1F(
+        Form("h_betavertex_%s", cnamech[i]),
+        Form("h_betavertex_%s", cnamech[i]),
+        30, 0.4, 0.7);
   }
 
   TH1F *hdopFW[4];
@@ -522,6 +527,7 @@ int main(int argc, char *argv[]) {
         hbetaF7F13[i]->Fill(betaF7F13);
         hbetaTH[i]->Fill(betaTH);
         hzvertex[i]->Fill(MINOS_Z_cor);
+        hbetavertex[i]->Fill(beta_vertex);
 
         for(unsigned int j = 0; j < dali_edop->size(); j++) {  //+ w/o Addback
           hdoptime[i]->Fill(dali_t->at(j), dali_edop->at(j));
@@ -643,6 +649,7 @@ int main(int argc, char *argv[]) {
     hbetaF7F13[i]->Write();
     hbetaTH[i]->Write();
     hzvertex[i]->Write();
+    hbetavertex[i]->Write();
   }
   for(int i = 0; i < 4; i++) {
     hdopFW[i]->Write();
