@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
     hbetavertex[i] = new TH1F(
         Form("h_betavertex_%s", cnamech[i]),
         Form("h_betavertex_%s", cnamech[i]),
-        30, 0.4, 0.7);
+        300, 0.4, 0.7);
   }
 
   TH1F *hdopFW[4];
