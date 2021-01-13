@@ -174,6 +174,9 @@ int main(int argc, char *argv[]) {
   TH1F *hzvertex[11];
   TH1F *hbetavertex[11];
 
+  TH1F *htransbr[11];
+  TH1F *htransbrsa[11];
+
   for(int i = 0; i < gatenum; i++) {
     hdopmult[i] = new TH2F(
         Form("h_edopmult_%s", cnamech[i]),
@@ -232,6 +235,15 @@ int main(int argc, char *argv[]) {
         Form("h_betavertex_%s", cnamech[i]),
         Form("h_betavertex_%s", cnamech[i]),
         30, 0.4, 0.7);
+
+    htransbr[i] = new TH1F(
+        Form("h_trans_BR_%s", cnamech[i]),
+        Form("F5X (gated on BR for %s)", cnamech[i]),
+        100, -150, 150);
+    htransbrsa[i] = new TH1F(
+        Form("h_trans_BRSA_%s", cnamech[i]),
+        Form("F5X (gated on BR and SA for %s)", cnamech[i]),
+        100, -150, 150);
   }
 
   TH1F *hdopFW[4];
@@ -518,6 +530,30 @@ int main(int argc, char *argv[]) {
     //  }
     //}
 
+    if(br56ca->IsInside(aoqBR, zetBR)) {
+      htransbr[0]->Fill(F5X);
+      htransbr[1]->Fill(F5X);
+      if(PIDgate[0])
+        htransbrsa[0]->Fill(F5X);
+      if(PIDgate[1])
+        htransbrsa[1]->Fill(F5X);
+    }
+    if(br56sc->IsInside(aoqBR, zetBR)) {
+      htransbr[2]->Fill(F5X);
+      if(PIDgate[2])
+        htransbrsa[2]->Fill(F5X);
+    }
+    if(br58sc->IsInside(aoqBR, zetBR)) {
+      htransbr[3]->Fill(F5X);
+      if(PIDgate[3])
+        htransbrsa[3]->Fill(F5X);
+    }
+    if(br59sc->IsInside(aoqBR, zetBR)) {
+      htransbr[4]->Fill(F5X);
+      if(PIDgate[4])
+        htransbrsa[4]->Fill(F5X);
+    }
+
     for(int i = 0; i < gatenum; i++) {
       if(PIDgates[i]) {
         hbetaF7F13[i]->Fill(betaF7F13);
@@ -646,6 +682,9 @@ int main(int argc, char *argv[]) {
     hbetaTH[i]->Write();
     hzvertex[i]->Write();
     hbetavertex[i]->Write();
+
+    htransbr[i]->Write();
+    htransbrsa[i]->Write();
   }
   for(int i = 0; i < 4; i++) {
     hdopFW[i]->Write();
