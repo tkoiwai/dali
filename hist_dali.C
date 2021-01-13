@@ -158,10 +158,6 @@ int main(int argc, char *argv[]) {
                       (char *)"m3_ab",
                       (char *)"mle4_ab"};
 
-  //TH1F *hdop[110];
-  //TH1F *hdopafter[110];
-  //TH1F *hdopsimple[110];
-
   TH1F *hdop[50];
   TH1F *hdopafter[50];
   TH1F *hdopsimple[50];
@@ -235,7 +231,7 @@ int main(int argc, char *argv[]) {
     hbetavertex[i] = new TH1F(
         Form("h_betavertex_%s", cnamech[i]),
         Form("h_betavertex_%s", cnamech[i]),
-        300, 0.4, 0.7);
+        30, 0.4, 0.7);
   }
 
   TH1F *hdopFW[4];
